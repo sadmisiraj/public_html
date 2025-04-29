@@ -1,0 +1,23 @@
+{
+    "name": "cost-calculator-builder/cost-calculator-builder-pro",
+    "description": "WP Cost Calculator helps you to build any type of estimation forms on a few easy steps. The plugin offers its own calculation builder",
+    "homepage": "https://stylemixthemes.com/cost-calculator/",
+    "license": "GPL-2.0-or-later",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-zip": "*",
+        "nacmartin/phpexecjs": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "CCBPro\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform-check": false
+    }
+}

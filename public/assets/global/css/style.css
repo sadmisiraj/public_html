@@ -1,0 +1,72 @@
+
+/*----------------------------------------------
+21. Error section start
+----------------------------------------------*/
+.error-section {
+    height: 100vh;
+    width: 100vw;
+    background-color: #F8F8FA;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-section .error-content {
+    color: #26282CFF;
+}
+
+.error-section .error-content .error-title {
+    font-size: 150px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.error-section .error-content .error-info {
+    font-size: 40px;
+    line-height: 1.3;
+}
+.error-section .error-content .error-info.font-30 {
+    font-size: 30px;
+}
+
+.error-section .error-content .btn-area {
+    margin-top: 30px;
+}
+
+.error-section .error-content .btn-area .cmn-btn {
+    text-transform: none;
+}
+
+@media (max-width: 991px) {
+    .error-section {
+        padding: 100px 0;
+    }
+
+    .error-section .error-content .error-title {
+        font-size: 100px;
+    }
+
+    .error-section .error-content .error-info {
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 991px) {
+    .error-section .error-content .error-title {
+        font-size: 60px;
+    }
+
+    .error-section .error-content .error-info {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 575px) {
+    .error-section {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+
