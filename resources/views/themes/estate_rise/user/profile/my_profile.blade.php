@@ -33,6 +33,12 @@
                            href="javascript:void(0)"><i
                                 class="fal fa-key"></i>@lang('Password')</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-target="#tab-rgp"
+                           href="javascript:void(0)"><i
+                                class="fal fa-chart-network"></i>@lang('RGP')</a>
+                    </li>
                     @foreach($kyc as $key => $value)
                         <li class="nav-item">
                             <a class="nav-link {{$errors->has($value->name) || session('kycForm') ==$value->name? 'active':''}} {{session($value->name)?'active':''}}"
@@ -234,6 +240,42 @@
                     </div>
                 </form>
             </div>
+            
+            <div id="tab-rgp" class="tab-content">
+                <div class="account-settings-profile-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">@lang('RGP Details')</h5>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="profile-form-section">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="rgp_l" class="form-label">@lang('RGP L')</label>
+                                        <input type="text" class="form-control" id="rgp_l" value="{{ $user->rgp_l ?? 'N/A' }}" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="rgp_r" class="form-label">@lang('RGP R')</label>
+                                        <input type="text" class="form-control" id="rgp_r" value="{{ $user->rgp_r ?? 'N/A' }}" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="rgp_pair_matching" class="form-label">@lang('RGP Pair Matching')</label>
+                                        <input type="text" class="form-control" id="rgp_pair_matching" value="{{ $user->rgp_pair_matching ?? 'N/A' }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle mr-2"></i> @lang('RGP values can only be updated by administrators.')
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             @forelse($kyc as $kyc_key => $item)
                 <div id="tab-{{$kyc_key}}"
                      class="tab-content {{$errors->has($item->name) || session('kycForm') ==$item->name ?'content':''}}">

@@ -63,14 +63,27 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm($sponsor=null)
     {
-
         $basic = basicControl();
         if ($basic->registration == 0) {
             return redirect('/')->with('warning', 'Registration Has Been Disabled.');
         }
 
+        // Store sponsor in session if provided in URL and it exists
+        $validSponsor = false;
+        $sponsorUser = null;
+        $invalidSponsorLink = false;
+        
         if ($sponsor != null) {
-            session()->put('sponsor', $sponsor);
+            $sponsorUser = User::where('username', $sponsor)->first();
+            if ($sponsorUser) {
+                session()->put('sponsor', $sponsor);
+                $validSponsor = true;
+            } else {
+                // If sponsor from URL is invalid, remove it from session
+                session()->forget('sponsor');
+                $sponsor = null;
+                $invalidSponsorLink = true;
+            }
         }
 
         $seo = Page::where(['slug' => 'registration','template_name' => getTheme()])->firstOrFail();
@@ -87,7 +100,7 @@ class RegisterController extends Controller
                 getFile($seo->breadcrumb_image_driver, $seo->breadcrumb_image) : null,
         ];
 
-        return view(template() . 'auth.register',$data,compact('sponsor'));
+        return view(template() . 'auth.register', $data, compact('sponsor', 'validSponsor', 'sponsorUser', 'invalidSponsorLink'));
     }
 
     /**
@@ -99,7 +112,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $basicControl = basicControl();
-            $phoneCode = isset($data['phone_code']) ? $data['phone_code'] : null;
+        $phoneCode = isset($data['phone_code']) ? $data['phone_code'] : null;
         if ($basicControl->strong_password == 0) {
             $rules['password'] = ['required', 'min:6', 'confirmed'];
         } else {
@@ -117,24 +130,21 @@ class RegisterController extends Controller
         }
 
         if ($basicControl->manual_recaptcha == 1 && $basicControl->manual_recaptcha_user_registration == 1) {
-
             $rules['captcha'] = ['required',
                 Rule::when((!empty($data['captcha']) && strcasecmp(session()->get('captcha'), $_POST['captcha']) != 0), ['confirmed']),
             ];
         }
 
-        $rules['first_name'] = ['required', 'string', 'max:91'];
-        $rules['last_name'] = ['required', 'string', 'max:91'];
-        $rules['username'] = ['required', 'alpha_dash', 'min:5', 'unique:users,username'];
         $rules['email'] = ['required', 'string', 'email', 'max:255',  'unique:users,email'];
         $rules['phone'] = ['required', 'string', 'unique:users,phone', new PhoneLength($phoneCode)];
         $rules['phone_code'] = ['required', 'string', 'max:15'];
         $rules['country'] = ['nullable', 'string', 'max:80'];
         $rules['country_code'] = ['nullable', 'string', 'max:80'];
+        $rules['sponsor'] = ['required'];
+        
         return Validator::make($data, $rules, [
-            'first_name.required' => 'First Name Field is required',
-            'last_name.required' => 'Last Name Field is required',
             'g-recaptcha-response.required' => 'The reCAPTCHA field is required.',
+            'sponsor.required' => 'Referral code is required',
         ]);
     }
 
@@ -147,18 +157,32 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         $basic = basicControl();
-        $sponsor = session()->get('sponsor');
-        if ($sponsor != null) {
-            $sponsorId = User::where('username', $sponsor)->first();
-        } else {
-            $sponsorId = null;
+        $sponsorId = null;
+        
+        // Find referrer by username
+        $sponsor = User::where('username', $data['sponsor'])->first();
+        if ($sponsor) {
+            $sponsorId = $sponsor->id;
         }
+        
+        // Generate a unique username from email
+        $emailParts = explode('@', $data['email']);
+        $username = strtolower($emailParts[0] . rand(100, 999));
+        // Remove spaces and special characters
+        $username = preg_replace('/[^a-zA-Z0-9]/', '', $username);
+        
+        // Check if username already exists and make it unique
+        while (User::where('username', $username)->exists()) {
+            $username = strtolower($emailParts[0] . rand(100, 9999));
+            $username = preg_replace('/[^a-zA-Z0-9]/', '', $username);
+        }
+        
         return User::create([
-            'firstname' => $data['first_name'],
-            'lastname' => $data['last_name'],
-            'username' => $data['username'],
+            'firstname' => null,
+            'lastname' => null,
+            'username' => $username,
             'email' => $data['email'],
-            'referral_id' => ($sponsorId != null) ? $sponsorId->id : null,
+            'referral_id' => $sponsorId,
             'password' => Hash::make($data['password']),
             'phone_code' => $data['phone_code'],
             'phone' => $data['phone'],
@@ -249,6 +273,28 @@ class RegisterController extends Controller
     protected function guard()
     {
         return Auth::guard();
+    }
+
+    public function checkReferralCode(Request $request)
+    {
+        $sponsor = $request->sponsor;
+        
+        $user = User::where('username', $sponsor)->first();
+        
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Valid referral code',
+                'data' => [
+                    'name' => $user->fullname
+                ]
+            ]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid referral code'
+        ]);
     }
 
 }

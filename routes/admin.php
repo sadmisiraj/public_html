@@ -320,6 +320,7 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('user/password/{id}', [UsersController::class, 'passwordUpdate'])->name('user.password.update');
         Route::post('user/preferences/{id}', [UsersController::class, 'preferencesUpdate'])->name('user.preferences.update');
         Route::post('user/two-fa-security/{id}', [UsersController::class, 'userTwoFaUpdate'])->name('user.twoFa.update');
+        Route::post('user/rgp-update/{id}', [UsersController::class, 'rgpUpdate'])->name('user.rgp.update');
         Route::get('user/details/export', [UsersController::class, 'export'])->name('user.details.export');
 
         Route::get('user/send-email/{id}', [UsersController::class, 'sendEmail'])->name('send.email');

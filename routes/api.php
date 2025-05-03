@@ -84,12 +84,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('card/payment', [PaymentController::class,'cardPayment']);
             Route::post('deposit', [PaymentController::class, 'deposit']);
 
+            // Referral bonus routes
+            Route::get('referral-bonus', [HomeController::class,'referralBonus']);
+            Route::get('referral-bonus/search', [HomeController::class,'referralBonusSearch']);
+            
+            // Badges route
+            Route::get('badge', [HomeController::class,'badge']);
+            
+            // Referral route
+            Route::get('referral', [HomeController::class,'referral']);
         });
-
-        Route::get('referral', [HomeController::class,'referral']);
-        Route::get('referral-bonus', [HomeController::class,'referralBonus']);
-        Route::get('referral-bonus/search', [HomeController::class,'referralBonusSearch']);
-        Route::get('badge', [HomeController::class,'badge']);
 
         Route::get('profile', [ProfileController::class,'profile']);
         Route::post('profile/image/upload', [ProfileController::class,'profileImageUpload']);

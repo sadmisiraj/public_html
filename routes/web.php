@@ -54,7 +54,16 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.update');
 
 Route::get('instruction/page', function () {
-    return view('instruction-page');
+    // Get sponsor from query parameter if available
+    $sponsor = request()->get('sponsor');
+    
+    if ($sponsor) {
+        // If sponsor is provided, redirect to register with sponsor
+        return redirect()->route('register.sponsor', ['sponsor' => $sponsor]);
+    }
+    
+    // Otherwise, just redirect to register page
+    return redirect()->route('register');
 })->name('instructionPage');
 
 Route::group(['middleware' => ['maintenanceMode']], function () use ($basicControl) {
@@ -63,6 +72,7 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
         Route::post('/login', [UserLoginController::class, 'login'])->name('login.submit');
         Route::post('/loginModal', [UserLoginController::class, 'loginModal'])->name('loginModal');
         Route::get('register/{sponsor?}', [RegisterController::class, 'showRegistrationForm'])->name('register.sponsor');
+        Route::post('check-referral-code', [RegisterController::class, 'checkReferralCode'])->name('check.referral.code');
     });
 
     Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], function () {
@@ -126,6 +136,19 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
 
                 // terminate investment
                 Route::post('terminate/investment/{id}', [HomeController::class, 'terminate'])->name('terminate');
+                
+                //plan
+                Route::get('/plan', [HomeController::class, 'planList'])->name('plan');
+                
+                // referral bonus
+                Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');
+                
+                // badges
+                Route::get('/badges', [HomeController::class, 'badges'])->name('badges');
+                
+                // referral
+                Route::get('/referral', [HomeController::class, 'referral'])->name('referral');
+                Route::post('get-referral-user', [HomeController::class, 'getReferralUser'])->name('myGetDirectReferralUser');
             });
 
             /* ===== Manage Two Step ===== */
@@ -138,15 +161,6 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('push-notification-show', [InAppNotificationController::class, 'show'])->name('push.notification.show');
             Route::get('push.notification.readAll', [InAppNotificationController::class, 'readAll'])->name('push.notification.readAll');
             Route::get('push-notification-readAt/{id}', [InAppNotificationController::class, 'readAt'])->name('push.notification.readAt');
-
-            // referral
-            Route::get('/referral', [HomeController::class, 'referral'])->name('referral');
-            Route::post('get-referral-user', [HomeController::class, 'getReferralUser'])->name('myGetDirectReferralUser');
-            Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');
-            Route::get('/badges', [HomeController::class, 'badges'])->name('badges');
-
-            //plan
-            Route::get('/plan', [HomeController::class, 'planList'])->name('plan');
 
             Route::get('verification/kyc', [KycVerificationController::class, 'kyc'])->name('verification.kyc');
             Route::get('verification/kyc-form/{id}', [KycVerificationController::class, 'kycForm'])->name('verification.kyc.form');

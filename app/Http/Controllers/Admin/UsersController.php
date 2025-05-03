@@ -1172,39 +1172,59 @@ class UsersController extends Controller
 
     public function badgeUpdate(Request $request, $id)
     {
-        $badge = Ranking::findOrFail($request->badge_id);
+        $request->validate([
+            'ranking_id' => 'required',
+        ]);
 
-        $user = User::findOrFail($id);
-        $user->admin_update_badge = $request->badge_id;
-        $user->last_lavel = $badge->rank_lavel;
-        $user->save();
+        try {
+            $user = User::where('id', $id)->firstOr(function () {
+                throw new \Exception('User not found!');
+            });
 
-        $msg = [
-            'user' => $user->fullname,
-            'badge' => $user->last_lavel
-        ];
+            $user->update([
+                'last_lavel' => $request->ranking_id,
+                'ranking_id' => $request->ranking_id,
+            ]);
 
-        $adminAction = [
-            "name" => $user->firstname . ' ' . $user->lastname,
-            "image" => getFile($user->image_driver, $user->image),
-            "link" => route('admin.users'),
-            "icon" => "fas fa-ticket-alt text-white"
-        ];
+            return back()->with('success', 'Badge Updated Successfully.');
 
-        $userAction = [
-            "link" => route('user.profile'),
-            "icon" => "fa fa-money-bill-alt text-white"
-        ];
-
-        $this->userPushNotification($user, 'BADGE_NOTIFY_TO_USER', $msg, $userAction);
-        $this->userFirebasePushNotification($user,'BADGE_NOTIFY_TO_USER', $msg,route('user.profile'));
-
-
-        $this->adminPushNotification('BADGE_NOTIFY_TO_ADMIN', $msg, $adminAction);
-        $this->adminFirebasePushNotification( 'BADGE_NOTIFY_TO_ADMIN', $msg,route('admin.users'));
-        return back()->with('success', 'Updated Successfully.');
+        } catch (\Exception $exp) {
+            return back()->with('error', $exp->getMessage());
+        }
     }
 
+    /**
+     * Update RGP values for a user
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function rgpUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'rgp_l' => 'required|string|max:50',
+            'rgp_r' => 'required|string|max:50',
+            'rgp_pair_matching' => 'required|string|max:50',
+        ]);
+
+        try {
+            $user = User::where('id', $id)->firstOr(function () {
+                throw new \Exception('User not found!');
+            });
+
+            $user->update([
+                'rgp_l' => $request->rgp_l,
+                'rgp_r' => $request->rgp_r,
+                'rgp_pair_matching' => $request->rgp_pair_matching,
+            ]);
+
+            return back()->with('success', 'RGP values updated successfully.');
+
+        } catch (\Exception $exp) {
+            return back()->with('error', $exp->getMessage());
+        }
+    }
 
     public function export(Request $request)
     {

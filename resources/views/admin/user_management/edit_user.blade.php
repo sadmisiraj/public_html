@@ -87,6 +87,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="#rgpSection">
+                                    <i class="bi-diagram-3 nav-icon"></i> @lang('RGP Management')
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="#recentDevicesSection">
                                     <i class="bi-phone nav-icon"></i> @lang('Recent devices')
                                 </a>
@@ -287,6 +292,8 @@
                     @include('admin.user_management.components.preferences_section')
 
                     @include('admin.user_management.components.two_step_verify_section')
+
+                    @include('admin.user_management.components.rgp_section')
 
                     @include('admin.user_management.components.recent_devices_section')
 
