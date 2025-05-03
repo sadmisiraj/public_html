@@ -189,7 +189,7 @@
                                             </div>
                                         </div>
                                         <div class="text-box">
-                                            <p class="sub-title">@lang('Purchase Completed')</p>
+                                            <p class="sub-title">{{ isset($configs[0]) ? $configs[0]->display_name : 'Config 1' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -204,7 +204,7 @@
                                             </div>
                                         </div>
                                         <div class="text-box">
-                                            <p class="sub-title">@lang('ROI Speed')</p>
+                                            <p class="sub-title">{{ isset($configs[1]) ? $configs[1]->display_name : 'Config 2' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -218,7 +218,7 @@
                                             </div>
                                         </div>
                                         <div class="text-box">
-                                            <p class="sub-title"> @lang('ROI Redeemed')</p>
+                                            <p class="sub-title">{{ isset($configs[2]) ? $configs[2]->display_name : 'Config 3' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -406,45 +406,95 @@
 @endsection
 
 @push('script')
+    <style>
+        /* Ensure text is centered in the circle */
+        .circle {
+            position: relative;
+        }
+        .circle span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        /* Special styling for percentage values */
+        .circle span.percent i {
+            font-style: normal;
+            font-size: 10px;
+        }
+    </style>
     <script>
         $(document).ready(function (){
             // Circle progress start
+            @php
+                // Get configs
+                $config1Raw = isset($configs[0]) ? $configs[0]->value : '0';
+                $config2Raw = isset($configs[1]) ? $configs[1]->value : '0';
+                $config3Raw = isset($configs[2]) ? $configs[2]->value : '0';
+                
+                // Check if values end with % to determine if they're percentages
+                $isConfig1Percent = str_ends_with($config1Raw, '%');
+                $isConfig2Percent = str_ends_with($config2Raw, '%');
+                $isConfig3Percent = str_ends_with($config3Raw, '%');
+                
+                // Strip % for percentage values and convert to integer
+                $config1Value = $isConfig1Percent ? (int)str_replace('%', '', $config1Raw) : $config1Raw;
+                $config2Value = $isConfig2Percent ? (int)str_replace('%', '', $config2Raw) : $config2Raw;
+                $config3Value = $isConfig3Percent ? (int)str_replace('%', '', $config3Raw) : $config3Raw;
+            @endphp
 
             if ($('.circle').length) {
                 $('.first.circle').circleProgress({
-                    value: Number('0.'+"{{getPercent($roi['totalInvest'], $roi['completed'])}}"),
+                    value: {{ $isConfig1Percent ? $config1Value/100 : 0 }},
                     size: 70,
                     fill: {
                         gradient: ["#ae8656"]
                     }
                 }).on('circle-animation-progress', function (event, progress) {
-                    $(this).find('span').html(Math.round(Number("{{getPercent($roi['totalInvest'], $roi['completed'])}}") * progress) + '<i>%</i>');
+                    @if($isConfig1Percent)
+                        $(this).find('span').html(Math.round({{ $config1Value }} * progress) + '<i>%</i>');
+                    @else
+                        $(this).find('span').html('{{ $config1Raw }}');
+                        // Show empty ring for non-percentage values
+                    @endif
                     $(this).find('span').addClass('percent');
                 });
-
             }
+
             if ($('.circle').length) {
                 $('.second.circle').circleProgress({
-                    value: Number('0.'+"{{100 - getPercent($roi['expectedProfit'], $roi['returnProfit'])}}"),
+                    value: {{ $isConfig2Percent ? $config2Value/100 : 0 }},
                     size: 70,
                     fill: {
                         gradient: ["#ae8656"]
                     }
                 }).on('circle-animation-progress', function (event, progress) {
-                    $(this).find('span').html(Math.round("{{100 - getPercent($roi['expectedProfit'], $roi['returnProfit'])}}" * progress) + '<i>%</i>');
+                    @if($isConfig2Percent)
+                        $(this).find('span').html(Math.round({{ $config2Value }} * progress) + '<i>%</i>');
+                    @else
+                        $(this).find('span').html('{{ $config2Raw }}');
+                        // Show empty ring for non-percentage values
+                    @endif
                     $(this).find('span').addClass('percent');
                 });
-
             }
+
             if ($('.circle').length) {
                 $('.third.circle').circleProgress({
-                    value: Number("{{getPercent($roi['expectedProfit'], $roi['returnProfit'])}}") >= 100 ? 1:Number('0.'+"{{getPercent($roi['expectedProfit'], $roi['returnProfit'])}}"),
+                    value: {{ $isConfig3Percent ? $config3Value/100 : 0 }},
                     size: 70,
                     fill: {
                         gradient: ["#ae8656"]
                     }
                 }).on('circle-animation-progress', function (event, progress) {
-                    $(this).find('span').html(Math.round("{{getPercent($roi['expectedProfit'], $roi['returnProfit'])}}" * progress) + '<i>%</i>');
+                    @if($isConfig3Percent)
+                        $(this).find('span').html(Math.round({{ $config3Value }} * progress) + '<i>%</i>');
+                    @else
+                        $(this).find('span').html('{{ $config3Raw }}');
+                        // Show empty ring for non-percentage values
+                    @endif
                     $(this).find('span').addClass('percent');
                 });
             }

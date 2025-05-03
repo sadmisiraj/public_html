@@ -312,6 +312,14 @@
                             </div>
                         @endif
 
+                        <div class="nav-item">
+                            <a class="nav-link {{ menuActive(['admin.configs']) }}"
+                               href="{{ route('admin.configs') }}" data-placement="left">
+                                <i class="bi bi-sliders nav-icon"></i>
+                                <span class="nav-link-title">@lang('Configs')</span>
+                            </a>
+                        </div>
+
                         @if(adminAccessRoute(config('role.manage_staff.access.view')))
                             <div class="nav-item">
                                 <a class="nav-link {{ menuActive(['admin.role.staff']) }}"

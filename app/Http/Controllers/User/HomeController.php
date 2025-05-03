@@ -92,6 +92,9 @@ class HomeController extends Controller
             ->get()->makeHidden('nextPayment')->toArray();
         $data['roi'] = collect($roi)->collapse();
         $data['ticket'] = SupportTicket::where('user_id', Auth::id())->count();
+        
+        // Fetch all configs from database for progress rings
+        $data['configs'] = \App\Models\Config::all();
 
         $monthlyInvestment = collect(['January' => 0, 'February' => 0, 'March' => 0, 'April' => 0, 'May' => 0, 'June' => 0, 'July' => 0, 'August' => 0, 'September' => 0, 'October' => 0, 'November' => 0, 'December' => 0]);
         Investment::where('user_id', $this->user->id)

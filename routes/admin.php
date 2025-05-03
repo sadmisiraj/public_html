@@ -40,6 +40,7 @@ use App\Http\Controllers\Admin\MaintenanceModeController;
 use App\Http\Controllers\Admin\NotificationTemplateController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\ConfigController;
 
 /*
 |--------------------------------------------------------------------------
@@ -428,8 +429,11 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('manage/staffs/status/change/{id}', [RolePermissionController::class, 'statusChange'])->name('role.statusChange');
         Route::post('manage/staffs/login/{id}', [RolePermissionController::class, 'userLogin'])->name('role.usersLogin');
 
-        /* ====== Manage Themes =====*/
+        /* ====== Config Settings =====*/
+        Route::get('configs', [ConfigController::class, 'index'])->name('configs');
+        Route::post('configs/update', [ConfigController::class, 'update'])->name('configs.update');
 
+        /* ====== Manage Themes =====*/
         Route::get('themes', [ThemeController::class, 'index'])->name('theme');
         Route::post('select/theme/{val}', [ThemeController::class, 'selectTheme'])->name('select.theme');
 
