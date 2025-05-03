@@ -42,6 +42,9 @@ class ManagePlanController extends Controller
             ->addColumn('featured',function ($plan){
                 return $plan->featuredMessage;
             })
+            ->addColumn('eligible_for_referral',function ($plan){
+                return $plan->referralEligibilityMessage;
+            })
             ->addColumn('action',function ($plan){
                 if (adminAccessRoute(config('role.manage_plan.access.edit'))){
                     $html = '<a class="btn btn-white btn-sm edit_btn" href="'.route('admin.plan.edit',$plan->id).'" >
@@ -53,7 +56,7 @@ class ManagePlanController extends Controller
                 return  '';
 
             })
-            ->rawColumns(['price','action','status','featured'])
+            ->rawColumns(['price','action','status','featured','eligible_for_referral'])
             ->make(true);
     }
 
@@ -96,6 +99,7 @@ class ManagePlanController extends Controller
         $repeatable = $reqData['is_lifetime'] == 1 ? 0 : $reqData['repeatable'];
 
         $featured = $reqData['featured'];
+        $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -121,6 +125,7 @@ class ManagePlanController extends Controller
         $data->is_lifetime = $reqData['is_lifetime'];
         $data->repeatable = $repeatable;
         $data->featured = $featured;
+        $data->eligible_for_referral = $eligible_for_referral;
         $data->save();
 
         return back()->with('success', 'Plan has been Added');
@@ -166,6 +171,7 @@ class ManagePlanController extends Controller
         $profit_type = (int)$reqData['profit_type'];
         $repeatable = $reqData['is_lifetime'] ? 0  : $reqData['repeatable'];
         $featured = $reqData['featured'];
+        $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -188,10 +194,9 @@ class ManagePlanController extends Controller
         $data->status = $reqData['status'];
         $data->is_capital_back = $reqData['is_capital_back'];
         $data->is_lifetime = $reqData['is_lifetime'];
-
-
         $data->repeatable = $repeatable;
         $data->featured = $featured;
+        $data->eligible_for_referral = $eligible_for_referral;
         $data->save();
 
         return back()->with('success', 'Plan has been Updated');

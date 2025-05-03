@@ -71,6 +71,7 @@
                         <th>@lang('Plan Price')</th>
                         <th>@lang('Status')</th>
                         <th>@lang('Featured')</th>
+                        <th>@lang('Eligible for Referral')</th>
                         <th>@lang('Action')</th>
                     </tr>
                     </thead>
@@ -147,6 +148,7 @@
                         {data: 'price', name: 'price'},
                         {data: 'status', name: 'status'},
                         {data: 'featured', name: 'featured'},
+                        {data: 'eligible_for_referral', name: 'eligible_for_referral'},
                         {data: 'action', name: 'action'},
                     ],
 

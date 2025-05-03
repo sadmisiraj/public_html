@@ -77,6 +77,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="#referralNodeSection">
+                                    <i class="bi-diagram-3 nav-icon"></i> @lang('Referral Node')
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="#preferencesSection">
                                     <i class="bi-gear nav-icon"></i> @lang('Preferences')
                                 </a>
@@ -250,15 +255,15 @@
                                         <span class="form-label-secondary">(@lang("Optional"))</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" name="addressTwo"
-                                               id="addressLine2Label" placeholder="Address Two"
-                                               aria-label="Address Two"
+                                               id="addressLine2Label"
+                                               placeholder="Your address"
+                                               aria-label="Your address"
                                                value="{{ old('addressTwo', $user->address_two) }}" autocomplete="off">
                                         @error('addressTwo')
                                         <span class="invalid-feedback d-block">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
-
 
                                 <label class="row form-check form-switch mb-4" for="userStatusSwitch">
                                     <span class="col-8 col-sm-3 ms-0">
@@ -286,9 +291,65 @@
                     @include('admin.user_management.components.email_section')
                     @include('admin.user_management.components.username_section')
                     @include('admin.user_management.components.password_section')
+                    
+                    <!-- Referral Node Section -->
+                    <div class="card" id="referralNodeSection">
+                        <div class="card-header">
+                            <h2 class="card-title h4">@lang('Referral Node')</h2>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('admin.user.update', $user->id) }}" method="post">
+                                @csrf
+                                <div class="row mb-4">
+                                    <label class="col-sm-3 col-form-label form-label">
+                                        @lang('Binary Position')
+                                        <i class="bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" 
+                                           title="@lang('Binary placement position (left or right) in the referral structure')"></i>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" name="referral_node" id="leftNodeRadio" 
+                                                   value="left" {{ $user->referral_node == 'left' ? 'checked' : '' }}>
+                                            <label class="btn btn-outline-primary" for="leftNodeRadio">
+                                                <i class="bi bi-arrow-left-circle me-1"></i> @lang('Left')
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="referral_node" id="rightNodeRadio" 
+                                                   value="right" {{ $user->referral_node == 'right' ? 'checked' : '' }}>
+                                            <label class="btn btn-outline-primary" for="rightNodeRadio">
+                                                @lang('Right') <i class="bi bi-arrow-right-circle ms-1"></i>
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            @lang('Select the binary placement position for this user in the referral structure')
+                                        </div>
+                                        @error('referral_node')
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Hidden fields to preserve user data -->
+                                <input type="hidden" name="firstName" value="{{ old('firstName', $user->firstname) }}">
+                                <input type="hidden" name="lastName" value="{{ old('lastName', $user->lastname) }}">
+                                <input type="hidden" name="phone" value="{{ old('phone', $user->phone) }}">
+                                <input type="hidden" name="addressOne" value="{{ old('addressOne', $user->address_one) }}">
+                                <input type="hidden" name="addressTwo" value="{{ old('addressTwo', $user->address_two) }}">
+                                <input type="hidden" name="country" value="{{ old('country', $user->country) }}">
+                                <input type="hidden" name="city" value="{{ old('city', $user->city) }}">
+                                <input type="hidden" name="state" value="{{ old('state', $user->state) }}">
+                                <input type="hidden" name="zipCode" value="{{ old('zipCode', $user->zip_code) }}">
+                                <input type="hidden" name="status" value="{{ $user->status }}">
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">@lang('Save changes')</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End Referral Node Section -->
+
                     @include('admin.user_management.components.badge_section')
-
-
                     @include('admin.user_management.components.preferences_section')
 
                     @include('admin.user_management.components.two_step_verify_section')

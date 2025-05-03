@@ -231,18 +231,19 @@ class UsersController extends Controller
         });
 
         $request->validate([
-            'firstName' => 'required|string|min:2|max:100',
-            'lastName' => 'required|string|min:2|max:100',
+            'firstName' => 'nullable|string|min:2|max:100',
+            'lastName' => 'nullable|string|min:2|max:100',
             'phone' => 'required|unique:users,phone,' . $id,
             'country' => 'required|string|min:2|max:100',
             'city' => 'required|string|min:2|max:100',
             'state' => 'required|string|min:2|max:100',
-            'addressOne' => 'required|string|min:2|max:100',
-            'addressTwo' => 'required|string|min:2',
+            'addressOne' => 'nullable|string|min:2|max:100',
+            'addressTwo' => 'nullable|string|min:2',
             'zipCode' => 'required|string|min:2|max:100',
             'status' => 'nullable|integer|in:0,1',
             'image' => 'nullable|mimes:jpeg,png,jpg,gif|sizes:2048',
             'language_id' => Rule::in($languages),
+            'referral_node' => 'nullable|string|in:left,right,',
         ]);
 
 
@@ -275,7 +276,8 @@ class UsersController extends Controller
                 'country' => $request->country,
                 'image' => $profileImage ?? $user->image,
                 'image_driver' => $driver ?? $user->image_driver,
-                'status' => $request->status
+                'status' => $request->status,
+                'referral_node' => $request->referral_node,
             ]);
 
             return back()->with('success', 'Basic Information Updated Successfully.');

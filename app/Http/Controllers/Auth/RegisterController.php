@@ -61,7 +61,7 @@ class RegisterController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function showRegistrationForm($sponsor=null)
+    public function showRegistrationForm($sponsor=null, $position=null)
     {
         $basic = basicControl();
         if ($basic->registration == 0) {
@@ -72,16 +72,27 @@ class RegisterController extends Controller
         $validSponsor = false;
         $sponsorUser = null;
         $invalidSponsorLink = false;
+        $referralNode = null;
+        $needPlacementSelection = false;
         
         if ($sponsor != null) {
             $sponsorUser = User::where('username', $sponsor)->first();
             if ($sponsorUser) {
                 session()->put('sponsor', $sponsor);
+                if ($position && in_array($position, ['left', 'right'])) {
+                    session()->put('referral_node', $position);
+                    $referralNode = $position;
+                } else {
+                    // Sponsor is valid but no position specified
+                    $needPlacementSelection = true;
+                }
                 $validSponsor = true;
             } else {
                 // If sponsor from URL is invalid, remove it from session
                 session()->forget('sponsor');
+                session()->forget('referral_node');
                 $sponsor = null;
+                $referralNode = null;
                 $invalidSponsorLink = true;
             }
         }
@@ -100,7 +111,7 @@ class RegisterController extends Controller
                 getFile($seo->breadcrumb_image_driver, $seo->breadcrumb_image) : null,
         ];
 
-        return view(template() . 'auth.register', $data, compact('sponsor', 'validSponsor', 'sponsorUser', 'invalidSponsorLink'));
+        return view(template() . 'auth.register', $data, compact('sponsor', 'validSponsor', 'sponsorUser', 'invalidSponsorLink', 'referralNode', 'needPlacementSelection'));
     }
 
     /**
@@ -177,12 +188,16 @@ class RegisterController extends Controller
             $username = preg_replace('/[^a-zA-Z0-9]/', '', $username);
         }
         
+        // Get referral position (node) from session
+        $referralNode = session()->get('referral_node');
+        
         return User::create([
             'firstname' => null,
             'lastname' => null,
             'username' => $username,
             'email' => $data['email'],
             'referral_id' => $sponsorId,
+            'referral_node' => $referralNode,
             'password' => Hash::make($data['password']),
             'phone_code' => $data['phone_code'],
             'phone' => $data['phone'],

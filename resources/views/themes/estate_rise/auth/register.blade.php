@@ -39,8 +39,32 @@
                                                 <div id="sponsor-name" class="mt-2">
                                                     @if(isset($validSponsor) && $validSponsor && isset($sponsorUser))
                                                         <span class="text-success">Referrer: {{ $sponsorUser->fullname }}</span>
+                                                        @if(isset($referralNode) && $referralNode)
+                                                            <span class="text-success ms-2">({{ ucfirst($referralNode) }} Placement)</span>
+                                                            <input type="hidden" name="referral_node" value="{{ $referralNode }}">
+                                                        @endif
                                                     @endif
                                                 </div>
+                                                
+                                                <!-- Placement Selection - will show after sponsor validation or when sponsor is from URL but without position -->
+                                                <div id="placement-selection" class="mt-3" style="display: {{ (isset($needPlacementSelection) && $needPlacementSelection) ? 'block' : 'none' }};">
+                                                    <label class="form-label fw-bold">@lang('Select Placement Position')</label>
+                                                    <div class="btn-group w-100" role="group">
+                                                        <input type="radio" class="btn-check" name="referral_node" id="leftPlacement" value="left" autocomplete="off">
+                                                        <label class="btn btn-outline-primary" for="leftPlacement">
+                                                            <i class="bi bi-arrow-left-circle me-1"></i> @lang('Left')
+                                                        </label>
+                                                        
+                                                        <input type="radio" class="btn-check" name="referral_node" id="rightPlacement" value="right" autocomplete="off">
+                                                        <label class="btn btn-outline-primary" for="rightPlacement">
+                                                            @lang('Right') <i class="bi bi-arrow-right-circle ms-1"></i>
+                                                        </label>
+                                                    </div>
+                                                    @if(isset($needPlacementSelection) && $needPlacementSelection)
+                                                    <div class="form-text text-danger">Please select a placement position</div>
+                                                    @endif
+                                                </div>
+                                                
                                                 <div id="sponsor-feedback" class="invalid-feedback">@lang('A valid referral code is required')</div>
                                                 @error('sponsor')<span class="text-danger mt-1">@lang($message)</span>@enderror
                                             </div>
@@ -174,7 +198,18 @@
         // Enable/disable register button based on sponsor validation
         function updateRegisterButton() {
             if ($('#sponsor-name').hasClass('text-success') || $('#sponsor-name').find('.text-success').length > 0) {
-                $('#register-btn').prop('disabled', false);
+                // If placement selection is visible (manually entered referral code), 
+                // check if placement has been selected
+                if ($('#placement-selection').is(':visible')) {
+                    if ($('input[name="referral_node"]:checked').length > 0) {
+                        $('#register-btn').prop('disabled', false);
+                    } else {
+                        $('#register-btn').prop('disabled', true);
+                    }
+                } else {
+                    // If hidden input for referral node exists or placement selection is not required
+                    $('#register-btn').prop('disabled', false);
+                }
             } else {
                 $('#register-btn').prop('disabled', true);
             }
@@ -182,7 +217,22 @@
         
         // If sponsor is already set from URL and is valid, enable registration
         if ($('#sponsor').val() && $('#sponsor').prop('readonly') && $('#sponsor-name').find('.text-success').length > 0) {
-            updateRegisterButton();
+            // Check if placement is needed
+            if ($('#placement-selection').is(':visible')) {
+                // Disable register button until placement is selected
+                $('#register-btn').prop('disabled', true);
+                
+                // Add event listeners for placement selection
+                $('#leftPlacement, #rightPlacement').on('change', function() {
+                    if ($('input[name="referral_node"]:checked').length) {
+                        $('#register-btn').prop('disabled', false);
+                        $('#placement-selection .form-text').removeClass('text-danger').addClass('text-success').text('Placement selected');
+                    }
+                });
+            } else {
+                // If placement is already set or not needed, enable register button
+                $('#register-btn').prop('disabled', false);
+            }
         }
         
         // If invalid sponsor link was provided, show error state
@@ -230,9 +280,30 @@
                     if (response.success) {
                         $('#sponsor-name').html('<span class="text-success">Referrer: ' + response.data.name + '</span>');
                         $('#sponsor').removeClass('is-invalid').addClass('is-valid');
+                        
+                        // If user manually entered the referral code, show placement selection
+                        // Only show if not already coming from a referral link with position
+                        if (!$('input[name="referral_node"][type="hidden"]').length) {
+                            $('#placement-selection').show();
+                            $('#placement-selection').append('<div class="form-text text-danger">Please select a placement position</div>');
+                            // Initially disable register button until placement is selected
+                            $('#register-btn').prop('disabled', true);
+                            
+                            // Enable button only when placement is selected
+                            $('#leftPlacement, #rightPlacement').on('change', function() {
+                                if ($('input[name="referral_node"]:checked').length) {
+                                    $('#register-btn').prop('disabled', false);
+                                    $('#placement-selection .form-text').removeClass('text-danger').addClass('text-success').text('Placement selected');
+                                }
+                            });
+                        } else {
+                            // If coming from a referral link with position already set, enable the button
+                            $('#register-btn').prop('disabled', false);
+                        }
                     } else {
                         $('#sponsor-name').html('<span class="text-danger">Invalid referral code</span>');
                         $('#sponsor').removeClass('is-valid').addClass('is-invalid');
+                        $('#placement-selection').hide();
                     }
                     $('#validate-sponsor').prop('disabled', false);
                     updateRegisterButton();
@@ -241,6 +312,7 @@
                     $('#sponsor-name').html('<span class="text-danger">Error validating referral code</span>');
                     $('#sponsor').removeClass('is-valid').addClass('is-invalid');
                     $('#validate-sponsor').prop('disabled', false);
+                    $('#placement-selection').hide();
                     updateRegisterButton();
                 }
             });
@@ -286,6 +358,12 @@
             // Check sponsor validation
             if (!$('#sponsor-name').find('.text-success').length && !$('#sponsor-name').hasClass('text-success')) {
                 $('#sponsor').addClass('is-invalid');
+                isValid = false;
+            }
+            
+            // Check if placement selection is required and selected
+            if ($('#placement-selection').is(':visible') && !$('input[name="referral_node"]:checked').length) {
+                $('#placement-selection').addClass('is-invalid');
                 isValid = false;
             }
 

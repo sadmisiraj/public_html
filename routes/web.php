@@ -71,7 +71,7 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
         Route::get('/login', [UserLoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [UserLoginController::class, 'login'])->name('login.submit');
         Route::post('/loginModal', [UserLoginController::class, 'loginModal'])->name('loginModal');
-        Route::get('register/{sponsor?}', [RegisterController::class, 'showRegistrationForm'])->name('register.sponsor');
+        Route::get('register/{sponsor?}/{position?}', [RegisterController::class, 'showRegistrationForm'])->name('register.sponsor');
         Route::post('check-referral-code', [RegisterController::class, 'checkReferralCode'])->name('check.referral.code');
     });
 
@@ -89,67 +89,49 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::post('profile-update', [HomeController::class, 'profileUpdate'])->name('profile.update');
             Route::post('profile-update/image', [HomeController::class, 'profileUpdateImage'])->name('profile.update.image');
             Route::post('update/password', [HomeController::class, 'updatePassword'])->name('updatePassword');
+            
+            Route::post('save-token', [HomeController::class, 'saveToken'])->name('save.token');
+            Route::get('add-fund', [HomeController::class, 'addFund'])->name('addFund');
+            Route::get('funds', [HomeController::class, 'fund'])->name('fund.index');
 
-            Route::middleware('kyc')->group(function () {
-                Route::post('save-token', [HomeController::class, 'saveToken'])->name('save.token');
-                Route::get('add-fund', [HomeController::class, 'addFund'])->name('addFund');
-                Route::get('funds', [HomeController::class, 'fund'])->name('fund.index');
-
-                /* PAYMENT REQUEST BY USER */
-                Route::get('payout-list', [PayoutController::class, 'index'])->name('payout.index');
-                Route::get('payout-search', [PayoutController::class, 'search'])->name('payout.search');
-
-                Route::get('payout', [PayoutController::class, 'payout'])->name('payout');
-                Route::get('payout-supported-currency', [PayoutController::class, 'payoutSupportedCurrency'])->name('payout.supported.currency');
-                Route::get('payout-check-amount', [PayoutController::class, 'checkAmount'])->name('payout.checkAmount');
-                Route::post('request-payout', [PayoutController::class, 'payoutRequest'])->name('payout.request');
-
-                Route::match(['get', 'post'], 'confirm-payout/{trx_id}', [PayoutController::class, 'confirmPayout'])->name('payout.confirm');
-                Route::post('confirm-payout/flutterwave/{trx_id}', [PayoutController::class, 'flutterwavePayout'])->name('payout.flutterwave');
-                Route::post('confirm-payout/paystack/{trx_id}', [PayoutController::class, 'paystackPayout'])->name('payout.paystack');
-                Route::get('payout-check-limit', [PayoutController::class, 'checkLimit'])->name('payout.checkLimit');
-                Route::post('payout-bank-form', [PayoutController::class, 'getBankForm'])->name('payout.getBankForm');
-                Route::post('payout-bank-list', [PayoutController::class, 'getBankList'])->name('payout.getBankList');
-
-
-                Route::group(['prefix' => 'ticket', 'as' => 'ticket.'], function () {
-                    Route::get('/{id?}', [SupportTicketController::class, 'index'])->name('list');
-                    Route::get('/create/ticket', [SupportTicketController::class, 'create'])->name('create');
-                    Route::post('/create', [SupportTicketController::class, 'store'])->name('store');
-                    Route::get('/view/{ticket}', [SupportTicketController::class, 'ticketView'])->name('view');
-                    Route::put('/reply/{ticket}', [SupportTicketController::class, 'reply'])->name('reply');
-                    Route::get('/download/{ticket}', [SupportTicketController::class, 'download'])->name('download');
-                    Route::post('close/{ticket}', [SupportTicketController::class, 'close'])->name('close');
-                });
-
-                Route::get('invest-history', [HomeController::class, 'investHistory'])->name('invest-history');
-                Route::post('/purchase-plan', [HomeController::class, 'purchasePlan'])->name('purchase-plan');
-                Route::get('payment', [HomeController::class, 'payment'])->name('payment');
-                Route::get('payment-check-amount', [PaymentController::class, 'checkAmount'])->name('payment.checkAmount');
-
-                /* ====== Transaction Log =====*/
-                Route::get('/transaction', [HomeController::class, 'transaction'])->name('transaction');
-
-                // money-transfer
-                Route::get('/money-transfer', [HomeController::class, 'moneyTransfer'])->name('money-transfer');
-                Route::post('/money-transfer', [HomeController::class, 'moneyTransferConfirm'])->name('money.transfer');
-
-                // terminate investment
-                Route::post('terminate/investment/{id}', [HomeController::class, 'terminate'])->name('terminate');
-                
-                //plan
-                Route::get('/plan', [HomeController::class, 'planList'])->name('plan');
-                
-                // referral bonus
-                Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');
-                
-                // badges
-                Route::get('/badges', [HomeController::class, 'badges'])->name('badges');
-                
-                // referral
-                Route::get('/referral', [HomeController::class, 'referral'])->name('referral');
-                Route::post('get-referral-user', [HomeController::class, 'getReferralUser'])->name('myGetDirectReferralUser');
+            // Support Ticket
+            Route::group(['prefix' => 'ticket', 'as' => 'ticket.'], function () {
+                Route::get('/{id?}', [SupportTicketController::class, 'index'])->name('list');
+                Route::get('/create/ticket', [SupportTicketController::class, 'create'])->name('create');
+                Route::post('/create', [SupportTicketController::class, 'store'])->name('store');
+                Route::get('/view/{ticket}', [SupportTicketController::class, 'ticketView'])->name('view');
+                Route::put('/reply/{ticket}', [SupportTicketController::class, 'reply'])->name('reply');
+                Route::get('/download/{ticket}', [SupportTicketController::class, 'download'])->name('download');
+                Route::post('close/{ticket}', [SupportTicketController::class, 'close'])->name('close');
             });
+
+            Route::get('invest-history', [HomeController::class, 'investHistory'])->name('invest-history');
+            Route::post('/purchase-plan', [HomeController::class, 'purchasePlan'])->name('purchase-plan');
+            Route::get('payment', [HomeController::class, 'payment'])->name('payment');
+            Route::get('payment-check-amount', [PaymentController::class, 'checkAmount'])->name('payment.checkAmount');
+
+            /* ====== Transaction Log =====*/
+            Route::get('/transaction', [HomeController::class, 'transaction'])->name('transaction');
+
+            // money-transfer
+            Route::get('/money-transfer', [HomeController::class, 'moneyTransfer'])->name('money-transfer');
+            Route::post('/money-transfer', [HomeController::class, 'moneyTransferConfirm'])->name('money.transfer');
+
+            // terminate investment
+            Route::post('terminate/investment/{id}', [HomeController::class, 'terminate'])->name('terminate');
+            
+            //plan
+            Route::get('/plan', [HomeController::class, 'planList'])->name('plan');
+            
+            // referral bonus
+            Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');
+            
+            // badges
+            Route::get('/badges', [HomeController::class, 'badges'])->name('badges');
+            
+            // referral
+            Route::get('/referral', [HomeController::class, 'referral'])->name('referral');
+            Route::post('get-referral-user', [HomeController::class, 'getReferralUser'])->name('myGetDirectReferralUser');
 
             /* ===== Manage Two Step ===== */
             Route::get('two-step-security', [TwoFaSecurityController::class, 'twoStepSecurity'])->name('twostep.security');
@@ -166,8 +148,23 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('verification/kyc-form/{id}', [KycVerificationController::class, 'kycForm'])->name('verification.kyc.form');
             Route::post('verification/kyc/submit', [KycVerificationController::class, 'verificationSubmit'])->name('kyc.verification.submit');
             Route::get('verification/kyc/history', [KycVerificationController::class, 'history'])->name('verification.kyc.history');
+            Route::get('payout-list', [PayoutController::class, 'index'])->name('payout.index');
 
-
+            // Only payout routes need KYC verification
+            Route::middleware('kyc')->group(function () {
+                /* PAYMENT REQUEST BY USER */
+                Route::get('payout-search', [PayoutController::class, 'search'])->name('payout.search');
+                Route::get('payout', [PayoutController::class, 'payout'])->name('payout');
+                Route::get('payout-supported-currency', [PayoutController::class, 'payoutSupportedCurrency'])->name('payout.supported.currency');
+                Route::get('payout-check-amount', [PayoutController::class, 'checkAmount'])->name('payout.checkAmount');
+                Route::post('request-payout', [PayoutController::class, 'payoutRequest'])->name('payout.request');
+                Route::match(['get', 'post'], 'confirm-payout/{trx_id}', [PayoutController::class, 'confirmPayout'])->name('payout.confirm');
+                Route::post('confirm-payout/flutterwave/{trx_id}', [PayoutController::class, 'flutterwavePayout'])->name('payout.flutterwave');
+                Route::post('confirm-payout/paystack/{trx_id}', [PayoutController::class, 'paystackPayout'])->name('payout.paystack');
+                Route::get('payout-check-limit', [PayoutController::class, 'checkLimit'])->name('payout.checkLimit');
+                Route::post('payout-bank-form', [PayoutController::class, 'getBankForm'])->name('payout.getBankForm');
+                Route::post('payout-bank-list', [PayoutController::class, 'getBankList'])->name('payout.getBankList');
+            });
         });
     });
 

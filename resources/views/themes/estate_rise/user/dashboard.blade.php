@@ -367,13 +367,29 @@
                             <div class="card">
                                 <div class="card-body">
                                     <!-- <h4 class="mb-20">Referral Link</h4> -->
-                                    <div class="input-group">
-                                        <input id="referralURL" type="text" class="form-control"
-                                               value="{{route('register.sponsor',[Auth::user()->username])}}"
-                                               aria-label="Recipient's username" aria-describedby="basic-addon2"
-                                               readonly>
-                                        <div class="input-group-text" id="copyBtn"><i
-                                                class="fa-regular fa-copy"></i>@lang('copy')
+                                    <h5 class="mb-3">@lang('Referral Links')</h5>
+                                    <div class="mb-3">
+                                        <label class="form-label">@lang('Left Placement')</label>
+                                        <div class="input-group">
+                                            <input id="leftReferralURL" type="text" class="form-control"
+                                                   value="{{route('register.sponsor',[Auth::user()->username, 'left'])}}"
+                                                   aria-label="Left referral link" aria-describedby="copy-left-btn"
+                                                   readonly>
+                                            <div class="input-group-text" id="copyLeftBtn"><i
+                                                    class="fa-regular fa-copy"></i>@lang('copy')
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">@lang('Right Placement')</label>
+                                        <div class="input-group">
+                                            <input id="rightReferralURL" type="text" class="form-control"
+                                                   value="{{route('register.sponsor',[Auth::user()->username, 'right'])}}"
+                                                   aria-label="Right referral link" aria-describedby="copy-right-btn"
+                                                   readonly>
+                                            <div class="input-group-text" id="copyRightBtn"><i
+                                                    class="fa-regular fa-copy"></i>@lang('copy')
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -499,14 +515,26 @@
             }
         })
 
-        document.getElementById("copyBtn").addEventListener("click", () => {
-            let referralURL = document.getElementById("referralURL");
-            referralURL.select();
-            navigator.clipboard.writeText(referralURL.value)
-            if (referralURL.value) {
-                document.getElementById("copyBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
+        document.getElementById("copyLeftBtn").addEventListener("click", () => {
+            let leftReferralURL = document.getElementById("leftReferralURL");
+            leftReferralURL.select();
+            navigator.clipboard.writeText(leftReferralURL.value)
+            if (leftReferralURL.value) {
+                document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
                 setTimeout(() => {
-                    document.getElementById("copyBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
+                    document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
+                }, 1000)
+            }
+        })
+
+        document.getElementById("copyRightBtn").addEventListener("click", () => {
+            let rightReferralURL = document.getElementById("rightReferralURL");
+            rightReferralURL.select();
+            navigator.clipboard.writeText(rightReferralURL.value)
+            if (rightReferralURL.value) {
+                document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
+                setTimeout(() => {
+                    document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
                 }, 1000)
             }
         })

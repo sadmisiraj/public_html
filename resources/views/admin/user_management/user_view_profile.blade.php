@@ -28,6 +28,10 @@
                                     <li><i class="bi-geo-alt dropdown-item-icon"></i> @lang($user->country)</li>
                                     @endif
 
+                                    @if(isset($user->referral_node))
+                                    <li><i class="bi-diagram-3 dropdown-item-icon"></i> @lang('Referral Node'): <span class="badge bg-soft-{{ $user->referral_node == 'left' ? 'primary' : 'success' }} text-{{ $user->referral_node == 'left' ? 'primary' : 'success' }}">@lang(ucfirst($user->referral_node))</span></li>
+                                    @endif
+
                                     <li><i class="bi bi-wallet dropdown-item-icon"></i> {{ currencyPosition($user->balance) }}
                                     </li>
 

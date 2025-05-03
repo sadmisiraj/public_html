@@ -50,6 +50,18 @@ class ManagePlan extends Model
                   </span>';
     }
 
+    public function getReferralEligibilityMessageAttribute()
+    {
+        if ($this->eligible_for_referral == 0) {
+            return  '<span class="badge bg-soft-warning text-warning">
+                    <span class="legend-indicator bg-warning"></span>' . trans('No') . '
+                  </span>';
+        }
+        return  '<span class="badge bg-soft-success text-success">
+                    <span class="legend-indicator bg-success"></span>' . trans('Yes') . '
+                  </span>';
+    }
+
     public function getCapitalBackStatus()
     {
         if ($this->is_capital_back == 0) {

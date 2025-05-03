@@ -1140,7 +1140,7 @@ function getPercent($total, $current)
 
 function getDirectReferralUsers($userId)
 {
-    $directReferralUsers = User::where('referral_id', $userId)->select('id', 'firstname', 'lastname', 'username', 'email', 'phone_code', 'phone', 'referral_id', 'total_invest', 'created_at')->get();
+    $directReferralUsers = User::where('referral_id', $userId)->select('id', 'firstname', 'lastname', 'username', 'email', 'phone_code', 'phone', 'referral_id', 'referral_node', 'total_invest', 'created_at')->get();
     return $directReferralUsers;
 }
 
