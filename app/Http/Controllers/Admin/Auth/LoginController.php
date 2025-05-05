@@ -30,7 +30,7 @@ class LoginController extends Controller
 
     protected $maxAttempts = 3; // Change this to 4 if you want 4 tries
     protected $decayMinutes = 5; // Change this according to your
-    protected $redirectTo = 'admin/dashboard';
+    protected $redirectTo = 'security/dashboard';
     public function __construct()
     {
         $this->middleware('guest:admin')->except('logout');

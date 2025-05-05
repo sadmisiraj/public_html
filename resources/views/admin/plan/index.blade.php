@@ -69,6 +69,7 @@
                         <th>@lang('SL.')</th>
                         <th>@lang('Name')</th>
                         <th>@lang('Plan Price')</th>
+                        <th>@lang('Base Plan')</th>
                         <th>@lang('Status')</th>
                         <th>@lang('Featured')</th>
                         <th>@lang('Eligible for Referral')</th>
@@ -146,6 +147,7 @@
                         {data: 'sl', name: 'sl'},
                         {data: 'name', name: 'name'},
                         {data: 'price', name: 'price'},
+                        {data: 'base_plan', name: 'base_plan'},
                         {data: 'status', name: 'status'},
                         {data: 'featured', name: 'featured'},
                         {data: 'eligible_for_referral', name: 'eligible_for_referral'},

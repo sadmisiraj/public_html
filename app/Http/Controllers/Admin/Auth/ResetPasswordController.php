@@ -30,7 +30,7 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = 'admin/dashboard';
+    protected $redirectTo = 'security/dashboard';
 
     /**
      * Display the password reset view for the given token.

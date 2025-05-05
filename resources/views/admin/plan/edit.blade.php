@@ -55,6 +55,31 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-6">
+                                    <label for="base_plan_id" class="form-label">@lang('Base Plan')</label>
+                                    <i class="bi bi-info-circle text-body ms-1"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       aria-label="User must purchase this plan before being able to purchase the current plan"
+                                       data-bs-original-title="User must purchase this plan before being able to purchase the current plan"
+                                    ></i>
+                                    <!-- Select -->
+                                    <div class="tom-select-custom">
+                                        <select class="js-select form-select" name="base_plan_id" autocomplete="off"
+                                                data-hs-tom-select-options='{
+                                                  "placeholder": "Select a base plan"
+                                             }'>
+                                            <option value="">@lang('No Base Plan')</option>
+                                            @foreach($plans as $plan)
+                                                <option value="{{$plan->id}}" @selected(old('base_plan_id', $data->base_plan_id) == $plan->id)>{{$plan->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @error("base_plan_id")
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
                                 <div class="col-md-6" id="minimum_invest_field">
                                     <label for="minimum_invest" class="form-label">@lang('Minimum Amount')</label>
                                     <div class="input-group mb-4">

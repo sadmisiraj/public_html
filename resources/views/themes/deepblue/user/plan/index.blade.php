@@ -1,5 +1,28 @@
 @extends(template().'layouts.user')
 @section('title',trans('Investment Plan'))
+@push('style')
+    <style>
+        .disabled-plan {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .plan-locked, .plan-active {
+            position: relative;
+        }
+        
+        .plan-locked::after, .plan-active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+    </style>
+@endpush
 @section('content')
 
 
@@ -46,8 +69,11 @@
                                     @forelse ($plans as $key => $plan)
                                         @php
                                             $getTime = getTime($plan);
+                                            $isPlanActive = in_array($plan->id, $userActivePlans);
+                                            $isBasePlanRequired = $plan->base_plan_id && !in_array($plan->base_plan_id, $userActivePlans);
+                                            $rowClass = $isPlanActive ? 'plan-active' : ($isBasePlanRequired ? 'plan-locked' : '');
                                         @endphp
-                                        <tr>
+                                        <tr class="{{ $rowClass }}">
                                             <td>{{loopIndex($plans) + $key}}</td>
                                             <td>
                                                 {{$plan->name}}
@@ -66,12 +92,34 @@
                                                 {!! $plan->getCapitalBackStatus() !!}
                                             </td>
                                             <td>
-                                                <a class="btn btn-primary base-btn btn-block btn-rounded investNow"
-                                                   data-price="{{$plan->price}}"
-                                                   data-resource="{{$plan}}"
-                                                   href="javascript:void(0)">
-                                                    <i class="fal fa-usd-circle" aria-hidden="true"></i>
-                                                    @lang('Invest') </a>
+                                                @if(in_array($plan->id, $userActivePlans))
+                                                    @php
+                                                        $userPlan = auth()->user()->userPlans()->where('plan_id', $plan->id)->where('is_active', true)->first();
+                                                        $expiryText = $userPlan && $userPlan->expires_at ? 'Active till ' . $userPlan->expires_at->format('d M Y') : 'Active (Lifetime)';
+                                                    @endphp
+                                                    <div class="btn btn-success base-btn btn-block btn-rounded" 
+                                                        style="opacity: 0.7; cursor: default;">
+                                                        <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                                        {{ $expiryText }}
+                                                    </div>
+                                                @elseif($plan->base_plan_id && !in_array($plan->base_plan_id, $userActivePlans))
+                                                    @php
+                                                        $basePlan = \App\Models\ManagePlan::find($plan->base_plan_id);
+                                                    @endphp
+                                                    <div class="btn btn-warning base-btn btn-block btn-rounded"
+                                                        style="opacity: 0.7; cursor: not-allowed;">
+                                                        <i class="fas fa-lock" aria-hidden="true"></i>
+                                                        @lang('Purchase') {{ $basePlan ? $basePlan->name : 'base plan' }} @lang('to unlock')
+                                                    </div>
+                                                @else
+                                                    <a class="btn btn-primary base-btn btn-block btn-rounded investNow"
+                                                    data-price="{{$plan->price}}"
+                                                    data-resource="{{$plan}}"
+                                                    href="javascript:void(0)">
+                                                        <i class="fal fa-usd-circle" aria-hidden="true"></i>
+                                                        @lang('Invest')
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -158,6 +206,44 @@
         "use strict";
         (function ($) {
             $(document).on('click', '.investNow', function () {
+                let plan = $(this).data('resource');
+                
+                // Prevent opening modal for locked plans
+                if (plan.base_plan_id) {
+                    let basePlanActive = false;
+                    @foreach($userActivePlans as $activePlanId)
+                        if (plan.base_plan_id == {{ $activePlanId }}) {
+                            basePlanActive = true;
+                        }
+                    @endforeach
+                    
+                    if (!basePlanActive) {
+                        // Base plan is not active, show message
+                        let basePlanName = '';
+                        @foreach($plans as $p)
+                            if (plan.base_plan_id == {{ $p->id }}) {
+                                basePlanName = '{{ $p->name }}';
+                            }
+                        @endforeach
+                        
+                        Notiflix.Notify.failure("You need to purchase " + basePlanName + " plan first to unlock this plan");
+                        return;
+                    }
+                }
+                
+                // Check if plan is already active
+                let isPlanActive = false;
+                @foreach($userActivePlans as $activePlanId)
+                    if (plan.id == {{ $activePlanId }}) {
+                        isPlanActive = true;
+                    }
+                @endforeach
+                
+                if (isPlanActive) {
+                    Notiflix.Notify.info("You already have an active subscription to this plan");
+                    return;
+                }
+                
                 $("#investment-modal").toggleClass("modal-open");
                 let data = $(this).data('resource');
                 let price = $(this).data('price');

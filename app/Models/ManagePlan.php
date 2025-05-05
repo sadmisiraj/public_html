@@ -124,4 +124,28 @@ class ManagePlan extends Model
     {
         return $this->hasMany(Investment::class, 'plan_id');
     }
+
+    /**
+     * Get the base plan for this plan
+     */
+    public function basePlan()
+    {
+        return $this->belongsTo(ManagePlan::class, 'base_plan_id');
+    }
+
+    /**
+     * Get plans that have this plan as their base
+     */
+    public function childPlans()
+    {
+        return $this->hasMany(ManagePlan::class, 'base_plan_id');
+    }
+
+    /**
+     * Get the user plans associated with this plan
+     */
+    public function userPlans()
+    {
+        return $this->hasMany(UserPlan::class, 'plan_id');
+    }
 }

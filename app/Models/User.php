@@ -181,6 +181,47 @@ class User extends Authenticatable
         return $this->hasMany(Investment::class)->latest();
     }
 
+    /**
+     * Get the plans purchased by the user
+     */
+    public function userPlans()
+    {
+        return $this->hasMany(UserPlan::class);
+    }
+
+    /**
+     * Check if user has an active plan
+     *
+     * @param int $planId
+     * @return bool
+     */
+    public function hasActivePlan($planId)
+    {
+        return $this->userPlans()
+            ->where('plan_id', $planId)
+            ->where('is_active', true)
+            ->where(function($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->exists();
+    }
+
+    /**
+     * Check if user has purchased a base plan required for a given plan
+     *
+     * @param int $basePlanId
+     * @return bool
+     */
+    public function hasBasePlan($basePlanId)
+    {
+        if (!$basePlanId) {
+            return true; // No base plan required
+        }
+        
+        return $this->hasActivePlan($basePlanId);
+    }
+
     public function rank()
     {
         return $this->hasOne(Ranking::class, 'rank_lavel', 'last_lavel');

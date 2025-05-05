@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Facades\App\Services\BasicService;
+use App\Models\UserPlan;
 
 
 class HomeController extends Controller
@@ -339,8 +340,16 @@ class HomeController extends Controller
 
     public function planList()
     {
+        $user = Auth::user();
+        $userActivePlans = $user->userPlans()
+            ->where('is_active', true)
+            ->whereRaw('(expires_at IS NULL OR expires_at > NOW())')
+            ->pluck('plan_id')
+            ->toArray();
+            
         $plans = ManagePlan::where('status', 1)->paginate(10);
-        return view(template() . 'user.plan.index', compact('plans'));
+        
+        return view(template() . 'user.plan.index', compact('plans', 'userActivePlans'));
     }
 
     public function investHistory()
@@ -641,6 +650,21 @@ class HomeController extends Controller
         if (!$plan) {
             return back()->with('error', 'Invalid Plan Request');
         }
+        
+        // Check if this plan requires a base plan and if user has purchased it
+        if ($plan->base_plan_id && !$user->hasBasePlan($plan->base_plan_id)) {
+            $basePlan = ManagePlan::find($plan->base_plan_id);
+            if ($basePlan) {
+                return back()->with('error', 'You need to purchase ' . $basePlan->name . ' plan first to unlock this plan');
+            }
+            return back()->with('error', 'You need to purchase the base plan first');
+        }
+        
+        // Check if user already has an active plan
+        if ($user->hasActivePlan($plan->id)) {
+            return back()->with('error', 'You already have an active subscription to this plan');
+        }
+        
         $timeManage = ManageTime::where('time', $plan->schedule)->first();
 
         $balance_type = $request->balance_type;
@@ -700,6 +724,20 @@ class HomeController extends Controller
                 $remarks = 'Invested On ' . $plan->name;
                 $transaction = BasicService::makeTransaction($user, $amount, 0, '-', $balance_type, $trx, $remarks);
                 $invest->transactional()->save($transaction);
+                
+                // Create user plan record
+                $expiresAt = null;
+                if ($plan->is_lifetime != 1) {
+                    $expiresAt = Carbon::now()->addDays($plan->repeatable);
+                }
+                
+                $userPlan = new UserPlan();
+                $userPlan->user_id = $user->id;
+                $userPlan->plan_id = $plan->id;
+                $userPlan->purchase_date = Carbon::now();
+                $userPlan->expires_at = $expiresAt;
+                $userPlan->is_active = true;
+                $userPlan->save();
             }
 
             if ($basic->investment_commission == 1) {

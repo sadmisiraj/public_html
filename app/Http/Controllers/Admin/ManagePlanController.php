@@ -36,6 +36,13 @@ class ManagePlanController extends Controller
             ->addColumn('price',function ($plan){
                 return $plan->price;
             })
+            ->addColumn('base_plan',function ($plan){
+                if ($plan->base_plan_id) {
+                    $basePlan = ManagePlan::find($plan->base_plan_id);
+                    return $basePlan ? $basePlan->name : 'N/A';
+                }
+                return '<span class="badge bg-light text-dark">None</span>';
+            })
             ->addColumn('status',function ($plan){
                 return $plan->statusMessage;
             })
@@ -56,7 +63,7 @@ class ManagePlanController extends Controller
                 return  '';
 
             })
-            ->rawColumns(['price','action','status','featured','eligible_for_referral'])
+            ->rawColumns(['price','action','status','featured','eligible_for_referral','base_plan'])
             ->make(true);
     }
 
@@ -67,7 +74,8 @@ class ManagePlanController extends Controller
     public function create()
     {
         $times = ManageTime::latest()->get();
-        return view('admin.plan.create', compact('times'));
+        $plans = ManagePlan::where('status', 1)->get();
+        return view('admin.plan.create', compact('times', 'plans'));
     }
 
 
@@ -126,6 +134,7 @@ class ManagePlanController extends Controller
         $data->repeatable = $repeatable;
         $data->featured = $featured;
         $data->eligible_for_referral = $eligible_for_referral;
+        $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->save();
 
         return back()->with('success', 'Plan has been Added');
@@ -139,7 +148,8 @@ class ManagePlanController extends Controller
     {
         $data = ManagePlan::findOrFail($id);
         $times = ManageTime::latest()->get();
-        return view('admin.plan.edit', compact('data', 'times'));
+        $plans = ManagePlan::where('status', 1)->where('id', '!=', $id)->get();
+        return view('admin.plan.edit', compact('data', 'times', 'plans'));
     }
 
     /**
@@ -183,6 +193,11 @@ class ManagePlanController extends Controller
             return back()->with('error', 'Return Time cannot lower than 0')->withInput();
         }
 
+        // Validate that base_plan_id is not the same as the plan's id
+        if (isset($reqData['base_plan_id']) && $reqData['base_plan_id'] == $id) {
+            return back()->with('error', 'A plan cannot be its own base plan')->withInput();
+        }
+
         $data->name = $reqData['name'];
         $data->badge = $reqData['badge'];
         $data->minimum_amount = $minimum_amount;
@@ -197,6 +212,7 @@ class ManagePlanController extends Controller
         $data->repeatable = $repeatable;
         $data->featured = $featured;
         $data->eligible_for_referral = $eligible_for_referral;
+        $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->save();
 
         return back()->with('success', 'Plan has been Updated');
