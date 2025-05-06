@@ -28,6 +28,7 @@
                                 <th scope="col">@lang('Return Profit')</th>
                                 <th scope="col">@lang('Received Amount')<i class="fa-sharp fa-thin fa-circle-info ms-1" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Total Return" data-bs-original-title="Per Return"></i></th>
                                 <th scope="col">@lang('Upcoming Payment')</th>
+                                <th scope="col">@lang('Invoice')</th>
                                 @if(basicControl()->user_termination)
                                     <th scope="col">@lang('Action')</th>
                                 @endif
@@ -58,6 +59,11 @@
                                         @else
                                             <span class="badge text-bg-danger">@lang('Terminated')</span>
                                         @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('user.invest-history.invoice', $invest->id) }}" class="btn btn-info">
+                                            <i class="fas fa-download"></i> @lang('Invoice')
+                                        </a>
                                     </td>
                                     @if(basicControl()->user_termination)
                                         <td>

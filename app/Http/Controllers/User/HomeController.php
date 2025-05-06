@@ -30,6 +30,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Facades\App\Services\BasicService;
 use App\Models\UserPlan;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class HomeController extends Controller
@@ -794,5 +795,20 @@ class HomeController extends Controller
         return view(template() . 'user.plan.payment', $data);
     }
 
+    public function downloadInvoice($id)
+    {
+        $investment = Investment::with('plan', 'user')->find($id);
+        
+        if (!$investment || $investment->user_id != Auth::id()) {
+            session()->flash('error', 'Investment not found or you do not have permission to access it.');
+            return redirect()->route('user.invest-history');
+        }
+
+        $user = Auth::user();
+        $basicControl = basicControl();
+        
+        $pdf = Pdf::loadView('pdf.investment_invoice', compact('investment', 'user', 'basicControl'));
+        return $pdf->download('invoice_' . $investment->trx . '.pdf');
+    }
 
 }

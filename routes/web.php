@@ -106,6 +106,7 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             });
 
             Route::get('invest-history', [HomeController::class, 'investHistory'])->name('invest-history');
+            Route::get('invest-history/invoice/{id}', [HomeController::class, 'downloadInvoice'])->name('invest-history.invoice');
             Route::post('/purchase-plan', [HomeController::class, 'purchasePlan'])->name('purchase-plan');
             Route::get('payment', [HomeController::class, 'payment'])->name('payment');
             Route::get('payment-check-amount', [PaymentController::class, 'checkAmount'])->name('payment.checkAmount');
