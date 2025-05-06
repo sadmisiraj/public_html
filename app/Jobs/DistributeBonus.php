@@ -31,12 +31,14 @@ class DistributeBonus implements ShouldQueue
 
     /**
      * Execute the job.
+     * 
+     * Distributes referral bonuses to eligible users with active plans that have eligible_for_referral = 1
      */
     public function handle(): void
     {
         $user = $this->user;
         $commissionType = $this->commissionType;
-        $amount = $this->amount;
+        $amount = $this->amount;    
 
         $basic = basicControl();
         $userId = $user->id;
@@ -49,6 +51,27 @@ class DistributeBonus implements ShouldQueue
             if (!$refer) {
                 break;
             }
+            
+            // Check if the user has any plan with eligible_for_referral = 1
+            $hasEligiblePlan = false;
+            $userPlans = \App\Models\UserPlan::where('user_id', $refer->id)
+                ->where('is_active', true)
+                ->whereRaw('(expires_at IS NULL OR expires_at > NOW())')
+                ->pluck('plan_id')
+                ->toArray();
+                
+            if (!empty($userPlans)) {
+                $hasEligiblePlan = \App\Models\ManagePlan::whereIn('id', $userPlans)
+                    ->where('eligible_for_referral', 1)
+                    ->exists();
+            }
+            // Skip this referrer if they don't have an eligible plan
+            if (!$hasEligiblePlan) {
+                $userId = $refer->id;
+                $i++;
+                break;
+            }
+            
             $commission = \App\Models\Referral::where('commission_type', $commissionType)->where('level', $i)->first();
             if (!$commission) {
                 break;
