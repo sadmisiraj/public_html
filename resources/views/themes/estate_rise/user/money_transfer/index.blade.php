@@ -28,12 +28,12 @@
                                 <div class="row g-4">
                                     <div class="col-12">
                                         <div>
-                                            <label for="Recipient-email-or-username"
-                                                   class="form-label">@lang('Receiver Email Address') </label>
-                                            <input type="email" class="form-control"
-                                                   id="Recipient-email-or-username" name="email" value="{{old('email')}}" required>
+                                            <label for="Recipient-username"
+                                                   class="form-label">@lang('Receiver Username') </label>
+                                            <input type="text" class="form-control"
+                                                   id="Recipient-username" name="username" value="{{old('username')}}" required>
                                         </div>
-                                        @error('email')
+                                        @error('username')
                                         <div class="error text-danger">@lang($message) </div>
                                         @enderror
                                     </div>

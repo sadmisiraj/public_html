@@ -374,7 +374,7 @@ class HomeController extends Controller
     public function moneyTransferConfirm(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required',
+            'username' => 'required',
             'amount' => 'required',
             'wallet_type' => ['required', Rule::in(['balance', 'interest_balance'])],
             'password' => 'required'
@@ -383,17 +383,17 @@ class HomeController extends Controller
         ]);
 
         $basic = basicControl();
-        $email = trim($request->email);
+        $username = trim($request->username);
 
-        $receiver = User::where('email', $email)->first();
+        $receiver = User::where('username', $username)->first();
 
 
         if (!$receiver) {
-            session()->flash('error', 'This Email  could not Found!');
+            session()->flash('error', 'This Username could not Found!');
             return back();
         }
         if ($receiver->id == Auth::id()) {
-            session()->flash('error', 'This Email  could not Found!');
+            session()->flash('error', 'This Username could not Found!');
             return back()->withInput();
         }
 
@@ -454,7 +454,7 @@ class HomeController extends Controller
                     $transaction->charge = $transferCharge;
                     $transaction->trx_type = '-';
                     $transaction->balance_type = $wallet_type;
-                    $transaction->remarks = 'Balance Transfer to  ' . $receiver->email;
+                    $transaction->remarks = 'Balance Transfer to  ' . $receiver->username;
                     $transaction->trx_id = $sendTaka->trx;
                     $transaction->final_balance = $user[$wallet_type];
                     $transaction->save();
