@@ -86,7 +86,7 @@ class DistributeBonus implements ShouldQueue
             $trx = strRandom();
             $balance_type = 'interest_balance';
 
-            $remarks = ' level ' . $i . ' Referral bonus From ' . $user->username;
+            $remarks = ' level ' . $i . ' Team bonus From ' . $user->username;
 
             $bonus = new \App\Models\ReferralBonus();
             $bonus->from_user_id = $refer->id;
