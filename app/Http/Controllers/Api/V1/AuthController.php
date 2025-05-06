@@ -54,6 +54,7 @@ class AuthController extends Controller
                     'country_code' => 'max:5',
                     'phone_code' => 'required',
                     'phone' => 'required',
+                    'state' => 'nullable|string|max:80',
                     'password' => 'required|min:6|confirmed'
                 ]);
 
@@ -67,15 +68,24 @@ class AuthController extends Controller
                 $sponsorId = null;
             }
 
+            // Generate username with 'REINO' prefix
+            $username = 'REINO' . rand(10000, 99999);
+            
+            // Check if username already exists and make it unique
+            while (User::where('username', $username)->exists()) {
+                $username = 'REINO' . rand(10000, 99999);
+            }
+
             $user = User::create([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
-                'username' => $request->username,
+                'username' => $username,
                 'email' => $request->email,
                 'referral_id' => ($sponsorId != null) ? $sponsorId->id : null,
                 'country_code' => $request->country_code,
                 'phone_code' => $request->phone_code,
                 'phone' => $request->phone,
+                'state' => $request->state,
                 'password' => Hash::make($request->password),
                 'email_verification' => ($basic->email_verification) ? 0 : 1,
                 'sms_verification' => ($basic->sms_verification) ? 0 : 1,

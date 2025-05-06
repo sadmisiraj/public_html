@@ -211,9 +211,45 @@
                                                 <input type="text" class="form-control" name="city" id="cityLabel"
                                                        placeholder="City" aria-label="City"
                                                        value="{{ old('city', $user->city) }}" autocomplete="off">
-                                                <input type="text" class="form-control" name="state" id="stateLabel"
-                                                       placeholder="State" aria-label="State"
-                                                       value="{{ old('state', $user->state) }}">
+                                                <select class="js-select form-select" name="state" id="stateLabel">
+                                                    <option value="" disabled>@lang('Select State')</option>
+                                                    <option value="Andhra Pradesh" {{ old('state', $user->state) == 'Andhra Pradesh' ? 'selected' : '' }}>Andhra Pradesh</option>
+                                                    <option value="Arunachal Pradesh" {{ old('state', $user->state) == 'Arunachal Pradesh' ? 'selected' : '' }}>Arunachal Pradesh</option>
+                                                    <option value="Assam" {{ old('state', $user->state) == 'Assam' ? 'selected' : '' }}>Assam</option>
+                                                    <option value="Bihar" {{ old('state', $user->state) == 'Bihar' ? 'selected' : '' }}>Bihar</option>
+                                                    <option value="Chhattisgarh" {{ old('state', $user->state) == 'Chhattisgarh' ? 'selected' : '' }}>Chhattisgarh</option>
+                                                    <option value="Goa" {{ old('state', $user->state) == 'Goa' ? 'selected' : '' }}>Goa</option>
+                                                    <option value="Gujarat" {{ old('state', $user->state) == 'Gujarat' ? 'selected' : '' }}>Gujarat</option>
+                                                    <option value="Haryana" {{ old('state', $user->state) == 'Haryana' ? 'selected' : '' }}>Haryana</option>
+                                                    <option value="Himachal Pradesh" {{ old('state', $user->state) == 'Himachal Pradesh' ? 'selected' : '' }}>Himachal Pradesh</option>
+                                                    <option value="Jharkhand" {{ old('state', $user->state) == 'Jharkhand' ? 'selected' : '' }}>Jharkhand</option>
+                                                    <option value="Karnataka" {{ old('state', $user->state) == 'Karnataka' ? 'selected' : '' }}>Karnataka</option>
+                                                    <option value="Kerala" {{ old('state', $user->state) == 'Kerala' ? 'selected' : '' }}>Kerala</option>
+                                                    <option value="Madhya Pradesh" {{ old('state', $user->state) == 'Madhya Pradesh' ? 'selected' : '' }}>Madhya Pradesh</option>
+                                                    <option value="Maharashtra" {{ old('state', $user->state) == 'Maharashtra' ? 'selected' : '' }}>Maharashtra</option>
+                                                    <option value="Manipur" {{ old('state', $user->state) == 'Manipur' ? 'selected' : '' }}>Manipur</option>
+                                                    <option value="Meghalaya" {{ old('state', $user->state) == 'Meghalaya' ? 'selected' : '' }}>Meghalaya</option>
+                                                    <option value="Mizoram" {{ old('state', $user->state) == 'Mizoram' ? 'selected' : '' }}>Mizoram</option>
+                                                    <option value="Nagaland" {{ old('state', $user->state) == 'Nagaland' ? 'selected' : '' }}>Nagaland</option>
+                                                    <option value="Odisha" {{ old('state', $user->state) == 'Odisha' ? 'selected' : '' }}>Odisha</option>
+                                                    <option value="Punjab" {{ old('state', $user->state) == 'Punjab' ? 'selected' : '' }}>Punjab</option>
+                                                    <option value="Rajasthan" {{ old('state', $user->state) == 'Rajasthan' ? 'selected' : '' }}>Rajasthan</option>
+                                                    <option value="Sikkim" {{ old('state', $user->state) == 'Sikkim' ? 'selected' : '' }}>Sikkim</option>
+                                                    <option value="Tamil Nadu" {{ old('state', $user->state) == 'Tamil Nadu' ? 'selected' : '' }}>Tamil Nadu</option>
+                                                    <option value="Telangana" {{ old('state', $user->state) == 'Telangana' ? 'selected' : '' }}>Telangana</option>
+                                                    <option value="Tripura" {{ old('state', $user->state) == 'Tripura' ? 'selected' : '' }}>Tripura</option>
+                                                    <option value="Uttar Pradesh" {{ old('state', $user->state) == 'Uttar Pradesh' ? 'selected' : '' }}>Uttar Pradesh</option>
+                                                    <option value="Uttarakhand" {{ old('state', $user->state) == 'Uttarakhand' ? 'selected' : '' }}>Uttarakhand</option>
+                                                    <option value="West Bengal" {{ old('state', $user->state) == 'West Bengal' ? 'selected' : '' }}>West Bengal</option>
+                                                    <option value="Andaman and Nicobar Islands" {{ old('state', $user->state) == 'Andaman and Nicobar Islands' ? 'selected' : '' }}>Andaman and Nicobar Islands</option>
+                                                    <option value="Chandigarh" {{ old('state', $user->state) == 'Chandigarh' ? 'selected' : '' }}>Chandigarh</option>
+                                                    <option value="Dadra and Nagar Haveli and Daman and Diu" {{ old('state', $user->state) == 'Dadra and Nagar Haveli and Daman and Diu' ? 'selected' : '' }}>Dadra and Nagar Haveli and Daman and Diu</option>
+                                                    <option value="Delhi" {{ old('state', $user->state) == 'Delhi' ? 'selected' : '' }}>Delhi</option>
+                                                    <option value="Jammu and Kashmir" {{ old('state', $user->state) == 'Jammu and Kashmir' ? 'selected' : '' }}>Jammu and Kashmir</option>
+                                                    <option value="Ladakh" {{ old('state', $user->state) == 'Ladakh' ? 'selected' : '' }}>Ladakh</option>
+                                                    <option value="Lakshadweep" {{ old('state', $user->state) == 'Lakshadweep' ? 'selected' : '' }}>Lakshadweep</option>
+                                                    <option value="Puducherry" {{ old('state', $user->state) == 'Puducherry' ? 'selected' : '' }}>Puducherry</option>
+                                                </select>
 
                                                 <input type="text" class="js-input-mask form-control" name="zipCode"
                                                        id="zipCodeLabel" placeholder="Zip code" aria-label="Zip code"

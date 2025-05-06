@@ -238,6 +238,7 @@ class HomeController extends Controller
             'phone_code' => 'required | max:15',
             'country_code' => 'required | string | max:80',
             'country' => 'required | string | max:80',
+            'state' => 'nullable | string | max:80',
             'username' => "sometimes|required|alpha_dash|min:5|unique:users,username," . $user->id,
             'address' => 'required',
             'language' => Rule::in($languages),
@@ -263,6 +264,7 @@ class HomeController extends Controller
             $user->phone_code = $req['phone_code'];
             $user->country_code = $req['country_code'];
             $user->country = $req['country'];
+            $user->state = $req['state'];
             $user->save();
             return back()->with('success', 'Updated Successfully.');
         } catch (\Exception $exception) {

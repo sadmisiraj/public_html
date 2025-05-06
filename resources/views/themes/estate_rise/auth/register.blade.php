@@ -106,6 +106,51 @@
                                                 @error('phone')<span class="text-danger mt-1">@lang($message)</span>@enderror
                                             </div>
                                             
+                                            <!-- State Field -->
+                                            <div class="col-md-12">
+                                                <select name="state" class="form-select select2-states" id="state" required>
+                                                    <option value="" selected disabled>@lang('Select State')</option>
+                                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                    <option value="Assam">Assam</option>
+                                                    <option value="Bihar">Bihar</option>
+                                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                                    <option value="Goa">Goa</option>
+                                                    <option value="Gujarat">Gujarat</option>
+                                                    <option value="Haryana">Haryana</option>
+                                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                    <option value="Jharkhand">Jharkhand</option>
+                                                    <option value="Karnataka">Karnataka</option>
+                                                    <option value="Kerala">Kerala</option>
+                                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                    <option value="Maharashtra">Maharashtra</option>
+                                                    <option value="Manipur">Manipur</option>
+                                                    <option value="Meghalaya">Meghalaya</option>
+                                                    <option value="Mizoram">Mizoram</option>
+                                                    <option value="Nagaland">Nagaland</option>
+                                                    <option value="Odisha">Odisha</option>
+                                                    <option value="Punjab">Punjab</option>
+                                                    <option value="Rajasthan">Rajasthan</option>
+                                                    <option value="Sikkim">Sikkim</option>
+                                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                                    <option value="Telangana">Telangana</option>
+                                                    <option value="Tripura">Tripura</option>
+                                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                    <option value="Uttarakhand">Uttarakhand</option>
+                                                    <option value="West Bengal">West Bengal</option>
+                                                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                                    <option value="Chandigarh">Chandigarh</option>
+                                                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                                                    <option value="Delhi">Delhi</option>
+                                                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                    <option value="Ladakh">Ladakh</option>
+                                                    <option value="Lakshadweep">Lakshadweep</option>
+                                                    <option value="Puducherry">Puducherry</option>
+                                                </select>
+                                                <div class="invalid-feedback">@lang('Please select a state')</div>
+                                                @error('state')<span class="text-danger mt-1">@lang($message)</span>@enderror
+                                            </div>
+                                            
                                             <!-- Password Fields -->
                                             <div class="col-md-12">
                                                 <input type="password" name="password" class="form-control" id="password" placeholder="@lang('Password')" required>
@@ -185,6 +230,13 @@
 </script>
 <script>
     $(document).ready(function(){
+        // Initialize select2 for state dropdown with search
+        $('.select2-states').select2({
+            placeholder: "Select State",
+            allowClear: true,
+            width: '100%'
+        });
+        
         // Update country code and country name when phone code changes
         $('#phone_code').change(function() {
             var selectedOption = $(this).find('option:selected');
@@ -339,6 +391,14 @@
                 $('#phone').removeClass('is-invalid').addClass('is-valid');
             }
             
+            // Check state
+            if (!$('#state').val()) {
+                $('#state').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#state').removeClass('is-invalid').addClass('is-valid');
+            }
+            
             // Check password
             if (!$('#password').val() || $('#password').val().length < 6) {
                 $('#password').addClass('is-invalid');
@@ -398,6 +458,15 @@
                 }
             }
         });
+        
+        // Real-time state validation
+        $('#state').on('change', function() {
+            if ($(this).val()) {
+                $(this).removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $(this).removeClass('is-valid').addClass('is-invalid');
+            }
+        });
     });
 </script>
 @endpush
@@ -419,6 +488,34 @@
     }
     .is-invalid ~ .invalid-feedback {
         display: block;
+    }
+    
+    /* Select2 styling */
+    .select2-container--default .select2-selection--single {
+        height: 45px;
+        border-radius: 4px;
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        background-color: #fff;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 43px;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px;
+        color: #212529;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        padding: 8px;
+        border-radius: 4px;
+    }
+    
+    .select2-dropdown {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
     }
 </style>
 @endpush

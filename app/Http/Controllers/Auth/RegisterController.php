@@ -150,6 +150,7 @@ class RegisterController extends Controller
         $rules['phone'] = ['required', 'string', 'unique:users,phone', new PhoneLength($phoneCode)];
         $rules['phone_code'] = ['required', 'string', 'max:15'];
         $rules['country'] = ['nullable', 'string', 'max:80'];
+        $rules['state'] = ['nullable', 'string', 'max:80'];
         $rules['country_code'] = ['nullable', 'string', 'max:80'];
         $rules['sponsor'] = ['required'];
         
@@ -176,16 +177,12 @@ class RegisterController extends Controller
             $sponsorId = $sponsor->id;
         }
         
-        // Generate a unique username from email
-        $emailParts = explode('@', $data['email']);
-        $username = strtolower($emailParts[0] . rand(100, 999));
-        // Remove spaces and special characters
-        $username = preg_replace('/[^a-zA-Z0-9]/', '', $username);
+        // Generate a unique username with 'REINO' prefix and random numbers
+        $username = 'REINO' . rand(10000, 99999);
         
         // Check if username already exists and make it unique
         while (User::where('username', $username)->exists()) {
-            $username = strtolower($emailParts[0] . rand(100, 9999));
-            $username = preg_replace('/[^a-zA-Z0-9]/', '', $username);
+            $username = 'REINO' . rand(10000, 99999);
         }
         
         // Get referral position (node) from session
@@ -203,6 +200,7 @@ class RegisterController extends Controller
             'phone' => $data['phone'],
             'country_code' => strtoupper($data['country_code']??''),
             'country' => $data['country']??'',
+            'state' => $data['state']??'',
             'email_verification' => ($basic->email_verification) ? 0 : 1,
             'sms_verification' => ($basic->sms_verification) ? 0 : 1,
         ]);
