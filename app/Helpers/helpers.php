@@ -164,7 +164,7 @@ if (!function_exists('controlPanelRoutes')) {
         $listRoutes->push(config('generalsettings.sms'));
         $list = $listRoutes->collapse()->map(function ($item) {
             return $item['route'];
-        })->values()->push('admin.settings')->unique();
+        })->values()->push('admin.settings', 'admin.holiday.index')->unique();
         return $list;
     }
 }

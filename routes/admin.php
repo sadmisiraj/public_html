@@ -41,6 +41,7 @@ use App\Http\Controllers\Admin\NotificationTemplateController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\ConfigController;
+use App\Http\Controllers\Admin\HolidayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,6 +118,13 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::get('app-settings', [BasicControlController::class, 'appSettings'])->name('app.settings');
         Route::post('app-settings/update', [BasicControlController::class, 'appSettingUpdate'])->name('app.settings.update');
 
+        /* ===== HOLIDAY MANAGEMENT ===== */
+        Route::get('holiday-management', [HolidayController::class, 'index'])->name('holiday.index');
+        Route::post('holiday-management/update-weekly', [HolidayController::class, 'updateWeeklyHolidays'])->name('holiday.update-weekly');
+        Route::post('holiday-management/store', [HolidayController::class, 'storeSpecificHoliday'])->name('holiday.store');
+        Route::post('holiday-management/update/{id}', [HolidayController::class, 'updateSpecificHoliday'])->name('holiday.update');
+        Route::get('holiday-management/delete/{id}', [HolidayController::class, 'deleteSpecificHoliday'])->name('holiday.delete');
+        Route::post('holiday-management/toggle-profit-disable', [HolidayController::class, 'toggleProfitDisable'])->name('holiday.toggle.profit');
 
         /* ===== STORAGE ===== */
         Route::get('storage', [StorageController::class, 'index'])->name('storage.index');

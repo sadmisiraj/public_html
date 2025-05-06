@@ -37,6 +37,15 @@ return [
             'delete' => [],
         ]
     ],
+    'holiday' => [
+        'label' => "Holidays",
+        'access' => [
+            'view' => ['admin.holiday.index'],
+            'add' => ['admin.holiday.store'],
+            'edit' => ['admin.holiday.update-weekly', 'admin.holiday.update'],
+            'delete' => ['admin.holiday.delete'],
+        ]
+    ],
     'ranking' => [
         'label' => "User Ranking",
         'access' => [

@@ -78,6 +78,7 @@ class Kernel extends HttpKernel
         'adminAuthorization' => \App\Http\Middleware\AdminAuthorizeMiddleware::class,
         'userCheckApi' => \App\Http\Middleware\CheckUserStatusApi::class,
         'apiKycCheck' => \App\Http\Middleware\ApiKyc::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
 
 
     ];

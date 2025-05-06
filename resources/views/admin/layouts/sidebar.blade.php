@@ -91,6 +91,13 @@
                                     <span class="nav-link-title">@lang("Referral")</span>
                                 </a>
                             </div>
+                            <div class="nav-item">
+                                <a class="nav-link {{ menuActive(['admin.holiday.index']) }}"
+                                   href="{{ route('admin.holiday.index') }}">
+                                    <i class="fa-solid fa-calendar-xmark nav-icon"></i>
+                                    <span class="nav-link-title">@lang("Holidays")</span>
+                                </a>
+                            </div>
                         @endif
 
                         @if(adminAccessRoute(config('role.ranking.access.view')))

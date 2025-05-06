@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\DistributeBonus;
 use App\Models\Investment;
+use App\Models\Holiday;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,11 @@ class DistributeProfit extends Command
         $now = Carbon::now();
         $basic = basicControl();
 
+        // Check if today is a holiday and profit distribution on holidays is disabled
+        if ($basic->holiday_profit_disable && Holiday::isHoliday()) {
+            $this->info('Today is a holiday. Profit distribution is skipped.');
+            return;
+        }
 
         DB::transaction(function () use ($basic, $now) {
             Investment::with(['user:id,firstname,lastname,username,email,phone_code,phone,balance,interest_balance', 'plan'])
