@@ -229,26 +229,14 @@
     </script>
     <script>
         "use strict";
-        document.getElementById("copyBtn").addEventListener("click", () => {
-            let referralURL = document.getElementById("referralURL");
-            referralURL.select();
-            navigator.clipboard.writeText(referralURL.value)
-            if (referralURL.value) {
-                document.getElementById("copyBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>' + "{{trans('Copied')}}";
-                setTimeout(() => {
-                    document.getElementById("copyBtn").innerHTML = '<i class="fa-regular fa-copy"></i>' + "{{trans('copy')}}";
-                }, 1000)
-            }
-        })
-        
         document.getElementById("copyLeftBtn").addEventListener("click", () => {
             let leftReferralURL = document.getElementById("leftReferralURL");
             leftReferralURL.select();
             navigator.clipboard.writeText(leftReferralURL.value)
             if (leftReferralURL.value) {
-                document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
+                document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>' + "{{trans('Copied')}}";
                 setTimeout(() => {
-                    document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
+                    document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-copy"></i>' + "{{trans('copy')}}";
                 }, 1000)
             }
         })
@@ -258,9 +246,9 @@
             rightReferralURL.select();
             navigator.clipboard.writeText(rightReferralURL.value)
             if (rightReferralURL.value) {
-                document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
+                document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>' + "{{trans('Copied')}}";
                 setTimeout(() => {
-                    document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
+                    document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-copy"></i>' + "{{trans('copy')}}";
                 }, 1000)
             }
         })
