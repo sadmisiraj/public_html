@@ -446,7 +446,7 @@ class HomeController extends Controller
                     $sendTaka->receiver_id = $receiver->id;
                     $sendTaka->amount = round($request->amount, 2);
                     $sendTaka->charge = $transferCharge;
-                    $sendTaka->send_at = Carbon::parse()->addMinutes(1);
+                    $sendTaka->send_at = Carbon::now()->addMinutes(1);
                     $sendTaka->save();
 
                     $transaction = new Transaction();
@@ -664,7 +664,7 @@ class HomeController extends Controller
         }
         
         // Check if user already has an active plan
-        if ($user->hasActivePlan($plan->id)) {
+        if ($user->hasActivePlan($plan->id) && !$plan->allow_multiple_purchase) {
             return back()->with('error', 'You already have an active subscription to this plan');
         }
         
@@ -701,7 +701,7 @@ class HomeController extends Controller
         if (RateLimiter::tooManyAttempts($throttleKey, 1)) {  // Adjust '5' to desired max attempts
             return back()->with('error', 'Too many requests. Please wait 60 seconds before trying again.');
         }
-        RateLimiter::hit($throttleKey, 59);
+        RateLimiter::hit($throttleKey, 1);
 
 
 

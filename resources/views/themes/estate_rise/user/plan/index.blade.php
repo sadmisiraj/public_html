@@ -22,6 +22,12 @@
             background-color: rgba(0, 0, 0, 0.05);
             z-index: 1;
         }
+        .plan-active .btn-primary {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            z-index: 2;
+            position: relative;
+        }
     </style>
 @endpush
 @section('content')
@@ -52,6 +58,7 @@
                                 <th scope="col">@lang('Price')</th>
                                 <th scope="col">@lang('Profit')</th>
                                 <th scope="col">@lang('Capital Back')</th>
+                                <th scope="col">@lang('Status')</th>
                                 <th scope="col">@lang('Action')</th>
                             </tr>
                             </thead>
@@ -85,29 +92,59 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if(in_array($plan->id, $userActivePlans))
-                                            @php
-                                                $userPlan = auth()->user()->userPlans()->where('plan_id', $plan->id)->where('is_active', true)->first();
-                                                $expiryText = $userPlan && $userPlan->expires_at ? 'Active till ' . $userPlan->expires_at->format('d M Y') : 'Active (Lifetime)';
-                                            @endphp
-                                            <button class="cmn-btn btn-success disabled" style="opacity: 0.7; cursor: default; background-color: #28a745; color: #fff;">
-                                                <i class="fas fa-check-circle" aria-hidden="true"></i>
-                                                {{ $expiryText }}
-                                            </button>
-                                        @elseif($plan->base_plan_id && !in_array($plan->base_plan_id, $userActivePlans))
-                                            @php
+                                        @php
+                                            $statusText = '';
+                                            if ($isPlanActive) {
+                                                $userPlan = auth()->user()->userPlans()->where('plan_id', $plan->id)->where('is_active', true)->orderByDesc('expires_at')->first();
+                                                $statusText = $userPlan && $userPlan->expires_at ? 'Active till ' . $userPlan->expires_at->format('d M Y') : 'Active (Lifetime)';
+                                            } elseif ($isBasePlanRequired) {
                                                 $basePlan = \App\Models\ManagePlan::find($plan->base_plan_id);
+                                                $statusText = 'Purchase ' . ($basePlan ? $basePlan->name : 'base plan') . ' to unlock';
+                                            } else {
+                                                $statusText = 'Available';
+                                            }
+                                        @endphp
+                                        {{ $statusText }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $allowMultiple = $plan->allow_multiple_purchase ?? 0;
+                                        @endphp
+                                        @if($isPlanActive)
+                                            @if($allowMultiple)
+                                                <a class="cmn-btn btn-primary investNow" href="javascript:void(0)" data-bs-toggle="modal"
+                                                   data-bs-target="#InvestModal" data-price="{{$plan->price}}"
+                                                   data-resource="{{$plan}}" data-plan-id="{{$plan->id}}">
+                                                    <i class="fas fa-plus-circle" aria-hidden="true"></i> @lang('Topup')
+                                                </a>
+                                            @else
+                                                <button class="cmn-btn btn-success disabled" style="opacity: 0.7; cursor: not-allowed; background-color: #28a745; color: #fff;">
+                                                    <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                                    @lang('Active')
+                                                </button>
+                                            @endif
+                                        @elseif($isBasePlanRequired)
+                                            @php
+                                                $hasBasePlan = in_array($plan->base_plan_id, $userActivePlans);
                                             @endphp
-                                            <button class="cmn-btn btn-warning disabled" 
-                                                style="opacity: 0.7; cursor: not-allowed; background-color: #ffc107; color: #212529;">
-                                                <i class="fas fa-lock" aria-hidden="true"></i>
-                                                @lang('Purchase') {{ $basePlan ? $basePlan->name : 'base plan' }} @lang('to unlock')
-                                            </button>
+                                            @if($hasBasePlan)
+                                                <a class="cmn-btn investNow" href="javascript:void(0)" data-bs-toggle="modal"
+                                                   data-bs-target="#InvestModal" data-price="{{$plan->price}}"
+                                                   data-resource="{{$plan}}" data-plan-id="{{$plan->id}}">
+                                                    <i class="fal fa-usd-circle" aria-hidden="true"></i> @lang('Purchase')
+                                                </a>
+                                            @else
+                                                <button class="cmn-btn btn-warning disabled" style="opacity: 0.7; cursor: not-allowed; background-color: #ffc107; color: #212529;">
+                                                    <i class="fas fa-lock" aria-hidden="true"></i>
+                                                    @lang('Purchase')
+                                                </button>
+                                            @endif
                                         @else
                                             <a class="cmn-btn investNow" href="javascript:void(0)" data-bs-toggle="modal"
-                                            data-bs-target="#InvestModal" data-price="{{$plan->price}}"
-                                            data-resource="{{$plan}}"><i class="fal fa-usd-circle"
-                                                                        aria-hidden="true"></i> @lang('Purchase') </a>
+                                               data-bs-target="#InvestModal" data-price="{{$plan->price}}"
+                                               data-resource="{{$plan}}" data-plan-id="{{$plan->id}}">
+                                                <i class="fal fa-usd-circle" aria-hidden="true"></i> @lang('Purchase')
+                                            </a>
                                         @endif
                                     </td>
                                 </tr>
@@ -199,6 +236,7 @@
     <script>
         $(document).on('click', '.investNow', function () {
             let plan = $(this).data('resource');
+            let planId = $(this).data('plan-id');
             
             // Prevent opening modal for locked plans
             if (plan.base_plan_id) {
@@ -231,7 +269,7 @@
                 }
             @endforeach
             
-            if (isPlanActive) {
+            if (isPlanActive && !plan.allow_multiple_purchase) {
                 Notiflix.Notify.info("You already have an active subscription to this plan");
                 return;
             }
@@ -253,7 +291,7 @@
             $('.profit-details').html(`@lang('Profit'): ${(data.profit_type == '1') ? `${data.profit} %` : `${data.profit} ${currency}`}`);
             $('.profit-validity').html(`@lang('Per') ${data.schedule} @lang('hours') ,  ${(data.is_lifetime == '0') ? `${data.repeatable} @lang('times')` : `@lang('Lifetime')`}`);
             $('.plan-name').text(data.name);
-            $('.plan-id').val(data.id);
+            $('.plan-id').val(planId);
             $('.show-currency').text("{{basicControl()->base_currency}}");
         });
     </script>

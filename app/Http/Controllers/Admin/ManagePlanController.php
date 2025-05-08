@@ -108,6 +108,7 @@ class ManagePlanController extends Controller
 
         $featured = $reqData['featured'];
         $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
+        $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -135,6 +136,7 @@ class ManagePlanController extends Controller
         $data->featured = $featured;
         $data->eligible_for_referral = $eligible_for_referral;
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
+        $data->allow_multiple_purchase = $allow_multiple_purchase;
         $data->save();
 
         return back()->with('success', 'Plan has been Added');
@@ -182,6 +184,7 @@ class ManagePlanController extends Controller
         $repeatable = $reqData['is_lifetime'] ? 0  : $reqData['repeatable'];
         $featured = $reqData['featured'];
         $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
+        $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -213,6 +216,7 @@ class ManagePlanController extends Controller
         $data->featured = $featured;
         $data->eligible_for_referral = $eligible_for_referral;
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
+        $data->allow_multiple_purchase = $allow_multiple_purchase;
         $data->save();
 
         return back()->with('success', 'Plan has been Updated');

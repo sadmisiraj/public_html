@@ -69,7 +69,7 @@ class DistributeBonus implements ShouldQueue
             if (!$hasEligiblePlan) {
                 $userId = $refer->id;
                 $i++;
-                break;
+                continue;
             }
             
             $commission = \App\Models\Referral::where('commission_type', $commissionType)->where('level', $i)->first();

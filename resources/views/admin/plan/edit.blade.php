@@ -296,6 +296,28 @@
                                             <div class="flex-grow-1 ms-3">
                                                 <div class="row align-items-center">
                                                     <div class="col-sm mb-2 mb-sm-0">
+                                                        <h5 class="mb-0">@lang('Allow Multiple Purchase')</h5>
+                                                        <p class="fs-5 text-body mb-0">@lang('If enabled, users can purchase this plan multiple times')</p>
+                                                    </div>
+                                                    <div class="col-sm-auto d-flex align-items-center">
+                                                        <div class="form-check form-switch form-switch-google">
+                                                            <input type="hidden" name="allow_multiple_purchase" value="0">
+                                                            <input class="form-check-input" name="allow_multiple_purchase"
+                                                                   type="checkbox" id="allowMultiplePurchase" value="1" @checked(old('allow_multiple_purchase', $data->allow_multiple_purchase) == 1)>
+                                                            <label class="form-check-label"
+                                                                   for="allowMultiplePurchase"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="list-group-item mb-4">
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-sm mb-2 mb-sm-0">
                                                         <h5 class="mb-0">@lang('Eligible for Referral Income')</h5>
                                                         <p class="fs-5 text-body mb-0">@lang('If this plan is eligible for referral income, then turn on this button.')</p>
                                                     </div>
