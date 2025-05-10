@@ -28,6 +28,7 @@
                                 <th scope="col">@lang('Return Profit')</th>
                                 <th scope="col">@lang('Received Amount')<i class="fa-sharp fa-thin fa-circle-info ms-1" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Total Return" data-bs-original-title="Per Return"></i></th>
                                 <th scope="col">@lang('Upcoming Payment')</th>
+                                <th scope="col">@lang('Remarks')</th>
                                 <th scope="col">@lang('Invoice')</th>
                                 @if(basicControl()->user_termination)
                                     <th scope="col">@lang('Action')</th>
@@ -53,11 +54,119 @@
                                     </td>
                                     <td>
                                         @if($invest->status == 1)
-                                            <span class='next-payment' data-payment='{{$invest->afterward}}'>{{dateTime($invest->afterward)}}</span>
+                                            @php
+                                                $nextPaymentDate = \Carbon\Carbon::parse($invest->afterward);
+                                                $isHoliday = \App\Models\Holiday::isHolidayOnDate($nextPaymentDate);
+                                                
+                                                // Get the next payment time based on investment time
+                                                $nextPaymentTime = \Carbon\Carbon::parse($invest->formerly)->addHours((int)$invest->point_in_time);
+                                                
+                                                // If next payment time is after 11:59:59 PM, check if next day is a holiday
+                                                $isNextDayHoliday = false;
+                                                if ($nextPaymentTime->format('H:i:s') > '23:59:59') {
+                                                    $nextDay = $nextPaymentTime->copy()->addDay()->startOfDay();
+                                                    $isNextDayHoliday = \App\Models\Holiday::isHolidayOnDate($nextDay);
+                                                }
+                                                
+                                                // If current day or next day is holiday, get next working day
+                                                $nextWorkingDay = $isHoliday || $isNextDayHoliday ? 
+                                                    \App\Models\Holiday::getNextWorkingDay($isNextDayHoliday ? $nextDay : $nextPaymentDate) : 
+                                                    $nextPaymentDate;
+                                                
+                                                // Get all holidays between now and next working day
+                                                $now = \Carbon\Carbon::now();
+                                                $holidays = \App\Models\Holiday::where(function($query) use ($now, $nextWorkingDay) {
+                                                    $query->where(function($q) use ($now, $nextWorkingDay) {
+                                                        $q->where('type', 'specific')
+                                                          ->whereBetween('date', [$now->format('Y-m-d'), $nextWorkingDay->format('Y-m-d')]);
+                                                    })->orWhere(function($q) use ($now, $nextWorkingDay) {
+                                                        $q->where('type', 'weekly')
+                                                          ->where('status', true);
+                                                    });
+                                                })->get();
+                                                
+                                                $upcomingHolidays = [];
+                                                foreach($holidays as $holiday) {
+                                                    if($holiday->type == 'specific') {
+                                                        $holidayDate = \Carbon\Carbon::parse($holiday->date);
+                                                        if($holidayDate->between($now, $nextWorkingDay)) {
+                                                            $upcomingHolidays[] = [
+                                                                'name' => $holiday->name,
+                                                                'date' => $holidayDate->format('Y-m-d'),
+                                                                'type' => 'specific'
+                                                            ];
+                                                        }
+                                                    } else {
+                                                        // For weekly holidays, check each day between now and next working day
+                                                        $currentDate = $now->copy();
+                                                        while($currentDate <= $nextWorkingDay) {
+                                                            if($currentDate->dayOfWeek == $holiday->day_of_week) {
+                                                                $upcomingHolidays[] = [
+                                                                    'name' => $holiday->name,
+                                                                    'date' => $currentDate->format('Y-m-d'),
+                                                                    'type' => 'weekly'
+                                                                ];
+                                                            }
+                                                            $currentDate->addDay();
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // Sort holidays by date
+                                                usort($upcomingHolidays, function($a, $b) {
+                                                    return strtotime($a['date']) - strtotime($b['date']);
+                                                });
+                                            @endphp
+                                            <span class='next-payment' data-payment='{{$nextWorkingDay}}'>{{dateTime($nextWorkingDay)}}</span>
                                         @elseif($invest->status == 0)
                                             <span class="badge text-bg-success">@lang('Completed')</span>
                                         @else
                                             <span class="badge text-bg-danger">@lang('Terminated')</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($invest->status == 1)
+                                            @if($isHoliday)
+                                                @php
+                                                    $holiday = \App\Models\Holiday::where('type', 'specific')
+                                                        ->where('date', $nextPaymentDate->format('Y-m-d'))
+                                                        ->where('status', true)
+                                                        ->first();
+                                                    if(!$holiday) {
+                                                        $holiday = \App\Models\Holiday::where('type', 'weekly')
+                                                            ->where('day_of_week', $nextPaymentDate->dayOfWeek)
+                                                            ->where('status', true)
+                                                            ->first();
+                                                    }
+                                                @endphp
+                                                <div class="text-warning">
+                                                    <i class="fas fa-calendar-alt"></i> @lang('Payment delayed due to holiday:') {{ $holiday->name }}
+                                                </div>
+                                                @if(count($upcomingHolidays) > 1)
+                                                    <div class="mt-1">
+                                                        <i class="fas fa-info-circle"></i> @lang('More holidays upcoming')
+                                                        <button type="button" class="btn btn-sm btn-info ms-2" data-bs-toggle="modal" data-bs-target="#holidayModal{{$invest->id}}">
+                                                            @lang('See Details')
+                                                        </button>
+                                                    </div>
+                                                @endif
+                                            @elseif($isNextDayHoliday)
+                                                <div class="text-warning">
+                                                    <i class="fas fa-calendar-alt"></i> @lang('Next payment day is a holiday')
+                                                </div>
+                                                <div class="mt-1">
+                                                    <i class="fas fa-info-circle"></i> @lang('Payment will be processed on next working day')
+                                                    <button type="button" class="btn btn-sm btn-info ms-2" data-bs-toggle="modal" data-bs-target="#holidayModal{{$invest->id}}">
+                                                        @lang('See Details')
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <div class="text-success">
+                                                    <i class="fas fa-check-circle"></i> @lang('Regular payment day - No holidays')
+                                                </div>
+                                            @endif
+                                        @else
+                                            --
                                         @endif
                                     </td>
                                     <td>
@@ -126,6 +235,121 @@
         </div>
     </div>
     <!-- Modal section end -->
+
+    <!-- Holiday Details Modal -->
+    @foreach($investments as $invest)
+        @if($invest->status == 1)
+            @php
+                $nextPaymentDate = \Carbon\Carbon::parse($invest->afterward);
+                $isHoliday = \App\Models\Holiday::isHolidayOnDate($nextPaymentDate);
+                
+                // Get the next payment time based on investment time
+                $nextPaymentTime = \Carbon\Carbon::parse($invest->formerly)->addHours((int)$invest->point_in_time);
+                
+                // If next payment time is after 11:59:59 PM, check if next day is a holiday
+                $isNextDayHoliday = false;
+                if ($nextPaymentTime->format('H:i:s') > '23:59:59') {
+                    $nextDay = $nextPaymentTime->copy()->addDay()->startOfDay();
+                    $isNextDayHoliday = \App\Models\Holiday::isHolidayOnDate($nextDay);
+                }
+                
+                // If current day or next day is holiday, get next working day
+                $nextWorkingDay = $isHoliday || $isNextDayHoliday ? 
+                    \App\Models\Holiday::getNextWorkingDay($isNextDayHoliday ? $nextDay : $nextPaymentDate) : 
+                    $nextPaymentDate;
+                
+                // Get all holidays between now and next working day
+                $now = \Carbon\Carbon::now();
+                $holidays = \App\Models\Holiday::where(function($query) use ($now, $nextWorkingDay) {
+                    $query->where(function($q) use ($now, $nextWorkingDay) {
+                        $q->where('type', 'specific')
+                          ->whereBetween('date', [$now->format('Y-m-d'), $nextWorkingDay->format('Y-m-d')]);
+                    })->orWhere(function($q) use ($now, $nextWorkingDay) {
+                        $q->where('type', 'weekly')
+                          ->where('status', true);
+                    });
+                })->get();
+                
+                $upcomingHolidays = [];
+                foreach($holidays as $holiday) {
+                    if($holiday->type == 'specific') {
+                        $holidayDate = \Carbon\Carbon::parse($holiday->date);
+                        if($holidayDate->between($now, $nextWorkingDay)) {
+                            $upcomingHolidays[] = [
+                                'name' => $holiday->name,
+                                'date' => $holidayDate->format('Y-m-d'),
+                                'type' => 'specific'
+                            ];
+                        }
+                    } else {
+                        // For weekly holidays, check each day between now and next working day
+                        $currentDate = $now->copy();
+                        while($currentDate <= $nextWorkingDay) {
+                            if($currentDate->dayOfWeek == $holiday->day_of_week) {
+                                $upcomingHolidays[] = [
+                                    'name' => $holiday->name,
+                                    'date' => $currentDate->format('Y-m-d'),
+                                    'type' => 'weekly'
+                                ];
+                            }
+                            $currentDate->addDay();
+                        }
+                    }
+                }
+                
+                // Sort holidays by date
+                usort($upcomingHolidays, function($a, $b) {
+                    return strtotime($a['date']) - strtotime($b['date']);
+                });
+            @endphp
+            
+            @if(count($upcomingHolidays) > 0)
+                <div class="modal fade" id="holidayModal{{$invest->id}}" tabindex="-1" aria-labelledby="holidayModalLabel{{$invest->id}}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="holidayModalLabel{{$invest->id}}">@lang('Upcoming Holidays')</h5>
+                                <button type="button" class="cmn-btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fa-light fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>@lang('Date')</th>
+                                                <th>@lang('Holiday')</th>
+                                                <th>@lang('Type')</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($upcomingHolidays as $holiday)
+                                                <tr>
+                                                    <td>{{ \Carbon\Carbon::parse($holiday['date'])->format('d M, Y') }}</td>
+                                                    <td>{{ $holiday['name'] }}</td>
+                                                    <td>
+                                                        @if($holiday['type'] == 'specific')
+                                                            <span class="badge text-bg-primary">@lang('Specific')</span>
+                                                        @else
+                                                            <span class="badge text-bg-info">@lang('Weekly')</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="cmn-btn" data-bs-dismiss="modal">@lang('Close')</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
+    @endforeach
 @endsection
 
 @push('script')
@@ -160,7 +384,7 @@
 
                         $(this).text(`${days}d ${hours}h ${minutes}m ${seconds}s`);
                     } else {
-                        $(this).text('{{trans('Time has passed')}}');
+                        $(this).text('{{trans('Plan has expired.')}}');
                     }
                 }
             });
