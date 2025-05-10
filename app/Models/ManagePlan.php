@@ -11,6 +11,26 @@ class ManagePlan extends Model
 
     protected $guarded = ['id'];
 
+    protected $fillable = [
+        'name',
+        'badge',
+        'minimum_amount',
+        'maximum_amount',
+        'fixed_amount',
+        'profit',
+        'profit_type',
+        'schedule',
+        'status',
+        'is_capital_back',
+        'is_lifetime',
+        'repeatable',
+        'featured',
+        'eligible_for_referral',
+        'base_plan_id',
+        'allow_multiple_purchase',
+        'referral_levels'
+    ];
+
     protected $appends = ['price'];
 
     /*

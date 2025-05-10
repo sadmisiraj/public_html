@@ -182,6 +182,27 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="referral_levels" class="form-label">@lang('Referral Levels')</label>
+                                        <i class="bi bi-info-circle text-body ms-1"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           aria-label="Number of referral levels (1-10) for this plan"
+                                           data-bs-original-title="Number of referral levels (1-10) for this plan"
+                                        ></i>
+                                        <input type="number" class="form-control @error('referral_levels') is-invalid @enderror" 
+                                               value="{{old('referral_levels', $data->referral_levels)}}" 
+                                               name="referral_levels" 
+                                               id="referral_levels" 
+                                               min="1" 
+                                               max="10">
+                                        @error("referral_levels")
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <!-- Body -->

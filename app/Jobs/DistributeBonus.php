@@ -43,29 +43,45 @@ class DistributeBonus implements ShouldQueue
         $basic = basicControl();
         $userId = $user->id;
         $i = 1;
-        $level = \App\Models\Referral::where('commission_type', $commissionType)->count();
 
-        while ($userId != "" || $userId != "0" || $i < $level) {
+        // Get the user's active plan with the highest referral levels
+        $userPlan = \App\Models\UserPlan::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->whereRaw('(expires_at IS NULL OR expires_at > NOW())')
+            ->with('plan')
+            ->get()
+            ->sortByDesc(function($userPlan) {
+                return $userPlan->plan->referral_levels;
+            })
+            ->first();
+
+        if (!$userPlan || !$userPlan->plan->eligible_for_referral) {
+            return;
+        }
+
+        $maxLevel = $userPlan->plan->referral_levels;
+
+        while ($userId != "" || $userId != "0" || $i <= $maxLevel) {
             $me = \App\Models\User::with('referral')->find($userId);
             $refer = $me->referral;
             if (!$refer) {
                 break;
             }
             
-            // Check if the user has any plan with eligible_for_referral = 1
+            // Check if the referred user has any plan with eligible_for_referral = 1
             $hasEligiblePlan = false;
-            $userPlans = \App\Models\UserPlan::where('user_id', $refer->id)
+            $referredUserPlans = \App\Models\UserPlan::where('user_id', $user->id)
                 ->where('is_active', true)
                 ->whereRaw('(expires_at IS NULL OR expires_at > NOW())')
                 ->pluck('plan_id')
                 ->toArray();
                 
-            if (!empty($userPlans)) {
-                $hasEligiblePlan = \App\Models\ManagePlan::whereIn('id', $userPlans)
+            if (!empty($referredUserPlans)) {
+                $hasEligiblePlan = \App\Models\ManagePlan::whereIn('id', $referredUserPlans)
                     ->where('eligible_for_referral', 1)
                     ->exists();
             }
-            // Skip this referrer if they don't have an eligible plan
+            // Skip this referrer if the referred user doesn't have an eligible plan
             if (!$hasEligiblePlan) {
                 $userId = $refer->id;
                 $i++;
@@ -98,8 +114,8 @@ class DistributeBonus implements ShouldQueue
             $bonus->remarks = $remarks;
             $bonus->save();
 
-          $transaction =  BasicService::makeTransaction($refer, $com, 0, '+', $balance_type, $bonus->transaction, $remarks);
-          $bonus->transactional()->save($transaction);
+            $transaction =  BasicService::makeTransaction($refer, $com, 0, '+', $balance_type, $bonus->transaction, $remarks);
+            $bonus->transactional()->save($transaction);
 
             $msg = [
                 'transaction_id' => $trx,
@@ -115,7 +131,6 @@ class DistributeBonus implements ShouldQueue
             $this->sendMailSms($user, 'REFERRAL_BONUS', $msg);
             $this->userPushNotification($user, 'REFERRAL_BONUS', $msg, $action);
             $this->userFirebasePushNotification($user, 'REFERRAL_BONUS', $msg,  route('user.referral.bonus'));
-
 
             $userId = $refer->id;
             $i++;

@@ -89,6 +89,7 @@ class ManagePlanController extends Controller
             'name' => 'required',
             'schedule' => 'required',
             'profit' => 'numeric|min:0',
+            'referral_levels' => 'required|integer|min:1|max:10',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                 if ($value==1 && $request->is_capital_back==1) {
                     $fail('When capital back is on then you can not on lifetime feature');
@@ -109,6 +110,7 @@ class ManagePlanController extends Controller
         $featured = $reqData['featured'];
         $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
         $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
+        $referral_levels = $reqData['referral_levels'] ?? 1;
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -137,6 +139,7 @@ class ManagePlanController extends Controller
         $data->eligible_for_referral = $eligible_for_referral;
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->allow_multiple_purchase = $allow_multiple_purchase;
+        $data->referral_levels = $referral_levels;
         $data->save();
 
         return back()->with('success', 'Plan has been Added');
@@ -165,6 +168,7 @@ class ManagePlanController extends Controller
             'name' => 'required',
             'schedule' => 'numeric|min:0',
             'profit' => 'numeric|min:0',
+            'referral_levels' => 'required|integer|min:1|max:10',
             'repeatable' => 'sometimes|required',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                     if ($value==1 && $request->is_capital_back==1) {
@@ -185,6 +189,7 @@ class ManagePlanController extends Controller
         $featured = $reqData['featured'];
         $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
         $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
+        $referral_levels = $reqData['referral_levels'] ?? 1;
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -217,6 +222,7 @@ class ManagePlanController extends Controller
         $data->eligible_for_referral = $eligible_for_referral;
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->allow_multiple_purchase = $allow_multiple_purchase;
+        $data->referral_levels = $referral_levels;
         $data->save();
 
         return back()->with('success', 'Plan has been Updated');
