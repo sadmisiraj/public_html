@@ -602,6 +602,7 @@ class HomeController extends Controller
                 'phone' => $user->phone,
                 'count_direct_referral' => count(getDirectReferralUsers($user->id)),
                 'joined_at' => dateTime($user->created_at),
+                'referral_node' => $user->referral_node,
             ];
         });
 

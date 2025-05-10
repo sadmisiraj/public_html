@@ -73,8 +73,6 @@
                             <tr>
                                 <th scope="col">@lang('Username')</th>
                                 <th scope="col">@lang('Level')</th>
-                                <th scope="col">@lang('Email')</th>
-                                <th scope="col">@lang('Phone Number')</th>
                                 <th scope="col">@lang('Placement')</th>
                                 <th scope="col">@lang('Joined At')</th>
                             </tr>
@@ -85,7 +83,6 @@
                                     $countUser = count(getDirectReferralUsers($user->id));
                                 @endphp
                                 <tr id="user-{{ $user->id }}" data-level="0" data-loaded="false">
-
                                     <td>
                                         <a href="javascript:void(0)"
                                            class="{{ $countUser > 0 ? 'nextDirectReferral' : '' }} text-decoration-none"
@@ -100,14 +97,6 @@
                                     <td data-label="@lang('Level')">
                                         @lang('Level 1')
                                     </td>
-                                    <td data-label="@lang('Email')">
-                                        {{$user->email}}
-                                    </td>
-
-                                    <td data-label="@lang('Phone Number')">
-                                        {{$user->phone}}
-                                    </td>
-                                    
                                     <td data-label="@lang('Placement')">
                                         @if($user->referral_node)
                                             <span class="badge bg-{{ $user->referral_node == 'left' ? 'primary' : 'success' }}">
@@ -117,11 +106,9 @@
                                             -
                                         @endif
                                     </td>
-
                                     <td data-label="@lang('Joined At')">
                                         {{dateTime($user->created_at)}}
                                     </td>
-
                                 </tr>
                             @endforeach
                             </tbody>
@@ -142,9 +129,21 @@
         $(document).on('click', '.nextDirectReferral', function () {
             let _this = $(this);
             let parentRow = _this.closest('tr');
+            let userId = _this.data('id');
+            let currentLevel = parseInt(parentRow.data('level')) + 1;
 
-            // Check if the downline is already loaded
+            // Toggle expand/collapse
             if (parentRow.data('loaded')) {
+                // Collapse: remove all child rows of this user (at deeper levels)
+                let nextRow = parentRow.next();
+                while (nextRow.length && parseInt(nextRow.data('level')) > parseInt(parentRow.data('level'))) {
+                    let temp = nextRow.next();
+                    nextRow.remove();
+                    nextRow = temp;
+                }
+                parentRow.data('loaded', false);
+                // Change icon to collapsed state if needed
+                parentRow.find('i.far').removeClass('fa-circle-up').addClass('fa-circle-down');
                 return;
             }
 
@@ -152,34 +151,25 @@
         });
 
         function getDirectReferralUser(_this) {
-
             Notiflix.Block.standard('.block-statistics');
-
             let userId = _this.data('id');
             let parentRow = _this.closest('tr');
             let currentLevel = parseInt(parentRow.data('level')) + 1;
             let downLabel = currentLevel + 1;
-
             setTimeout(function () {
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 });
-
                 $.ajax({
                     url: "{{ route('user.myGetDirectReferralUser') }}",
                     method: 'POST',
-                    data: {
-                        userId: userId,
-                    },
+                    data: { userId: userId },
                     success: function (response) {
-
                         Notiflix.Block.remove('.block-statistics');
                         let directReferralUsers = response.data;
-
                         let referralData = '';
-
                         directReferralUsers.forEach(function (directReferralUser) {
                             referralData += `
                         <tr id="user-${directReferralUser.id}" data-level="${currentLevel}">
@@ -189,34 +179,24 @@
                                     ${directReferralUser.username}
                                 </a>
                             </td>
-
                             <td data-label="@lang('Level')">
                                  <span class="text-dark">Level ${downLabel}</span>
                             </td>
-
-                            <td data-label="@lang('Email')">
-                                ${directReferralUser.email ? directReferralUser.email : '-'}
-                            </td>
-                            <td data-label="@lang('Phone Number')">
-                                 ${directReferralUser.phone ?? '-'}
-                            </td>
-                            
                             <td data-label="@lang('Placement')">
                                 ${directReferralUser.referral_node ? 
                                     `<span class="badge bg-${directReferralUser.referral_node === 'left' ? 'primary' : 'success'}">
                                         ${directReferralUser.referral_node.charAt(0).toUpperCase() + directReferralUser.referral_node.slice(1)}
                                     </span>` : '-'}
                             </td>
-
                             <td data-label="Joined At">
                                 ${directReferralUser.joined_at}
                             </td>
                             </tr>`;
                         });
-
                         // Mark this row as having its downline loaded
                         parentRow.data('loaded', true);
-
+                        // Change icon to expanded state if needed
+                        parentRow.find('i.far').removeClass('fa-circle-down').addClass('fa-circle-up');
                         $(`#user-${userId}`).after(referralData);
                     },
                     error: function (xhr, status, error) {
