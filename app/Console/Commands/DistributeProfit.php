@@ -87,7 +87,7 @@ class DistributeProfit extends Command
                         $invest->save();
 
                         if ($basic->profit_commission == 1) {
-                            DistributeBonus::dispatch($user, $data->profit, 'profit_commission');
+                            DistributeBonus::dispatch($user, $data->profit, 'profit_commission', 0);
                         }
                     }
                 });

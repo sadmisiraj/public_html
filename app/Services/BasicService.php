@@ -61,7 +61,7 @@ class BasicService
                         $amount = $deposit->payable_amount_in_base_currency;
                         $basic = basicControl();
                         if ($basic->deposit_commission == 1) {
-                            DistributeBonus::dispatch($user, $amount,  'deposit');
+                            DistributeBonus::dispatch($user, $amount,  'deposit', 0);
                         }
 
                         $params = [
@@ -139,7 +139,7 @@ class BasicService
 
                     DB::commit();
                     if ($basic->investment_commission == 1) {
-                        DistributeBonus::dispatch($user, $amount, 'invest');
+                        DistributeBonus::dispatch($user, $amount, 'invest', $plan->id);
                     }
 
                     $msg = [

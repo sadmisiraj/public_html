@@ -648,7 +648,7 @@ class HomeController extends Controller
 
             if ($basic->investment_commission == 1) {
                 $type = 'invest';
-                DistributeBonus::dispatch($user, $request->amount, $type);
+                DistributeBonus::dispatch($user, $request->amount, $type, $plan->id);
             }
 
             $msg = [
