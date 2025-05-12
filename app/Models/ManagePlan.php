@@ -26,6 +26,7 @@ class ManagePlan extends Model
         'repeatable',
         'featured',
         'eligible_for_referral',
+        'eligible_for_rgp',
         'base_plan_id',
         'allow_multiple_purchase',
         'referral_levels'

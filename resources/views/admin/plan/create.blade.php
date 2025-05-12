@@ -356,6 +356,30 @@
                                         <span class="ms-4 invalid-feedback d-block">{{ $message }}</span>
                                         @enderror
                                     </div>
+                                    <div class="list-group-item mb-4">
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-sm mb-2 mb-sm-0">
+                                                        <h5 class="mb-0">@lang('Eligible for RGP')</h5>
+                                                        <p class="fs-5 text-body mb-0">@lang('If this plan is eligible for RGP, then turn on this button.')</p>
+                                                    </div>
+                                                    <div class="col-sm-auto d-flex align-items-center">
+                                                        <div class="form-check form-switch form-switch-google">
+                                                            <input type="hidden" name="eligible_for_rgp" value="0">
+                                                            <input class="form-check-input" name="eligible_for_rgp"
+                                                                   type="checkbox" id="eligible_for_rgp" value="1" @checked(old('eligible_for_rgp') == 1)>
+                                                            <label class="form-check-label"
+                                                                   for="eligible_for_rgp"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @error('eligible_for_rgp')
+                                        <span class="ms-4 invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
                         </div>

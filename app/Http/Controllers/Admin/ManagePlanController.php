@@ -109,6 +109,7 @@ class ManagePlanController extends Controller
 
         $featured = $reqData['featured'];
         $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
+        $eligible_for_rgp = $reqData['eligible_for_rgp'] ?? 0;
         $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
         $referral_levels = $reqData['referral_levels'] ?? 1;
 
@@ -137,6 +138,7 @@ class ManagePlanController extends Controller
         $data->repeatable = $repeatable;
         $data->featured = $featured;
         $data->eligible_for_referral = $eligible_for_referral;
+        $data->eligible_for_rgp = $eligible_for_rgp;
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->allow_multiple_purchase = $allow_multiple_purchase;
         $data->referral_levels = $referral_levels;
@@ -188,6 +190,7 @@ class ManagePlanController extends Controller
         $repeatable = $reqData['is_lifetime'] ? 0  : $reqData['repeatable'];
         $featured = $reqData['featured'];
         $eligible_for_referral = $reqData['eligible_for_referral'] ?? 0;
+        $eligible_for_rgp = $reqData['eligible_for_rgp'] ?? 0;
         $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
         $referral_levels = $reqData['referral_levels'] ?? 1;
 
@@ -220,6 +223,7 @@ class ManagePlanController extends Controller
         $data->repeatable = $repeatable;
         $data->featured = $featured;
         $data->eligible_for_referral = $eligible_for_referral;
+        $data->eligible_for_rgp = $eligible_for_rgp;
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->allow_multiple_purchase = $allow_multiple_purchase;
         $data->referral_levels = $referral_levels;
