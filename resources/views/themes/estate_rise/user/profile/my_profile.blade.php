@@ -305,13 +305,25 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="rgp_pair_matching" class="form-label">@lang('RGP Pair Matching')</label>
-                                        <input type="text" class="form-control" id="rgp_pair_matching" value="{{ $user->rgp_pair_matching ?? 'N/A' }}" readonly>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="rgp_pair_matching" 
+                                                value="{{ min(floatval($user->rgp_l ?? 0), floatval($user->rgp_r ?? 0)) }}" readonly>
+                                            @php
+                                                $pairMatchingValue = min(floatval($user->rgp_l ?? 0), floatval($user->rgp_r ?? 0));
+                                            @endphp
+                                            @if($pairMatchingValue > 0)
+                                                <form action="{{ route('user.match.rgp.pairs') }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-primary">@lang('Match')</button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row mt-4">
                                     <div class="col-12">
                                         <div class="alert alert-info">
-                                            <i class="fas fa-info-circle mr-2"></i> @lang('RGP values can only be updated by administrators.')
+                                            <i class="fas fa-info-circle mr-2"></i> @lang('RGP values can be redeemed when Left and Right RGP values are matched.')
                                         </div>
                                     </div>
                                 </div>

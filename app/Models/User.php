@@ -268,5 +268,24 @@ class User extends Authenticatable
         return $data;
     }
 
+    /**
+     * Calculate and get RGP pair matching value
+     * 
+     * @return float
+     */
+    public function getRgpPairMatchingValueAttribute()
+    {
+        // Calculate the matching value (minimum of left and right)
+        return min(floatval($this->rgp_l ?? 0), floatval($this->rgp_r ?? 0));
+    }
+
+    /**
+     * Update RGP pair matching value whenever rgp_l or rgp_r changes
+     */
+    public function updateRgpPairMatching()
+    {
+        $this->rgp_pair_matching = $this->getRgpPairMatchingValueAttribute();
+        return $this;
+    }
 
 }

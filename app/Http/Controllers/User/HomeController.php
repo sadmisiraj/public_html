@@ -742,6 +742,23 @@ class HomeController extends Controller
                 $userPlan->expires_at = $expiresAt;
                 $userPlan->is_active = true;
                 $userPlan->save();
+
+                // Check if plan is eligible for RGP and update referral chain's RGP values
+                if ($plan->eligible_for_rgp) {
+                    $currentUser = $user;
+                    $referralNode = $user->referral_node; // 'left' or 'right'
+                    while ($currentUser->referral_id) {
+                        $ancestor = User::find($currentUser->referral_id);
+                        if (!$ancestor) break;
+                        if ($referralNode === 'left') {
+                            $ancestor->rgp_l = number_format(floatval($ancestor->rgp_l ?? 0) + 50, 2);
+                        } elseif ($referralNode === 'right') {
+                            $ancestor->rgp_r = number_format(floatval($ancestor->rgp_r ?? 0) + 50, 2);
+                        }
+                        $ancestor->save();
+                        $currentUser = $ancestor;
+                    }
+                }
             }
 
             if ($basic->investment_commission == 1) {
@@ -810,6 +827,70 @@ class HomeController extends Controller
         
         $pdf = Pdf::loadView('pdf.investment_invoice', compact('investment', 'user', 'basicControl'));
         return $pdf->download('invoice_' . $investment->trx . '.pdf');
+    }
+
+    /**
+     * Match RGP pairs by calculating the minimum of RGPL and RGPR, updating values accordingly, and returning a success response.
+     * 
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function matchRgpPairs()
+    {
+        $user = auth()->user();
+        
+        // Calculate the matching value (minimum of left and right)
+        $rgpL = floatval($user->rgp_l ?? 0);
+        $rgpR = floatval($user->rgp_r ?? 0);
+        $matchingValue = min($rgpL, $rgpR);
+        
+        // Only process if there's a value to match
+        if ($matchingValue <= 0) {
+            return redirect()->back()->with('error', 'There are no RGP values to match.');
+        }
+        
+        // Update the user's RGP values
+        $user->rgp_l = number_format($rgpL - $matchingValue, 2);
+        $user->rgp_r = number_format($rgpR - $matchingValue, 2);
+        $user->rgp_pair_matching = 0; // Reset pair matching since we've matched it
+        
+        // Add the matching value to the user's balance
+        $user->balance += $matchingValue;
+        $user->save();
+        
+        // Generate a unique transaction ID for RGP matching
+        $transaction_id = 'RGP' . strtoupper(uniqid(rand(10, 99)));
+        
+        // Create transaction record
+        $transaction = new \App\Models\Transaction();
+        $transaction->user_id = $user->id;
+        $transaction->amount = $matchingValue;
+        $transaction->charge = 0;
+        $transaction->final_balance = $user->balance;
+        $transaction->trx_type = '+';
+        $transaction->remarks = 'RGP matched profit';
+        $transaction->trx_id = $transaction_id;
+        $transaction->transactional_type = 'RGP';
+        $transaction->balance_type = 'balance';
+        $transaction->save();
+        
+        // Send notifications
+        $msg = [
+            'amount' => currencyPosition($matchingValue),
+            'main_balance' => currencyPosition($user->balance),
+            'transaction' => $transaction->trx_id
+        ];
+        
+        $action = [
+            "link" => route('user.transaction'),
+            "icon" => "fa fa-money-bill-alt text-white"
+        ];
+        
+        $firebaseAction = route('user.transaction');
+        $this->userFirebasePushNotification($user, 'RGP_MATCHED', $msg, $firebaseAction);
+        $this->userPushNotification($user, 'RGP_MATCHED', $msg, $action);
+        $this->sendMailSms($user, 'RGP_MATCHED', $msg);
+        
+        return redirect()->back()->with('success', 'RGP pairs matched successfully. ' . currencyPosition($matchingValue) . ' has been added to your balance.');
     }
 
 }

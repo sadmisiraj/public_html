@@ -134,6 +134,9 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('/referral', [HomeController::class, 'referral'])->name('referral');
             Route::post('get-referral-user', [HomeController::class, 'getReferralUser'])->name('myGetDirectReferralUser');
 
+            // RGP Pair Matching
+            Route::post('/match-rgp-pairs', [HomeController::class, 'matchRgpPairs'])->name('match.rgp.pairs');
+
             /* ===== Manage Two Step ===== */
             Route::get('two-step-security', [TwoFaSecurityController::class, 'twoStepSecurity'])->name('twostep.security');
             Route::post('twoStep-enable', [TwoFaSecurityController::class, 'twoStepEnable'])->name('twoStepEnable');

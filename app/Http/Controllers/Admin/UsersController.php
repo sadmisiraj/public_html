@@ -1214,14 +1214,21 @@ class UsersController extends Controller
             $user = User::where('id', $id)->firstOr(function () {
                 throw new \Exception('User not found!');
             });
+            
+            // Store original RGP values
+            $rgpL = floatval($request->rgp_l);
+            $rgpR = floatval($request->rgp_r);
+            
+            // Calculate the pair matching value automatically
+            $pairMatching = min($rgpL, $rgpR);
 
             $user->update([
                 'rgp_l' => $request->rgp_l,
                 'rgp_r' => $request->rgp_r,
-                'rgp_pair_matching' => $request->rgp_pair_matching,
+                'rgp_pair_matching' => $pairMatching,
             ]);
 
-            return back()->with('success', 'RGP values updated successfully.');
+            return back()->with('success', 'RGP values updated successfully. Current pair matching value is ' . $pairMatching);
 
         } catch (\Exception $exp) {
             return back()->with('error', $exp->getMessage());

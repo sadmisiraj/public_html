@@ -42,6 +42,15 @@
                                placeholder="RGP Pair Matching Value" value="{{ old('rgp_pair_matching', $user->rgp_pair_matching ?? '') }}" autocomplete="off">
                         <!-- <div class="input-group-text">{{ $basicControl->base_currency ?? 'USD' }}</div> -->
                     </div>
+                    @php
+                        $matchableValue = min(floatval($user->rgp_l ?? 0), floatval($user->rgp_r ?? 0));
+                    @endphp
+                    <small class="form-text {{ $matchableValue > 0 ? 'text-success' : 'text-muted' }}">
+                        @lang('Current matchable value: :value (minimum of RGPL and RGPR)', ['value' => $matchableValue])
+                    </small>
+                    <small class="form-text text-muted">
+                        @lang('When matching occurs, this value will be added to the user\'s balance.')
+                    </small>
                     @error('rgp_pair_matching')
                     <span class="invalid-feedback d-block">{{ $message }}</span>
                     @enderror
