@@ -39,14 +39,14 @@
                 <div class="col-sm-9">
                     <div class="input-group">
                         <input type="text" class="form-control" name="rgp_pair_matching" id="rgp_pair_matching"
-                               placeholder="RGP Pair Matching Value" value="{{ old('rgp_pair_matching', $user->rgp_pair_matching ?? '') }}" autocomplete="off">
+                               placeholder="RGP Pair Matching Value" value="{{ min(floatval($user->rgp_l ?? 0), floatval($user->rgp_r ?? 0)) }}" autocomplete="off" readonly>
                         <!-- <div class="input-group-text">{{ $basicControl->base_currency ?? 'USD' }}</div> -->
                     </div>
                     @php
                         $matchableValue = min(floatval($user->rgp_l ?? 0), floatval($user->rgp_r ?? 0));
                     @endphp
                     <small class="form-text {{ $matchableValue > 0 ? 'text-success' : 'text-muted' }}">
-                        @lang('Current matchable value: :value (minimum of RGPL and RGPR)', ['value' => $matchableValue])
+                        @lang('Current matchable value: :value (RGPL and RGPR)', ['value' => $matchableValue])
                     </small>
                     <small class="form-text text-muted">
                         @lang('When matching occurs, this value will be added to the user\'s balance.')
@@ -61,6 +61,27 @@
                 <button type="submit" class="btn btn-primary">@lang('Save Changes')</button>
             </div>
         </form>
+        
+        @php
+            $matchableValue = min(floatval($user->rgp_l ?? 0), floatval($user->rgp_r ?? 0));
+        @endphp
+        @if($matchableValue > 0)
+            <div class="mt-4">
+                <form action="{{ route('admin.user.match.rgp', $user->id) }}" method="POST">
+                    @csrf
+                    <div class="alert alert-info">
+                        <p>
+                            <i class="bi bi-info-circle me-2"></i>
+                            @lang('Clicking the Match button will subtract :value from both RGP L and RGP R, and add :value to the user\'s balance.', ['value' => $matchableValue])
+                        </p>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-1"></i>
+                            @lang('Match RGP Value (:value)', ['value' => $matchableValue])
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
     </div>
 </div>
 <!-- End Card --> 

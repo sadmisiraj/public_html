@@ -222,6 +222,17 @@
                                             </div>
                                         </div>
 
+                                        <small class="col-sm-7 text-cap text-body">@lang('RGP Matched Users')</small>
+                                        <div class="col-sm-5 mb-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       id="RgpMatchedFilterCheckAll">
+                                                <label class="form-check-label" for="RgpMatchedFilterCheckAll">
+                                                    @lang('RGP Available')
+                                                </label>
+                                            </div>
+                                        </div>
+
                                         <div class="col-12 mb-4">
                                             <span class="text-cap text-body">@lang("Name")</span>
                                             <input type="text" class="form-control" id="username_filter_input"
@@ -425,17 +436,20 @@
                 let emailVerifiedFilter = $('#emailFilterCheckAll').is(':checked');
                 let SMSVerifiedFilter = $('#SMSFilterCheckAll').is(':checked');
                 let TwoFaFilter = $('#TwoFaFilterCheckAll').is(':checked');
+                let RgpMatchedFilter = $('#RgpMatchedFilterCheckAll').is(':checked');
 
                 emailVerifiedFilter = emailVerifiedFilter ? 1 : '';
                 SMSVerifiedFilter = SMSVerifiedFilter ? 1 : '';
                 TwoFaFilter = TwoFaFilter ? 1 : '';
+                RgpMatchedFilter = RgpMatchedFilter ? 1 : '';
 
 
                 const datatable = HSCore.components.HSDatatables.getItem(0);
 
                 datatable.ajax.url("{{ route('admin.users.search') }}" + "?filterStatus=" + filterSelectedStatus +
                     "&filterName=" + filterName + "&filterLocation=" + filterSelectedLocation + "&filterEmailVerification=" +
-                    emailVerifiedFilter + "&filterSMSVerification=" + SMSVerifiedFilter + "&filterTwoFaVerification=" + TwoFaFilter).load();
+                    emailVerifiedFilter + "&filterSMSVerification=" + SMSVerifiedFilter + "&filterTwoFaVerification=" + TwoFaFilter +
+                    "&filterRgpMatched=" + RgpMatchedFilter).load();
             });
 
             $.fn.dataTable.ext.errMode = 'throw';

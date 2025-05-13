@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\User\VerificationController;
 use App\Http\Controllers\User\KycVerificationController;
 use App\Http\Controllers\TwoFaSecurityController;
+use App\Http\Controllers\UsersController;
 
 
 /*
@@ -205,6 +206,8 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
     Auth::routes();
     /*= Frontend Manage Controller =*/
     Route::get("/{slug?}", [FrontendController::class, 'page'])->name('page');
+
+    Route::post('users/badge-update/{id}', [UsersController::class, 'badgeUpdate'])->name('user.badge.update');
 });
 
 

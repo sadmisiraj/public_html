@@ -90,9 +90,11 @@ class UsersController extends Controller
             ->when(isset($request->filterSMSVerification) && !empty($request->filterSMSVerification), function ($query)  {
                 return $query->where('sms_verification', request()->filterSMSVerification);
             })
-
             ->when(isset($request->filterTwoFaVerification) && !empty($request->filterTwoFaVerification), function ($query)  {
                 return $query->where('two_fa_verify', request()->filterTwoFaVerification);
+            })
+            ->when(isset($request->filterRgpMatched) && !empty($request->filterRgpMatched), function ($query)  {
+                return $query->where('rgp_l', '>', 0)->where('rgp_r', '>', 0);
             });
 
         return DataTables::of($users)
@@ -1230,6 +1232,80 @@ class UsersController extends Controller
 
             return back()->with('success', 'RGP values updated successfully. Current pair matching value is ' . $pairMatching);
 
+        } catch (\Exception $exp) {
+            return back()->with('error', $exp->getMessage());
+        }
+    }
+
+    /**
+     * Match RGP pairs for a user
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function matchRgp(Request $request, $id)
+    {
+        try {
+            $user = User::where('id', $id)->firstOr(function () {
+                throw new \Exception('User not found!');
+            });
+            
+            // Calculate the matching value (minimum of left and right)
+            $rgpL = floatval($user->rgp_l ?? 0);
+            $rgpR = floatval($user->rgp_r ?? 0);
+            $matchingPoints = (min($rgpL, $rgpR));
+            $matchingValue = (min($rgpL, $rgpR))*10;
+            
+            // Only process if there's a value to match
+            if ($matchingValue <= 0) {
+                return back()->with('error', 'There are no RGP values to match for this user.');
+            }
+            
+            // Update the user's RGP values
+            $user->rgp_l = number_format($rgpL - $matchingPoints, 2);
+            $user->rgp_r = number_format($rgpR - $matchingPoints, 2);
+            $user->rgp_pair_matching = 0; // Reset pair matching since we've matched it
+            
+            // Add the matching value to the user's balance
+            $user->balance += $matchingValue;
+            $user->save();
+            
+            // Generate a unique transaction ID for RGP matching
+            $transaction_id = 'RGP' . strtoupper(uniqid(rand(10, 99)));
+            
+            // Create transaction record
+            $transaction = new \App\Models\Transaction();
+            $transaction->user_id = $user->id;
+            $transaction->amount = $matchingValue;
+            $transaction->charge = 0;
+            $transaction->final_balance = $user->balance;
+            $transaction->trx_type = '+';
+            $transaction->remarks = 'RGP matched profit';
+            $transaction->trx_id = $transaction_id;
+            $transaction->transactional_type = 'RGP';
+            $transaction->balance_type = 'balance';
+            $transaction->save();
+            
+            // Send notifications
+            $msg = [
+                'amount' => currencyPosition($matchingValue),
+                'main_balance' => currencyPosition($user->balance),
+                'transaction' => $transaction->trx_id
+            ];
+            
+            $action = [
+                "link" => route('user.transaction'),
+                "icon" => "fa fa-money-bill-alt text-white"
+            ];
+            
+            $firebaseAction = route('user.transaction');
+            $this->userFirebasePushNotification($user, 'RGP_MATCHED', $msg, $firebaseAction);
+            $this->userPushNotification($user, 'RGP_MATCHED', $msg, $action);
+            $this->sendMailSms($user, 'RGP_MATCHED', $msg);
+            
+            return back()->with('success', 'RGP pairs matched successfully. ' . currencyPosition($matchingValue) . ' has been added to the user\'s balance.');
+            
         } catch (\Exception $exp) {
             return back()->with('error', $exp->getMessage());
         }
