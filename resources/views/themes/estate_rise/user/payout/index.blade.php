@@ -45,7 +45,16 @@
                             @forelse($payouts as $item)
                                 <tr>
                                     <td>{{$item->trx_id}}</td>
-                                    <td>@lang(optional($item->method)->name)</td>
+                                    <td>
+                                        @php
+                                            $method = optional($item->method);
+                                            if (is_null($method)) {
+                                                echo 'Method Not Found';
+                                            } else {
+                                                echo __($method->name);
+                                            }
+                                        @endphp
+                                    </td>
                                     <td>{{ $item->amount+0 .' '.$item->payout_currency_code  }}</td>
                                     <td>{{ $item->charge+0 .' '.$item->payout_currency_code  }} </td>
                                     <td>
@@ -68,7 +77,13 @@
                                             <button
                                                 type="button"
                                                 class="btn infoButton payoutHistoryBtn"
-                                                data-information="{{json_encode($item->getInformation())}}"
+                                                data-information="@php
+                                                    try {
+                                                        echo json_encode($item->getInformation() ?: []);
+                                                    } catch (\Exception $e) {
+                                                        echo json_encode([]);
+                                                    }
+                                                @endphp"
                                                 data-feedback="{{$item->feedback}}"
                                                 data-trx_id="{{ $item->trx_id }}"
                                                 data-bs-toggle="modal"

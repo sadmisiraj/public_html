@@ -98,9 +98,12 @@ class Payout extends Model
     {
         $info = [];
         $information = $this->information;
+        
+        if (empty($information)) {
+            return $info;
+        }
 
         foreach ($information as $key =>  $item) {
-
             if ($item->type === 'file'){
                 $info[$key]['field_name'] =  $item->field_name;
                 $info[$key]['field_value'] = getFile($item->field_driver , $item->field_value);
@@ -110,7 +113,6 @@ class Payout extends Model
                 $info[$key]['field_value'] = $item->field_value;
                 $info[$key]['type'] = $item->type;
             }
-
         }
         return $info;
     }

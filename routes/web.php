@@ -19,6 +19,7 @@ use App\Http\Controllers\User\VerificationController;
 use App\Http\Controllers\User\KycVerificationController;
 use App\Http\Controllers\TwoFaSecurityController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\User\PayoutOtpController;
 
 
 /*
@@ -155,9 +156,13 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('verification/kyc/history', [KycVerificationController::class, 'history'])->name('verification.kyc.history');
             Route::get('payout-list', [PayoutController::class, 'index'])->name('payout.index');
 
-            // Only payout routes need KYC verification
-            Route::middleware('kyc')->group(function () {
-                /* PAYMENT REQUEST BY USER */
+            // Payout OTP verification routes
+            Route::get('payout-verification', [PayoutOtpController::class, 'showVerification'])->name('payout.otp.verification');
+            Route::post('payout-verification', [PayoutOtpController::class, 'verifyOtp'])->name('payout.otp.verify');
+            Route::get('payout-verification/resend', [PayoutOtpController::class, 'resendOtp'])->name('payout.otp.resend');
+
+            // Only payout routes need KYC and OTP verification
+            Route::middleware(['kyc', 'payout.otp.verification'])->group(function () {
                 Route::get('payout-search', [PayoutController::class, 'search'])->name('payout.search');
                 Route::get('payout', [PayoutController::class, 'payout'])->name('payout');
                 Route::get('payout-supported-currency', [PayoutController::class, 'payoutSupportedCurrency'])->name('payout.supported.currency');

@@ -64,3 +64,39 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# SMS Verification Configuration for Payout OTP
+
+## Recent Updates (Important)
+
+- **Always Generate New OTP**: Modified the payout verification system to generate a new OTP code each time a user accesses the verification page. This ensures users always have a fresh OTP for maximum security.
+- Fixed an issue with OTP messages not being sent due to an incorrect conditional check in the notification system.
+- Added phone number display on the OTP verification page so users know where to expect the OTP code.
+
+## Troubleshooting SMS OTP for Payouts
+
+If users aren't receiving OTP messages for payout verification, check the following:
+
+1. **Enable SMS Verification**: Go to Admin Dashboard > SMS Controls > SMS Configuration and ensure that:
+   - "SMS Notification" is turned ON
+   - "SMS Verification" is turned ON
+
+2. **Verify SMS Gateway Configuration**: Ensure your SMS Gateway (Twilio, Vonage, Manual SMS, etc.) is properly configured with valid credentials.
+
+3. **Check User Phone Numbers**: Ensure all users have valid phone numbers with correct country codes in their profiles.
+
+4. **Test SMS Delivery**: Use the test functionality in the admin panel to verify that SMS messages are being delivered properly.
+
+5. **Check Application Log**: Review the Laravel logs for any SMS-related errors.
+
+## SMS Gateway Setup
+
+If using the Manual SMS gateway:
+- Ensure the API endpoint URL is correct
+- Verify all headers, parameters, and form data are configured properly
+- Test with a sample API call
+
+If using a third-party gateway like Twilio:
+- Verify API keys and credentials
+- Ensure the sender phone number is verified and active
+- Check your account balance
