@@ -127,12 +127,27 @@
                                     <i class="bi bi-check"></i> @lang('Approved')
                                 </a>
                             @endif
-                            <a class="btn btn-outline-success btn-sm exportBtn ms-2" href="javascript:void(0)" data-bs-toggle="modal"
-                               data-bs-target="#downloadWithdrawDetails">
-                                <i class="fa-regular fa-file-excel"></i> @lang('Export')
-                            </a>
+                            
                         </div>
                     </div>
+                    <!-- Export Dropdown Button -->
+                    <div class="dropdown ms-2">
+                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi-download me-1"></i> @lang('Export')
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                    <li>
+                                        <a class="dropdown-item export-excel" href="{{ route('admin.export.payout.excel') }}" id="exportExcelLink">
+                                            <i class="fa-regular fa-file-excel me-2"></i> @lang('Excel')
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item export-pdf" href="{{ route('admin.export.payout.pdf') }}" id="exportPdfLink">
+                                            <i class="fa-regular fa-file-pdf me-2"></i> @lang('PDF')
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100"
                                 id="dropdownMenuClickable" data-bs-auto-close="false"
@@ -366,33 +381,6 @@
     </div>
     <!-- End Modal -->
     @include('admin.user_management.components.payout_information_modal')
-    <!-- Modal -->
-    <div class="modal fade" id="downloadWithdrawDetails" tabindex="-1" role="dialog" aria-labelledby="downloadWithdrawDetailsModalLabel" data-bs-backdrop="static"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="downloadWithdrawDetailsModalLabel"><i
-                            class="fa-light fa-square-check"></i> @lang('Confirmation')</h3>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="{{route('admin.export.withdraw.details')}}" method="get">
-                    <div class="modal-body">
-                        @lang('Do you want to download Withdraw details?')
-                        <div class="input_field">
-
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-white" data-bs-dismiss="modal">@lang('Close')</button>
-                        <button type="submit" class="btn btn-primary">@lang('Confirm')</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
 @endsection
 
 @push('css-lib')
@@ -410,6 +398,27 @@
 
 @push('script')
     <script>
+        // Debug script to help troubleshoot export button
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Debug: Checking export button');
+            var exportButton = document.getElementById('exportDropdown');
+            if (exportButton) {
+                console.log('Debug: Export button found', exportButton);
+            } else {
+                console.log('Debug: Export button NOT found');
+            }
+            
+            // Log all buttons for comparison
+            var allButtons = document.querySelectorAll('button');
+            console.log('Debug: Total buttons on page:', allButtons.length);
+            
+            // Check if dropdown is working
+            if (typeof bootstrap !== 'undefined') {
+                console.log('Debug: Bootstrap is available');
+            } else {
+                console.log('Debug: Bootstrap is NOT available');
+            }
+        });
 
         $(document).on('ready', function () {
 
@@ -511,18 +520,64 @@
             });
 
             $(document).on('click','.exportBtn',function (){
+                // Redirect to the Excel export with selected IDs
                 let all_value = [];
                 $(".row-tic:checked").each(function () {
                     all_value.push($(this).attr('data-id'));
                 });
-                let strIds = all_value;
-                let inputField = '';
-                strIds.forEach((value,index)=>{
-                    inputField += `<input type="hidden" name="payout_ids[]" value="${value}">`
-                })
-                $('.input_field').html(inputField)
-
+                
+                if (all_value.length > 0) {
+                    let queryParams = '';
+                    all_value.forEach((value, index) => {
+                        queryParams += `payout_ids[]=${value}&`;
+                    });
+                    
+                    window.location.href = "{{ route('admin.export.payout.excel') }}?" + queryParams.slice(0, -1);
+                } else {
+                    // If no items selected, just show export dropdown
+                    $('#exportDropdown').dropdown('toggle');
+                }
             })
+            
+            // Handle export with current filters
+            function updateExportLinks() {
+                let filterTransactionId = $('#transaction_id_filter_input').val() || '';
+                let filterStatus = $('#filter_status').val() || 'all';
+                let filterMethod = $('#filter_method').val() || 'all';
+                let filterDate = $('#filter_date_range').val() || '';
+                
+                let excelUrl = "{{ route('admin.export.payout.excel') }}" + 
+                    "?filterTransactionID=" + filterTransactionId + 
+                    "&filterStatus=" + filterStatus + 
+                    "&filterMethod=" + filterMethod +
+                    "&filterDate=" + filterDate;
+                    
+                let pdfUrl = "{{ route('admin.export.payout.pdf') }}" + 
+                    "?filterTransactionID=" + filterTransactionId + 
+                    "&filterStatus=" + filterStatus + 
+                    "&filterMethod=" + filterMethod +
+                    "&filterDate=" + filterDate;
+                    
+                $('#exportExcelLink').attr('href', excelUrl);
+                $('#exportPdfLink').attr('href', pdfUrl);
+            }
+            
+            // Update export links when filter button is clicked
+            $('#filter_button').on('click', function() {
+                updateExportLinks();
+            });
+            
+            // Update export links on page load
+            updateExportLinks();
+            
+            // Clear filters and update export links
+            $('#clear_filter').on('click', function() {
+                $('#transaction_id_filter_input').val('');
+                $('#filter_status').val('all');
+                $('#filter_method').val('all');
+                $('#filter_date_range').val('');
+                updateExportLinks();
+            });
         });
 
 

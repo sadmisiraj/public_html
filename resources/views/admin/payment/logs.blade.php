@@ -125,6 +125,26 @@
                             </a>
                         </div>
                     </div>
+                    
+                    <!-- Export Dropdown Button -->
+                    <div class="dropdown me-2">
+                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi-download me-1"></i> @lang('Export')
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                            <li>
+                                <a class="dropdown-item export-excel" href="{{ route('admin.export.payment.excel') }}" id="exportExcelLink">
+                                    <i class="fa-regular fa-file-excel me-2"></i> @lang('Excel')
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item export-pdf" href="{{ route('admin.export.payment.pdf') }}" id="exportPdfLink">
+                                    <i class="fa-regular fa-file-pdf me-2"></i> @lang('PDF')
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100"
                                 id="dropdownMenuClickable" data-bs-auto-close="false"
@@ -486,6 +506,46 @@
                 $('.setBalanceRoute').attr('action', $(this).data('route'));
                 $('.user-balance').text($(this).data('balance'));
             })
+            
+            // Handle export with current filters
+            function updateExportLinks() {
+                let filterTransactionId = $('#transaction_id_filter_input').val() || '';
+                let filterStatus = $('#filter_status').val() || 'all';
+                let filterMethod = $('#filter_method').val() || 'all';
+                let filterDate = $('#filter_date_range').val() || '';
+                
+                let excelUrl = "{{ route('admin.export.payment.excel') }}" + 
+                    "?filterTransactionID=" + filterTransactionId + 
+                    "&filterStatus=" + filterStatus + 
+                    "&filterMethod=" + filterMethod +
+                    "&filterDate=" + filterDate;
+                    
+                let pdfUrl = "{{ route('admin.export.payment.pdf') }}" + 
+                    "?filterTransactionID=" + filterTransactionId + 
+                    "&filterStatus=" + filterStatus + 
+                    "&filterMethod=" + filterMethod +
+                    "&filterDate=" + filterDate;
+                    
+                $('#exportExcelLink').attr('href', excelUrl);
+                $('#exportPdfLink').attr('href', pdfUrl);
+            }
+            
+            // Update export links when filter button is clicked
+            $('#filter_button').on('click', function() {
+                updateExportLinks();
+            });
+            
+            // Update export links on page load
+            updateExportLinks();
+            
+            // Clear filters and update export links
+            $('#clear_filter').on('click', function() {
+                $('#transaction_id_filter_input').val('');
+                $('#filter_status').val('all');
+                $('#filter_method').val('all');
+                $('#filter_date_range').val('');
+                updateExportLinks();
+            });
         });
 
     </script>

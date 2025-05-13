@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\HolidayController;
+use App\Http\Controllers\Admin\ExportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -360,6 +361,10 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         /* ====== Transaction Log =====*/
         Route::get('transaction', [TransactionLogController::class, 'transaction'])->name('transaction');
         Route::get('transaction/search', [TransactionLogController::class, 'transactionSearch'])->name('transaction.search');
+        
+        // Transaction export routes
+        Route::get('export/transaction/excel', [ExportController::class, 'exportTransactionExcel'])->name('export.transaction.excel');
+        Route::get('export/transaction/pdf', [ExportController::class, 'exportTransactionPdf'])->name('export.transaction.pdf');
 
         /* ====== Payment Log =====*/
         Route::get('payment/log', [PaymentLogController::class, 'index'])->name('payment.log');
@@ -370,13 +375,20 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('payment-request/approved/multiple', [PaymentLogController::class, 'multipleApproved'])->name('payment-request.multiple.approved');
         Route::get('export/payment/details', [PaymentLogController::class, 'exportPaymentDetails'])->name('export.payment.details');
 
+        // New export routes
+        Route::get('export/payment/excel', [ExportController::class, 'exportPaymentExcel'])->name('export.payment.excel');
+        Route::get('export/payment/pdf', [ExportController::class, 'exportPaymentPdf'])->name('export.payment.pdf');
+
         /* ====== Payout Log =====*/
         Route::get('withdraw/log', [PayoutLogController::class, 'index'])->name('payout.log');
         Route::get('withdraw/search', [PayoutLogController::class, 'search'])->name('payout.search');
         Route::get('withdraw/pending', [PayoutLogController::class, 'pending'])->name('payout.pending');
         Route::put('withdraw/action/{id}', [PayoutLogController::class, 'action'])->name('payout.action');
         Route::post('payout-request/approved/multiple', [PayoutLogController::class, 'multipleApproved'])->name('payout-request.multiple.approved');
-        Route::get('export/withdraw/details', [PayoutLogController::class, 'exportWithdraw'])->name('export.withdraw.details');
+        
+        // Payout export routes
+        Route::get('export/payout/excel', [ExportController::class, 'exportPayoutExcel'])->name('export.payout.excel');
+        Route::get('export/payout/pdf', [ExportController::class, 'exportPayoutPdf'])->name('export.payout.pdf');
 
         /* ====== Blog Category Controller =====*/
         Route::resource('blog-category', BlogCategoryController::class);
