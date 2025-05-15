@@ -288,6 +288,7 @@
                         <th>@lang('Interest Balance')</th>
                         <th>@lang('Total Deposit')</th>
                         <th>@lang('Status')</th>
+                        <th>@lang('Referred By')</th>
                         <th>@lang('Last Login')</th>
                         <th>@lang('Action')</th>
                     </tr>
@@ -405,6 +406,7 @@
                     {data: 'interest_balance', name: 'interest_balance'},
                     {data: 'total_deposit', name: 'total_deposit'},
                     {data: 'status', name: 'status'},
+                    {data: 'referred_by', name: 'referred_by'},
                     {data: 'last login', name: 'last login'},
                     {data: 'action', name: 'action'},
                 ],

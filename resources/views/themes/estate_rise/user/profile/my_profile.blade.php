@@ -109,7 +109,8 @@
                                             <label for="username" class="form-label">@lang('username')</label>
                                             <input type="text" name="username"
                                                    value="{{ old('username', $user->username) }}"
-                                                   class="form-control" id="username">
+                                                   class="form-control" id="username" readonly disabled>
+                                            <small class="text-muted">@lang('Username cannot be changed for security reasons.')</small>
                                             @if($errors->has('username'))
                                                 <div
                                                     class="error text-danger">@lang($errors->first('username')) </div>

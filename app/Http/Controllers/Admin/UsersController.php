@@ -152,6 +152,13 @@ class UsersController extends Controller
                   </span>';
                 }
             })
+            ->addColumn('referred_by', function ($item) {
+                if ($item->referral) {
+                    $url = route('admin.user.view.profile', $item->referral->id ?? 0);
+                    return '<a href="' . $url . '" class="text-hover-primary">@' . $item->referral->username . '</a>';
+                }
+                return '<span class="text-muted">-</span>';
+            })
             ->addColumn('last login', function ($item) {
                 return diffForHumans($item->last_login);
             })
@@ -194,7 +201,7 @@ class UsersController extends Controller
                             <i class="bi-eye-fill dropdown-item-icon"></i> ' . trans("View Profile") . '
                       </a>';
 
-            })->rawColumns(['action', 'checkbox', 'name', 'balance', 'email-phone', 'status'])
+            })->rawColumns(['action', 'checkbox', 'name', 'balance', 'email-phone', 'status', 'referred_by'])
             ->make(true);
     }
 
