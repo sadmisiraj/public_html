@@ -123,7 +123,7 @@ class VerificationController extends Controller
         if ($this->checkValidCode($user, $user->verify_code, 2)) {
             $target_time = Carbon::parse($user->sent_at)->addMinutes(2)->timestamp;
             $delay = $target_time - time();
-            throw ValidationException::withMessages(['resend' => 'Please Try after ' . gmdate("i:s", $delay) . ' minutes']);
+            throw ValidationException::withMessages(['resend' => 'Thanks']);
         }
         if (!$this->checkValidCode($user, $user->verify_code)) {
             $user->verify_code = code(6);

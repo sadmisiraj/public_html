@@ -83,7 +83,7 @@ class PayoutOtpController extends Controller
         if ($this->checkValidCode($user, $user->verify_code, 2)) {
             $target_time = Carbon::parse($user->sent_at)->addMinutes(2)->timestamp;
             $delay = $target_time - time();
-            throw ValidationException::withMessages(['resend' => 'Please Try after ' . gmdate("i:s", $delay) . ' minutes']);
+            throw ValidationException::withMessages(['resend' => 'Thanks']);
         }
         
         // Generate new code
@@ -99,6 +99,27 @@ class PayoutOtpController extends Controller
         return back()->with('success', 'Verification code has been sent to your phone');
     }
 
+    /**
+     * Send OTP code via email as a fallback
+     */
+    public function sendOtpViaEmail()
+    {
+        $user = $this->user;
+        
+        // Generate new code
+        $user->verify_code = code(6);
+        $user->sent_at = Carbon::now();
+        $user->save();
+        
+        // Send OTP via Email
+        $this->verifyToMail($user, 'TWO_FACTOR_AUTH', [
+            'code' => $user->verify_code
+        ], 'Payout Verification Code');
+        
+        return back()->with('success', 'Verification code has been sent to your email: ' . $user->email);
+    }
+
+    
     /**
      * Check if OTP code is valid
      */

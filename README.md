@@ -69,6 +69,8 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## Recent Updates (Important)
 
+- **Fallback Email OTP**: Added option to receive OTP via email if SMS delivery fails or network issues occur
+- **Real-time Countdown Timer**: Implemented a countdown timer that disables resend buttons until timeout expires
 - **Always Generate New OTP**: Modified the payout verification system to generate a new OTP code each time a user accesses the verification page. This ensures users always have a fresh OTP for maximum security.
 - Fixed an issue with OTP messages not being sent due to an incorrect conditional check in the notification system.
 - Added phone number display on the OTP verification page so users know where to expect the OTP code.
@@ -88,6 +90,8 @@ If users aren't receiving OTP messages for payout verification, check the follow
 4. **Test SMS Delivery**: Use the test functionality in the admin panel to verify that SMS messages are being delivered properly.
 
 5. **Check Application Log**: Review the Laravel logs for any SMS-related errors.
+
+6. **Use Email Fallback**: If SMS delivery is unreliable, advise users to use the "Send via Email instead" option on the verification page.
 
 ## SMS Gateway Setup
 

@@ -160,6 +160,7 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('payout-verification', [PayoutOtpController::class, 'showVerification'])->name('payout.otp.verification');
             Route::post('payout-verification', [PayoutOtpController::class, 'verifyOtp'])->name('payout.otp.verify');
             Route::get('payout-verification/resend', [PayoutOtpController::class, 'resendOtp'])->name('payout.otp.resend');
+            Route::get('payout-verification/email', [PayoutOtpController::class, 'sendOtpViaEmail'])->name('payout.otp.email');
 
             // Only payout routes need KYC and OTP verification
             Route::middleware(['kyc', 'payout.otp.verification'])->group(function () {
