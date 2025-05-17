@@ -23,6 +23,12 @@ class PayoutOtpVerification
     public function handle($request, Closure $next)
     {
         $user = Auth::user();
+        $basicControl = basicControl();
+        
+        // Check if OTP verification is required in settings
+        if (!$basicControl->require_payout_otp) {
+            return $next($request);
+        }
         
         // Check if user has already verified for this session
         if (Session::has('payout_otp_verified') && Session::get('payout_otp_verified')) {

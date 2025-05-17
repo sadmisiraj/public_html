@@ -6,6 +6,11 @@ return [
             'icon' => 'bi bi-gear',
             'short_description' => 'Basic such as, site title, timezone, currency, notifications, verifications and so on.',
         ],
+        'payout-settings' => [
+            'route' => 'admin.security.payout',
+            'icon' => 'bi bi-shield-lock',
+            'short_description' => 'Configure payout security settings such as OTP verification requirements.',
+        ],
         'GDPR Cookie' => [
             'route' => 'admin.cookie',
             'icon' => 'fa-thin fa-cookie',

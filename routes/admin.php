@@ -43,6 +43,7 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\ExportController;
+use App\Http\Controllers\Admin\SecuritySettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -118,6 +119,12 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('currency-exchange-api-config/update', [BasicControlController::class, 'currencyExchangeApiConfigUpdate'])->name('currency.exchange.api.config.update');
         Route::get('app-settings', [BasicControlController::class, 'appSettings'])->name('app.settings');
         Route::post('app-settings/update', [BasicControlController::class, 'appSettingUpdate'])->name('app.settings.update');
+
+        /* ===== Security Settings ===== */
+        Route::get('security/payout', [SecuritySettingsController::class, 'payoutSettings'])->name('security.payout');
+        Route::post('security/payout/update', [SecuritySettingsController::class, 'updatePayoutSettings'])->name('security.payout.update');
+
+        /* ===== Cookie Settings ===== */
 
         /* ===== HOLIDAY MANAGEMENT ===== */
         Route::get('holiday-management', [HolidayController::class, 'index'])->name('holiday.index');
