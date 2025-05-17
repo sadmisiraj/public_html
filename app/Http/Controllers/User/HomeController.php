@@ -240,7 +240,6 @@ class HomeController extends Controller
             'country_code' => 'required | string | max:80',
             'country' => 'required | string | max:80',
             'state' => 'nullable | string | max:80',
-            'username' => "sometimes|required|alpha_dash|min:5|unique:users,username," . $user->id,
             'address' => 'required',
             'language' => Rule::in($languages),
         ];
@@ -259,7 +258,6 @@ class HomeController extends Controller
             $user->firstname = $req['first_name'];
             $user->lastname = $req['last_name'];
             $user->email = $req['email'];
-            $user->username = $req['username'];
             $user->address = $req['address'];
             $user->phone = $req['phone'];
             $user->phone_code = $req['phone_code'];

@@ -26,7 +26,6 @@ class AdminProfileSettingController extends Controller
     {
         $request->validate([
             'name' => 'required|string|min:3',
-            'username' => 'required|string|min:3',
             'email' => 'required|email|min:3|email:rfc,dns',
             'phone' => 'required|string|min:3',
             'addressLine' => 'required|string|min:3',
@@ -46,7 +45,6 @@ class AdminProfileSettingController extends Controller
 
             $response = $admin->update([
                 'name' => $request->name,
-                'username' => $request->username,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'address' => $request->addressLine,
