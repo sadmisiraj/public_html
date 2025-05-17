@@ -69,7 +69,7 @@ trait Notify
             $email_from = $basic->sender_email;
 
 
-            Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
+            Mail::to($user)->send(new SendMail($email_from, $subject, $message));
         } catch (\Exception $exception) {
 
             return true;
@@ -195,7 +195,7 @@ trait Notify
         $subject = ($subject == null) ? $templateObj->subject : $subject;
         $email_from = ($templateObj) ? $templateObj->email_from : $basic->sender_email;
 
-        Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
+        Mail::to($user)->send(new SendMail($email_from, $subject, $message));
     }
 
     public function verifyToSms($user, $templateKey, $params = [], $requestMessage = null)
