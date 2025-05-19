@@ -744,17 +744,18 @@ class HomeController extends Controller
                 // Check if plan is eligible for RGP and update referral chain's RGP values
                 if ($plan->eligible_for_rgp) {
                     $currentUser = $user;
-                    $referralNode = $user->referral_node; // 'left' or 'right'
-                    while ($currentUser->referral_id) {
-                        $ancestor = User::find($currentUser->referral_id);
-                        if (!$ancestor) break;
-                        if ($referralNode === 'left') {
-                            $ancestor->rgp_l = number_format(floatval($ancestor->rgp_l ?? 0) + 50, 2);
-                        } elseif ($referralNode === 'right') {
-                            $ancestor->rgp_r = number_format(floatval($ancestor->rgp_r ?? 0) + 50, 2);
+                    while ($currentUser->rgp_parent_id) {
+                        $parent = User::find($currentUser->rgp_parent_id);
+                        if (!$parent) break;
+                        
+                        // Credit based on child's placement
+                        if ($currentUser->referral_node === 'left') {
+                            $parent->rgp_l = number_format(floatval($parent->rgp_l ?? 0) + 50, 2);
+                        } else {
+                            $parent->rgp_r = number_format(floatval($parent->rgp_r ?? 0) + 50, 2);
                         }
-                        $ancestor->save();
-                        $currentUser = $ancestor;
+                        $parent->save();
+                        $currentUser = $parent;
                     }
                 }
             }

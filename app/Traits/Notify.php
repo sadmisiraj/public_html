@@ -156,9 +156,10 @@ trait Notify
     {
 
         $basic = basicControl();
-        if ($basic->email_verification ==0) {
-            return false;
-        }
+        //commenting as if this is enabled users will have to verify email during registarion
+        // if ($basic->email_verification ==0) {
+        //     return false;
+        // }
 
         $email_body = $basic->email_description;
         $templateObj = NotificationTemplate::where('template_key', $templateKey)->where('language_id', $user->language_id)->first();

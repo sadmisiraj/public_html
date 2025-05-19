@@ -283,13 +283,16 @@
                             @endif
                         </th>
                         <th class="table-column-ps-0">@lang('Full Name')</th>
-                        <th>@lang('Email-Phone')</th>
+                        
                         <th>@lang('Balance')</th>
-                        <th>@lang('Interest Balance')</th>
+                        <th>@lang('Profit')</th>
                         <th>@lang('Total Deposit')</th>
+                        <th>@lang('RGP L')</th>
+                        <th>@lang('RGP R')</th>
+                        <th>@lang('Pair Match')</th>
                         <th>@lang('Status')</th>
                         <th>@lang('Referred By')</th>
-                        <th>@lang('Last Login')</th>
+                        <th>@lang('Referral Node')</th>
                         <th>@lang('Action')</th>
                     </tr>
                     </thead>
@@ -401,13 +404,15 @@
                 columns: [
                     {data: 'checkbox', name: 'checkbox'},
                     {data: 'name', name: 'name'},
-                    {data: 'email-phone', name: 'email-phone'},
                     {data: 'balance', name: 'balance'},
                     {data: 'interest_balance', name: 'interest_balance'},
                     {data: 'total_deposit', name: 'total_deposit'},
+                    {data: 'rgp_l', name: 'rgp_l'},
+                    {data: 'rgp_r', name: 'rgp_r'},
+                    {data: 'rgp_pair_matching', name: 'rgp_pair_matching'},
                     {data: 'status', name: 'status'},
                     {data: 'referred_by', name: 'referred_by'},
-                    {data: 'last login', name: 'last login'},
+                    {data: 'referral_node', name: 'referral_node'},
                     {data: 'action', name: 'action'},
                 ],
                 select: {

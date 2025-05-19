@@ -288,4 +288,70 @@ class User extends Authenticatable
         return $this;
     }
 
+    /**
+     * Find the leftmost available node in the RGP tree
+     * 
+     * @return User|null
+     */
+    public function findLeftmostRgpNode()
+    {
+        $currentUser = $this;
+        
+        // Keep going left until we find a node without a left child
+        while ($currentUser) {
+            $leftChild = User::where('rgp_parent_id', $currentUser->id)
+                            ->where('referral_node', 'left')
+                            ->first();
+            
+            if (!$leftChild) {
+                return $currentUser;
+            }
+            
+            $currentUser = $leftChild;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Find the rightmost available node in the RGP tree
+     * 
+     * @return User|null
+     */
+    public function findRightmostRgpNode()
+    {
+        $currentUser = $this;
+        
+        // Keep going right until we find a node without a right child
+        while ($currentUser) {
+            $rightChild = User::where('rgp_parent_id', $currentUser->id)
+                             ->where('referral_node', 'right')
+                             ->first();
+            
+            if (!$rightChild) {
+                return $currentUser;
+            }
+            
+            $currentUser = $rightChild;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get the RGP parent user
+     */
+    public function rgpParent()
+    {
+        return $this->belongsTo(User::class, 'rgp_parent_id');
+    }
+
+    /**
+     * Get the RGP child users
+     */
+    public function rgpChildren()
+    {
+        return $this->hasMany(User::class, 'rgp_parent_id');
+    }
+
 }

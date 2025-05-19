@@ -176,7 +176,7 @@ class RegisterController extends Controller
         if ($sponsor) {
             $sponsorId = $sponsor->id;
         }
-        
+
         // Generate a unique username with 'REINO' prefix and random numbers
         $username = 'REINO' . rand(10000, 99999);
         
@@ -188,7 +188,7 @@ class RegisterController extends Controller
         // Get referral position (node) from session
         $referralNode = session()->get('referral_node');
         
-        return User::create([
+        $user = User::create([
             'firstname' => null,
             'lastname' => null,
             'username' => $username,
@@ -204,6 +204,19 @@ class RegisterController extends Controller
             'email_verification' => ($basic->email_verification) ? 0 : 1,
             'sms_verification' => ($basic->sms_verification) ? 0 : 1,
         ]);
+
+        if ($referralNode === 'left') {
+            $rgpParent = $sponsor->findLeftmostRgpNode();
+        } else {
+            $rgpParent = $sponsor->findRightmostRgpNode();
+        }
+
+        if ($rgpParent) {
+            $user->rgp_parent_id = $rgpParent->id;
+            $user->save();
+        }
+
+        return $user;
     }
 
     public function register(Request $request)
