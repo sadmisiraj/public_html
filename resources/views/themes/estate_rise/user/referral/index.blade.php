@@ -100,7 +100,7 @@
                                     <td data-label="@lang('Placement')">
                                         @if($user->referral_node)
                                             <span class="badge bg-{{ $user->referral_node == 'left' ? 'primary' : 'success' }}">
-                                                @lang(ucfirst($user->referral_node))
+                                                @lang($user->referral_node == 'left' ? 'Alpha' : 'Beta')
                                             </span>
                                         @else
                                             -
