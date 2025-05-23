@@ -119,7 +119,8 @@
                                         <div class="col-md-6">
                                             <label for="email" class="form-label">@lang('email address')</label>
                                             <input type="text" name="email" value="{{ old('email', $user->email) }}"
-                                                   class="form-control" id="email">
+                                                   class="form-control" id="email" readonly disabled>
+                                            <small class="text-muted">@lang('Email cannot be changed for security reasons.')</small>
                                             @if($errors->has('email'))
                                                 <div class="error text-danger">@lang($errors->first('email')) </div>
                                             @endif
@@ -131,7 +132,7 @@
                                             });
                                             $countries = $myCollection->sortBy('code');
                                         @endphp
-                                        <div class="col-md-6">
+                                        <div class="col-md-6" style="display: none;">
                                             <input type="hidden" name="country"
                                                    value="{{old('country',$user->country)}}" id="country">
                                             <input type="hidden" name="country_code"
@@ -152,8 +153,8 @@
                                         <div class="col-md-6">
                                             <label class="form-label">@lang('Phone Number')</label>
                                             <input type="text" name="phone" value="{{old('phone',$user->phone)}}"
-                                                   class="form-control" id="phonenumber"
-                                                   onkeyup="this.value = this.value.replace (/^\.|[^\d\.]/g, '')">
+                                                   class="form-control" id="phonenumber" readonly disabled>
+                                            <small class="text-muted">@lang('Phone number cannot be changed for security reasons.')</small>
                                             @error('phone')
                                             <div class="text-danger">{{$message}}</div>
                                             @enderror
