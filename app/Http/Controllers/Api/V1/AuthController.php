@@ -180,6 +180,7 @@ class AuthController extends Controller
                 $interestBalance = $user->total_interest_balance; //5
                 $investBalance = $user->total_invest; //50
                 $depositBalance = $user->total_deposit; //5.0
+                $profitBalance = $user->profit_balance; //5.0
 
                 $badges = Ranking::where([
                     ['min_invest', '<=', $investBalance],

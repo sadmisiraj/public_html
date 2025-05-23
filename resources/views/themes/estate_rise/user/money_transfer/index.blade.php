@@ -52,7 +52,8 @@
                                             <select name="wallet_type" id="wallet_type" class="form-control" required>
                                                 <option value="" selected disabled>{{trans('Select Wallet')}}</option>
                                                 <option value="balance" >{{trans('Deposit Balance')}}</option>
-                                                <option value="interest_balance" >{{trans('Performance Balance')}}</option>
+                                                <option value="interest_balance" >{{trans('Profit Balance')}}</option>
+                                                <option value="profit_balance" >{{trans('Performance Balance')}}</option>
                                             </select>
                                         </div>
                                         @error('wallet_type')

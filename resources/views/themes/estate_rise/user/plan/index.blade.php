@@ -188,6 +188,9 @@
                                             - {{currencyPosition(auth()->user()->balance)}}</option>
                                         <option
                                             value="interest_balance">@lang('Performance Balance')
+                                            - {{currencyPosition(auth()->user()->profit_balance)}}</option>
+                                        <option
+                                            value="profit_balance">@lang('Profit Balance')
                                             - {{currencyPosition(auth()->user()->interest_balance)}}</option>
                                     @endauth
                                     <option value="checkout">@lang('Checkout')</option>

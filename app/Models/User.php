@@ -48,6 +48,56 @@ class User extends Authenticatable
 
     protected $dates = ['deleted_at'];
 
+    protected $fillable = [
+        'firstname',
+        'lastname',
+        'username',
+        'email',
+        'password',
+        'balance',
+        'interest_balance',
+        'profit_balance',
+        'total_invest',
+        'total_deposit',
+        'total_interest_balance',
+        'status',
+        'provider',
+        'provider_id',
+        'image',
+        'image_driver',
+        'country_code',
+        'country',
+        'phone_code',
+        'phone',
+        'state',
+        'city',
+        'zip_code',
+        'address',
+        'referral_id',
+        'language_id',
+        'admin_update_badge',
+        'last_lavel',
+        'last_login',
+        'fcm_token',
+        'email_key',
+        'sms_key',
+        'push_key',
+        'in_app_key',
+        'github_id',
+        'google_id',
+        'facebook_id',
+        'prepaid_remaning_words',
+        'prepaid_remaning_images',
+        'prepaid_remaning_characters',
+        'subs_remaning_words',
+        'subs_remaning_images',
+        'subs_remaning_characters',
+        'subs_expired_at',
+        'rgp_l',
+        'rgp_r',
+        'rgp_pair_matching'
+    ];
+
     protected static function boot()
     {
         parent::boot();

@@ -79,8 +79,12 @@
                                             name="wallet_type"
                                     >
                                         <option
-                                            value="balance" class="bg-light text-dark">@lang('Deposit Balance') - {{currencyPosition(auth()->user()->balance+0)}}</option>
-                                        <option value="interest_balance" class="bg-light text-dark">@lang('Performance Balance') - {{currencyPosition(auth()->user()->interest_balance+0)}}</option>
+                                            value="balance"
+                                            class="bg-light text-dark">@lang('Deposit Balance - '.currencyPosition(auth()->user()->balance+0))</option>
+                                        <option value="interest_balance"
+                                                class="bg-light text-dark">@lang('Performance Balance -'.currencyPosition(auth()->user()->profit_balance+0))</option>
+                                        <option value="profit_balance"
+                                                class="bg-light text-dark">@lang('Profit Balance -'.currencyPosition(auth()->user()->interest_balance+0))</option>
                                     </select>
 
                                 </div>
@@ -169,8 +173,12 @@
                                             name="wallet_type"
                                     >
                                         <option
-                                            value="balance" class="bg-light text-dark">@lang('Deposit Balance') - {{currencyPosition(auth()->user()->balance+0)}}</option>
-                                        <option value="interest_balance" class="bg-light text-dark">@lang('Performance Balance') - {{currencyPosition(auth()->user()->interest_balance+0)}}</option>
+                                            value="balance"
+                                            class="bg-light text-dark">@lang('Deposit Balance - '.currencyPosition(auth()->user()->balance+0))</option>
+                                        <option value="interest_balance"
+                                                class="bg-light text-dark">@lang('Performance Balance -'.currencyPosition(auth()->user()->profit_balance+0))</option>
+                                        <option value="profit_balance"
+                                                class="bg-light text-dark">@lang('Profit Balance -'.currencyPosition(auth()->user()->interest_balance+0))</option>
                                     </select>
 
                                 </div>

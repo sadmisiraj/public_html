@@ -65,7 +65,7 @@ class DistributeProfit extends Command
                         $user->total_interest_balance += $data->profit;
                         $user->save();
 
-                        $remarks = currencyPosition($data->profit) . ' Interest From ' . optional($invest->plan)->name;
+                        $remarks = currencyPosition($data->profit) . ' Daily Profit From ' . optional($invest->plan)->name;
                         $transaction = BasicService::makeTransaction($user, $data->profit, 0, '+', 'interest_balance', null, $remarks);
                         $invest->transactional()->save($transaction);
                         // Complete the investment if user get full amount as plan

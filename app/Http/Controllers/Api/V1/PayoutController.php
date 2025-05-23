@@ -37,6 +37,9 @@ class PayoutController extends Controller
             $data['depositAmount'] = getAmount(auth()->user()->balance);
             $data['interest_balance'] = trans('Interest Balance - ' . config('basic.currency_symbol') . getAmount(auth()->user()->interest_balance));
             $data['interestAmount'] = getAmount(auth()->user()->interest_balance);
+            $data['profit_balance'] = trans('Profit Balance - ' . config('basic.currency_symbol') . getAmount(auth()->user()->profit_balance));
+            $data['profitAmount'] = getAmount(auth()->user()->profit_balance);
+
 
             $data['gateways'] = PayoutMethodResource::collection(PayoutMethod::where('is_active', 1)->get());
 
@@ -60,7 +63,7 @@ class PayoutController extends Controller
             return $this->jsonError('Today payout feature is not available.',200);
         }
         $rules = [
-            'wallet_type' => ['required', 'in:balance,interest_balance'],
+            'wallet_type' => ['required', 'in:balance,interest_balance,profit_balance'],
             'amount' => ['required', 'numeric'],
             'payout_method_id' => ['required'],
             'supported_currency' => ['required'],
@@ -85,8 +88,12 @@ class PayoutController extends Controller
             if ($user->balance < $checkAmountValidateData['net_amount_in_base_currency']){
                 return $this->jsonError("Insufficient Balance",200);
             }
-        }else{
+        }elseif($request->wallet_type ==  'interest_balance'){
             if ($user->interest_balance < $checkAmountValidateData['net_amount_in_base_currency']){
+                return $this->jsonError("Insufficient Balance",200);
+            }
+        }else{
+            if ($user->profit_balance < $checkAmountValidateData['net_amount_in_base_currency']){
                 return $this->jsonError("Insufficient Balance",200);
             }
         }

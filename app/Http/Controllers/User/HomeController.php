@@ -74,6 +74,7 @@ class HomeController extends Controller
         $data['firebaseNotify'] = config('firebase');
         $data['walletBalance'] = $user->balance+0;
         $data['interestBalance'] = $user->interest_balance+0;
+        $data['profitBalance'] = $user->profit_balance+0;
         $data['totalDeposit'] = $user->total_deposit+0;
         $data['lastPayout'] = getAmount(optional($this->user->payout()->whereStatus(2)->latest()->first())->amount_in_base_currency);
         $data['totalPayout'] = getAmount($this->user->payout()->whereStatus(2)->sum('amount_in_base_currency'));
@@ -670,7 +671,7 @@ class HomeController extends Controller
         $timeManage = ManageTime::where('time', $plan->schedule)->first();
 
         $balance_type = $request->balance_type;
-        if (!in_array($balance_type, ['balance', 'interest_balance', 'checkout'])) {
+        if (!in_array($balance_type, ['balance', 'interest_balance', 'checkout', 'profit_balance'])) {
             return back()->with('error', 'Invalid Wallet Type');
         }
 

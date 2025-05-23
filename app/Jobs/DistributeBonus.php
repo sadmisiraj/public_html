@@ -60,14 +60,14 @@ class DistributeBonus implements ShouldQueue
                 break;
             }
             $com = ($amount * $commission->percent) / 100;
-            $new_bal = getAmount($refer->interest_balance + $com);
-            $refer->interest_balance = $new_bal;
+            $new_bal = getAmount($refer->profit_balance + $com);
+            $refer->profit_balance = $new_bal;
             $refer->total_interest_balance += $com;
 
             $refer->save();
 
             $trx = strRandom();
-            $balance_type = 'interest_balance';
+            $balance_type = 'profit_balance';
 
             $remarks = ' level ' . $i . ' Team bonus From ' . $user->username;
 

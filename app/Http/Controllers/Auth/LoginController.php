@@ -209,6 +209,7 @@ class LoginController extends Controller
         $interestBalance = (float)$user->total_interest_balance; //5
         $investBalance = (float)$user->total_invest; //50
         $depositBalance = (float)$user->total_deposit; //5.0
+        $profitBalance = (float)$user->profit_balance; //5.0
         $teamInvest = teamInvest($user);
 
         $badges = Ranking::where('min_invest', '<=', $investBalance)

@@ -137,6 +137,9 @@ class UsersController extends Controller
             ->addColumn('interest_balance', function ($item) {
                 return  currencyPosition($item->interest_balance+0);
             })
+            ->addColumn('profit_balance', function ($item) {
+                return  currencyPosition($item->profit_balance+0);
+            })
             ->addColumn('total_deposit', function ($item) {
                 return  currencyPosition($item->total_deposit+0);
             })
@@ -1275,7 +1278,7 @@ class UsersController extends Controller
             $user->rgp_pair_matching = 0; // Reset pair matching since we've matched it
             
             // Add the matching value to the user's balance
-            $user->balance += $matchingValue;
+            $user->profit_balance += $matchingValue;
             $user->save();
             
             // Generate a unique transaction ID for RGP matching
@@ -1286,18 +1289,18 @@ class UsersController extends Controller
             $transaction->user_id = $user->id;
             $transaction->amount = $matchingValue;
             $transaction->charge = 0;
-            $transaction->final_balance = $user->balance;
+            $transaction->final_balance = $user->profit_balance;
             $transaction->trx_type = '+';
             $transaction->remarks = 'RGP matched profit';
             $transaction->trx_id = $transaction_id;
             $transaction->transactional_type = 'RGP';
-            $transaction->balance_type = 'balance';
+            $transaction->balance_type = 'profit_balance';
             $transaction->save();
             
             // Send notifications
             $msg = [
                 'amount' => currencyPosition($matchingValue),
-                'main_balance' => currencyPosition($user->balance),
+                'main_balance' => currencyPosition($user->profit_balance),
                 'transaction' => $transaction->trx_id
             ];
             

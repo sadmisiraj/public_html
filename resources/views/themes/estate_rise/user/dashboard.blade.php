@@ -90,8 +90,19 @@
                                         <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="icon">
                                     </div>
                                     <div class="text-box">
-                                        <h5 class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
+                                        <h5 class="mb-0">{{currencyPosition(auth()->user()->profit_balance+0)}}</h5>
                                         <p class="mtitle b-0">@lang('Performance Balance')</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="box-card2">
+                                    <div class="img-box">
+                                        <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="icon">
+                                    </div>
+                                    <div class="text-box">
+                                        <h5 class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
+                                        <p class="mtitle b-0">@lang('Profit Balance')</p>
                                     </div>
                                 </div>
                             </div>
@@ -156,8 +167,19 @@
                                                 <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="interest balance icon image">
                                             </div>
                                             <div class="text-box">
-                                                <h5 class="title mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
+                                                <h5 class="title mb-0">{{currencyPosition(auth()->user()->profit_balance+0)}}</h5>
                                                 <p class="mb-0">@lang('Performance Balance')</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="box-card2">
+                                            <div class="img-box">
+                                                <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="interest balance icon image">
+                                            </div>
+                                            <div class="text-box">
+                                                <h5 class="title mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
+                                                <p class="mb-0">@lang('Profit Balance')</p>
                                             </div>
                                         </div>
                                     </div>

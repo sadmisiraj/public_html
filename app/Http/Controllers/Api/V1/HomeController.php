@@ -38,6 +38,7 @@ class HomeController extends Controller
 
         $data['balance'] = 'Deposit Balance - ' .currencyPosition(getAmount(auth()->user()->balance));
         $data['interest_balance'] = 'Interest Balance - ' . currencyPosition(getAmount(auth()->user()->interest_balance));
+        $data['profit_balance'] = 'Profit Balance - ' . currencyPosition(getAmount(auth()->user()->profit_balance));
 
         $planArr = [];
         $data['plans'] = ManagePlan::where('status', 1)->get()->map(function ($query) use ($planArr) {
@@ -166,7 +167,7 @@ class HomeController extends Controller
             [
                 'email' => 'required',
                 'amount' => 'required',
-                'wallet_type' => ['required', Rule::in(['balance', 'interest_balance'])],
+                'wallet_type' => ['required', Rule::in(['balance', 'interest_balance', 'profit_balance'])],
                 'password' => 'required'
             ]);
 
@@ -602,7 +603,7 @@ class HomeController extends Controller
         $timeManage = ManageTime::where('time', $plan->schedule)->first();
 
         $balance_type = $request->balance_type;
-        if (!in_array($balance_type, ['balance', 'interest_balance'])) {
+        if (!in_array($balance_type, ['balance', 'interest_balance', 'profit_balance'])) {
             return response()->json($this->withErrors('Invalid Wallet Type'));
         }
 
@@ -691,8 +692,9 @@ class HomeController extends Controller
             $data['currency'] = $basic->currency_symbol;
             $data['mainBalance'] = getAmount($user->balance);
             $data['interestBalance'] = getAmount($user->interest_balance);
+            $data['profitBalance'] = getAmount($user->profit_balance);
             $data['totalDeposit'] = getAmount($user->deposits()->whereStatus(1)->sum('amount'));
-            $data['totalEarn'] = getAmount($user->transaction()->where('balance_type', 'interest_balance')->where('trx_type', '+')->sum('amount'));
+            $data['totalEarn'] = getAmount($user->transaction()->where('balance_type', 'interest_balance')->where('trx_type', '+')->sum('amount')) + getAmount($user->transaction()->where('balance_type', 'profit_balance')->where('trx_type', '+')->sum('amount'));
             $data['totalPayout'] = getAmount($user->payout()->whereStatus(2)->sum('amount'));
             $data['totalReferralBonus'] = getAmount($user->referralBonusLog()->where('type', 'deposit')->sum('amount')) + getAmount($user->referralBonusLog()->where('type', 'invest')->sum('amount'));
 
