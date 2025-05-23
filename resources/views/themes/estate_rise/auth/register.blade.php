@@ -81,22 +81,8 @@
                                             <!-- Phone Field -->
                                             <div class="col-md-12">
                                                 <div class="input-group">
-                                                    <select name="phone_code" id="phone_code" class="form-select" style="max-width: 150px;" required>
-                                                        @php
-                                                            $country_code = (string) @getIpInfo()['code'] ?: null;
-                                                            $myCollection = collect(config('country'))->map(function($row) {
-                                                                return collect($row);
-                                                            });
-                                                            $countries = $myCollection->sortBy('code');
-                                                        @endphp
-                                                        @foreach(config('country') as $value)
-                                                            <option value="{{$value['phone_code']}}"
-                                                                    data-name="{{$value['name']}}"
-                                                                    data-code="{{$value['code']}}"
-                                                                {{$country_code == $value['code'] ? 'selected' : ''}}
-                                                            > {{$value['name']}} ({{$value['phone_code']}})
-                                                            </option>
-                                                        @endforeach
+                                                    <select name="phone_code" id="phone_code" class="form-select" style="max-width: 150px; display: none;" required>
+                                                        <option value="+91" data-name="India" data-code="IN" selected> India (+91)</option>
                                                     </select>
                                                     <input type="text" class="form-control" id="phone" name="phone" 
                                                            placeholder="@lang('Phone Number')" value="{{ old('phone') }}" required>
