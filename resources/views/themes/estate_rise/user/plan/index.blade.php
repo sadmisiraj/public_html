@@ -56,8 +56,6 @@
                                 <th scope="col">@lang('SL')</th>
                                 <th scope="col">@lang('Name')</th>
                                 <th scope="col">@lang('Price')</th>
-                                <th scope="col">@lang('Profit')</th>
-                                <th scope="col">@lang('Capital Back')</th>
                                 <th scope="col">@lang('Status')</th>
                                 <th scope="col">@lang('Action')</th>
                             </tr>
@@ -77,20 +75,7 @@
                                     <td>
                                         {{$plan->price}}
                                     </td>
-                                    <td>
-                                        @if ($plan->profit_type == 1)
-                                            <span>{{getAmount($plan->profit)}}{{'%'}} @lang('Every') {{trans($getTime->name)}}</span>
-                                        @else
-                                            <span>{{trans(basicControl()->currency_symbol)}}{{getAmount($plan->profit)}} @lang('Every') {{trans($getTime->name)}}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($plan->is_capital_back == 0)
-                                            <span class="badge text-bg-danger">@lang('No')</span>
-                                        @else
-                                            <span class="badge text-bg-success">@lang('Yes')</span>
-                                        @endif
-                                    </td>
+                                    
                                     <td>
                                         @php
                                             $statusText = '';
@@ -192,9 +177,7 @@
                     <div class="modal-body">
                         <div class="text-center">
                             <h5 class="title plan-name"></h5>
-                            <p class="price-range"></p>
-                            <p class="profit-details"></p>
-                            <p class="profit-validity"></p>
+                            
                         </div>
                         <div class="row g-3 align-items-end">
                             <div class="input-box col-12">
@@ -204,7 +187,7 @@
                                             value="balance">@lang('Deposit Balance')
                                             - {{currencyPosition(auth()->user()->balance)}}</option>
                                         <option
-                                            value="interest_balance">@lang('Profit Balance')
+                                            value="interest_balance">@lang('Performance Balance')
                                             - {{currencyPosition(auth()->user()->interest_balance)}}</option>
                                     @endauth
                                     <option value="checkout">@lang('Checkout')</option>

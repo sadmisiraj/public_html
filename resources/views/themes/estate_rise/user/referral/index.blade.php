@@ -19,10 +19,10 @@
         <div class="col-12 mb-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-20">@lang('Invite Team Members')</h4>
-                    <h5 class="mb-3">@lang('Referral Links')</h5>
+                    <h4 class="mb-20">@lang('TC LINKS')</h4>
+                
                     <div class="mb-3">
-                        <label class="form-label">@lang('Left Placement')</label>
+                        <label class="form-label">@lang('ALPHA')</label>
                         <div class="input-group">
                             <input id="leftReferralURL" type="text" class="form-control"
                                    value="{{route('register.sponsor',[Auth::user()->username, 'left'])}}"
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">@lang('Right Placement')</label>
+                        <label class="form-label">@lang('BETA')</label>
                         <div class="input-group">
                             <input id="rightReferralURL" type="text" class="form-control"
                                    value="{{route('register.sponsor',[Auth::user()->username, 'right'])}}"
@@ -71,7 +71,7 @@
                         <table class="table table-striped align-middle">
                             <thead>
                             <tr>
-                                <th scope="col">@lang('Username')</th>
+                                <th scope="col">@lang('User ID')</th>
                                 <th scope="col">@lang('Level')</th>
                                 <th scope="col">@lang('Placement')</th>
                                 <th scope="col">@lang('Joined At')</th>

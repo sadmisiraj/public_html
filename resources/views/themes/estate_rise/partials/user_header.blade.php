@@ -2,15 +2,6 @@
 <header id="header" class="header">
     <button class="toggle-sidebar-btn d-none d-xl-block"><i class="fa-light fa-list"></i></button>
     <!-- End Logo -->
-
-    <div class="search-bar">
-        <form class="search-form d-flex align-items-center" method="POST" action="#">
-            <input type="text" class="form-control" name="query" placeholder="Search"
-                   title="Enter search keyword">
-            <span class="search-icon" title="Search"><i class="fa-regular fa-magnifying-glass"></i></span>
-        </form>
-    </div><!-- End Search Bar -->
-
     <!-- Start Icons Navigation -->
     <nav class="header-nav ms-auto">
         <ul class="nav-icons">
@@ -50,6 +41,9 @@
             @endauth
 
             <!-- Notification section end -->
+            
+            
+    
             <li class="nav-item dropdown">
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
                    data-bs-toggle="dropdown">

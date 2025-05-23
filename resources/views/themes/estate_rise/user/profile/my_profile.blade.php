@@ -106,7 +106,7 @@
                                             @endif
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="username" class="form-label">@lang('username')</label>
+                                            <label for="username" class="form-label">@lang('user ID')</label>
                                             <input type="text" name="username"
                                                    value="{{ old('username', $user->username) }}"
                                                    class="form-control" id="username" readonly disabled>
@@ -203,19 +203,7 @@
                                             <div class="text-danger">{{$message}}</div>
                                             @enderror
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">@lang('language')</label>
-                                            <select class="cmn-select2" name="language">
-                                                <option value="">@lang('Select Language')</option>
-                                                @foreach($languages as $la)
-                                                    <option value="{{$la->id}}"
-                                                        {{ old('language', $user->language_id) == $la->id ? 'selected' : '' }}>@lang($la->name)</option>
-                                                @endforeach
-                                            </select>
-                                            @error('language')
-                                            <div class="text-danger">{{$message}}</div>
-                                            @enderror
-                                        </div>
+                                        
                                         <div class="col-md-6">
                                             <label for="address" class="form-label">@lang('address')</label>
                                             <input type="text" name="address"
@@ -365,6 +353,9 @@
                                     </div>
                                 </div>
                             @else
+                            <div class="card-header">
+                                    <p class="card-header-title">@lang('Before you submit for KYC verification, please ensure that you have filled in all the profile details correctly. Otherwise, it may take longer to complete the verification.Only one account can be created using one PAN card information. Otherwise, the verification will be rejected.')</p>
+                                </div>
                                 <form action="{{ route('user.kyc.verification.submit') }}" method="post"
                                       enctype="multipart/form-data">
                                     @csrf

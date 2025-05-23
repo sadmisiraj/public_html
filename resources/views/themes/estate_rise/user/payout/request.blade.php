@@ -80,17 +80,11 @@
                                     >
                                         <option
                                             value="balance" class="bg-light text-dark">@lang('Deposit Balance') - {{currencyPosition(auth()->user()->balance+0)}}</option>
-                                        <option value="interest_balance" class="bg-light text-dark">@lang('Interest Balance') - {{currencyPosition(auth()->user()->interest_balance+0)}}</option>
+                                        <option value="interest_balance" class="bg-light text-dark">@lang('Performance Balance') - {{currencyPosition(auth()->user()->interest_balance+0)}}</option>
                                     </select>
 
                                 </div>
-                                <div class="col-md-12 input-box mb-3">
-                                    <select class="form-control"
-                                            name="supported_currency"
-                                            id="supported_currency">
-                                        <option value="">@lang('Select Currency')</option>
-                                    </select>
-                                </div>
+                                
 
                                 <div class="col-md-12 input-box">
                                     <div class="input-group">
@@ -176,7 +170,7 @@
                                     >
                                         <option
                                             value="balance" class="bg-light text-dark">@lang('Deposit Balance') - {{currencyPosition(auth()->user()->balance+0)}}</option>
-                                        <option value="interest_balance" class="bg-light text-dark">@lang('Interest Balance') - {{currencyPosition(auth()->user()->interest_balance+0)}}</option>
+                                        <option value="interest_balance" class="bg-light text-dark">@lang('Performance Balance') - {{currencyPosition(auth()->user()->interest_balance+0)}}</option>
                                     </select>
 
                                 </div>

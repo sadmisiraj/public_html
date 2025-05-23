@@ -16,6 +16,10 @@
                 </ol>
             </nav>
         </div>
+         <div class="profile-content">
+                       
+                          <h4>user<span>{{'@'.auth()->user()->username}}</span></h4> 
+                        </div>
         <!-- Page title end -->
         <div class="dashboard-top">
             <div class="row g-4 align-items-center">
@@ -70,7 +74,7 @@
                                     </div>
                                     <div class="text-box">
                                         <h5 class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
-                                        <p class="mtitle b-0">@lang('Profit Balance')</p>
+                                        <p class="mtitle b-0">@lang('Performance Balance')</p>
                                     </div>
                                 </div>
                             </div>
@@ -136,7 +140,7 @@
                                             </div>
                                             <div class="text-box">
                                                 <h5 class="title mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
-                                                <p class="mb-0">@lang('Profit Balance')</p>
+                                                <p class="mb-0">@lang('Performance Balance')</p>
                                             </div>
                                         </div>
                                     </div>
@@ -264,7 +268,7 @@
 
                                         <div class="text-box">
                                             <h5 class="title">{{currencyPosition($totalBonus+0)}}</h5>
-                                            <h6>@lang('Total Referral Bonus')</h6>
+                                            <h6>@lang('TRB')</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -338,7 +342,7 @@
 
                                                 <div class="text-box">
                                                     <h5 class="title">{{currencyPosition($totalTeamInvest+0)}}</h5>
-                                                    <h6>@lang('Team Investment')</h6>
+                                                    <h6>@lang('TRT')</h6>
                                                 </div>
                                             </div>
                                         </div>
@@ -367,9 +371,9 @@
                             <div class="card">
                                 <div class="card-body">
                                     <!-- <h4 class="mb-20">Referral Link</h4> -->
-                                    <h5 class="mb-3">@lang('Referral Links')</h5>
+                                    <h5 class="mb-3">@lang('TC LINKS')</h5>
                                     <div class="mb-3">
-                                        <label class="form-label">@lang('Left Placement')</label>
+                                        <label class="form-label">@lang('ALPHA')</label>
                                         <div class="input-group">
                                             <input id="leftReferralURL" type="text" class="form-control"
                                                    value="{{route('register.sponsor',[Auth::user()->username, 'left'])}}"
@@ -381,7 +385,7 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="form-label">@lang('Right Placement')</label>
+                                        <label class="form-label">@lang('BETA')</label>
                                         <div class="input-group">
                                             <input id="rightReferralURL" type="text" class="form-control"
                                                    value="{{route('register.sponsor',[Auth::user()->username, 'right'])}}"

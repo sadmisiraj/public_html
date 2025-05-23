@@ -30,7 +30,7 @@
                     <p class="mb-0">{{currencyPosition(auth()->user()->balance+0)}}</p>
                 </div>
                 <div class="item">
-                    <p class="mb-0"> @lang('Profit Balance') </p>
+                    <p class="mb-0"> @lang('Performance Balance') </p>
                     <p class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</p>
                 </div>
             </div>
@@ -120,6 +120,9 @@
                 <span>@lang('support ticket')</span>
             </a>
         </li>
+        <br>
+        <br>
     </ul>
 </aside>
+
 <!-- Sidebar section end -->

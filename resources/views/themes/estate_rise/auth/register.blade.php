@@ -38,7 +38,7 @@
                                                 </div>
                                                 <div id="sponsor-name" class="mt-2">
                                                     @if(isset($validSponsor) && $validSponsor && isset($sponsorUser))
-                                                        <span class="text-success">Referrer: Sponser</span>
+                                                        <span class="text-success">Guide:</span>
                                                         <!-- <span class="text-success">Referrer: {{ $sponsorUser->fullname }}</span>
                                                         @if(isset($referralNode) && $referralNode)
                                                             <span class="text-success ms-2">({{ ucfirst($referralNode) }} Placement)</span>

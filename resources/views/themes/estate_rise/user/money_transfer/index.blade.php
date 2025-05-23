@@ -29,7 +29,7 @@
                                     <div class="col-12">
                                         <div>
                                             <label for="Recipient-username"
-                                                   class="form-label">@lang('Receiver Username') </label>
+                                                   class="form-label">@lang('Receiver User ID') </label>
                                             <input type="text" class="form-control"
                                                    id="Recipient-username" name="username" value="{{old('username')}}" required>
                                         </div>
@@ -51,8 +51,8 @@
                                             <label for="Amount" class="form-label">@lang('Select Wallet')</label>
                                             <select name="wallet_type" id="wallet_type" class="form-control" required>
                                                 <option value="" selected disabled>{{trans('Select Wallet')}}</option>
-                                                <option value="balance" >{{trans('Deposit balance')}}</option>
-                                                <option value="interest_balance" >{{trans('Profit Balance')}}</option>
+                                                <option value="balance" >{{trans('Deposit Balance')}}</option>
+                                                <option value="interest_balance" >{{trans('Performance Balance')}}</option>
                                             </select>
                                         </div>
                                         @error('wallet_type')

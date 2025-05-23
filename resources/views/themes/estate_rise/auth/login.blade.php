@@ -22,7 +22,7 @@
                                         <div class="row g-4">
                                             <div class="col-12">
                                                 <input type="text" name="username" value="{{old('username',request()->username)}}" class="form-control" id="exampleInputEmail1"
-                                                       placeholder="@lang('Username or Email')">
+                                                       placeholder="@lang('UserID or Email')">
                                                 @error('username')<span class="text-danger mt-1">@lang($message)</span>@enderror
                                             </div>
                                             <div class="col-12">
@@ -79,11 +79,7 @@
                                         </div>
                                         <button type="submit" class="cmn-btn mt-30 w-100"><span>@lang('Log In')</span></button>
 
-                                        <div class="pt-20 text-center">
-                                            @lang("Don't have an account?")
-                                            <p class="mb-0 highlight mt-1"><a href="{{ route('register') }}">@lang('Create An Account')</a>
-                                            </p>
-                                        </div>
+                                       
                                     </form>
                                 </div>
                             </div>
