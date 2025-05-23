@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\SecuritySettingsController;
+use App\Http\Controllers\AnnouncementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -477,6 +478,12 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::get('investments', [ManagePlanController::class, 'investments'])->name('investments');
         Route::get('investment/list', [ManagePlanController::class, 'investmentList'])->name('investment.list');
         Route::post('terminate/investment/{id}', [ManagePlanController::class, 'terminateInvestment'])->name('terminate.investment');
+
+        // Announcements management
+        Route::get('announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::post('announcements/{id}/update', [AnnouncementController::class, 'update'])->name('announcements.update');
+        Route::delete('announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
     });
 

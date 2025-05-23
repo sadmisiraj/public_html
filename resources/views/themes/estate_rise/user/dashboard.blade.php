@@ -4,6 +4,16 @@
 
     @php
         $content = getContent();
+        use App\Models\Announcement;
+        $today = date('Y-m-d');
+        $announcements = Announcement::where('status', 'active')
+            ->where(function($q) use ($today) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
+            })
+            ->where(function($q) use ($today) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
+            })
+            ->pluck('text');
     @endphp
     <div class="main-wrapper">
         <!-- Page title start -->
@@ -16,8 +26,8 @@
                 </ol>
             </nav>
         </div>
-         <div class="profile-content">
-                       
+        <div class="profile-content">
+                         
                           <h4>user<span>{{'@'.auth()->user()->username}}</span></h4> 
                         </div>
         <!-- Page title end -->
@@ -41,6 +51,13 @@
                     </div>
                 </div>
                 <div class="col-lg-8">
+                    @if($announcements->count())
+                        <div class="mb-3">
+                            <marquee behavior="scroll" direction="left" style="background: #fffbe6; color: #b38b00; padding: 10px; border-radius: 5px; font-weight: bold;">
+                                {{ $announcements->implode(' | ') }}
+                            </marquee>
+                        </div>
+                    @endif
                     <div class="desktop-view-card-section">
                         <div class="grid-container">
                             <div class="item">
