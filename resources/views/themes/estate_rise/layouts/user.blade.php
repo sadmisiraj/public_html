@@ -60,11 +60,13 @@
                 <a class="nav-link active" href="{{route('user.dashboard')}}"><i class="fa-regular fa-house"></i></a>
             </li>
             <li class="nav-item">
-                <a onclick="searchBar()" class="nav-link search-bar-toggle" href="#"><i
-                        class="fa-regular fa-magnifying-glass"></i></a>
+                <a class="nav-link" href="{{route('user.profile')}}"><i class="fa-regular fa-user"></i></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{route('user.profile')}}"><i class="fa-regular fa-user"></i></a>
+                <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa-regular fa-sign-out"></i></a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </li>
         </ul>
         <!-- Bottom Mobile Tab nav section end -->
