@@ -34,6 +34,7 @@ class SecuritySettingsController extends Controller
     public function updatePayoutSettings(Request $request)
     {
         $requirePayoutOtp = $request->has('require_payout_otp') ? 1 : 0;
+        $requireMoneyTransferOtp = $request->has('require_money_transfer_otp') ? 1 : 0;
 
         try {
             $basic = basicControl();
@@ -41,6 +42,7 @@ class SecuritySettingsController extends Controller
                 'id' => $basic->id ?? ''
             ], [
                 'require_payout_otp' => $requirePayoutOtp,
+                'require_money_transfer_otp' => $requireMoneyTransferOtp,
             ]);
 
             if (!$response) {
@@ -48,7 +50,7 @@ class SecuritySettingsController extends Controller
             }
 
             Artisan::call('optimize:clear');
-            return back()->with('success', 'Payout security settings updated successfully.');
+            return back()->with('success', 'Security settings updated successfully.');
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

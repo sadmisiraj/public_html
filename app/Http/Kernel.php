@@ -80,5 +80,6 @@ class Kernel extends HttpKernel
         'apiKycCheck' => \App\Http\Middleware\ApiKyc::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'payout.otp.verification' => \App\Http\Middleware\PayoutOtpVerification::class,
+        'money.transfer.otp.verification' => \App\Http\Middleware\MoneyTransferOtpVerification::class,
     ];
 }

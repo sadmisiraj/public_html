@@ -18,8 +18,9 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\User\VerificationController;
 use App\Http\Controllers\User\KycVerificationController;
 use App\Http\Controllers\TwoFaSecurityController;
-use App\Http\Controllers\UsersController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\User\PayoutOtpController;
+use App\Http\Controllers\User\MoneyTransferOtpController;
 
 
 /*
@@ -117,8 +118,10 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('/transaction', [HomeController::class, 'transaction'])->name('transaction');
 
             // money-transfer
-            Route::get('/money-transfer', [HomeController::class, 'moneyTransfer'])->name('money-transfer');
-            Route::post('/money-transfer', [HomeController::class, 'moneyTransferConfirm'])->name('money.transfer');
+            Route::middleware(['money.transfer.otp.verification'])->group(function () {
+                Route::get('/money-transfer', [HomeController::class, 'moneyTransfer'])->name('money-transfer');
+                Route::post('/money-transfer', [HomeController::class, 'moneyTransferConfirm'])->name('money.transfer');
+            });
 
             // terminate investment
             Route::post('terminate/investment/{id}', [HomeController::class, 'terminate'])->name('terminate');
@@ -161,6 +164,12 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::post('payout-verification', [PayoutOtpController::class, 'verifyOtp'])->name('payout.otp.verify');
             Route::get('payout-verification/sms', [PayoutOtpController::class, 'sendOtpViaSms'])->name('payout.otp.sms');
             Route::get('payout-verification/email', [PayoutOtpController::class, 'sendOtpViaEmail'])->name('payout.otp.email');
+
+            // Money Transfer OTP verification routes
+            Route::get('money-transfer-verification', [MoneyTransferOtpController::class, 'showVerification'])->name('money.transfer.otp.verification');
+            Route::post('money-transfer-verification', [MoneyTransferOtpController::class, 'verifyOtp'])->name('money.transfer.otp.verify');
+            Route::get('money-transfer-verification/sms', [MoneyTransferOtpController::class, 'sendOtpViaSms'])->name('money.transfer.otp.sms');
+            Route::get('money-transfer-verification/email', [MoneyTransferOtpController::class, 'sendOtpViaEmail'])->name('money.transfer.otp.email');
 
             // Only payout routes need KYC and OTP verification
             Route::middleware(['kyc', 'payout.otp.verification'])->group(function () {
@@ -208,12 +217,25 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
     Route::post('khalti/payment/verify/{trx}', [\App\Http\Controllers\khaltiPaymentController::class, 'verifyPayment'])->name('khalti.verifyPayment');
     Route::post('khalti/payment/store', [khaltiPaymentController::class, 'storePayment'])->name('khalti.storePayment');
 
+    // Temporary debug route
+    Route::get('/debug-otp-settings-simple', function() {
+        $basic = basicControl();
+        return [
+            'require_payout_otp' => (bool)$basic->require_payout_otp,
+            'require_money_transfer_otp' => (bool)$basic->require_money_transfer_otp,
+        ];
+    });
+    
+    // Test route with money transfer OTP middleware
+    Route::middleware(['money.transfer.otp.verification'])->get('/test-money-transfer-middleware', function() {
+        return 'If you see this, the middleware did not redirect you, which means OTP verification is not required or has been completed.';
+    });
 
     Auth::routes();
     /*= Frontend Manage Controller =*/
     Route::get("/{slug?}", [FrontendController::class, 'page'])->name('page');
 
-    Route::post('users/badge-update/{id}', [UsersController::class, 'badgeUpdate'])->name('user.badge.update');
+    Route::post('users/badge-update/{id}', [UsersController::class, 'badgeUpdate'])->name('users.badgeUpdate');
 });
 
 

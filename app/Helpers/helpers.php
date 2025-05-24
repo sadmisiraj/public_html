@@ -133,6 +133,15 @@ if (!function_exists('basicControl')) {
                 \Cache::put('ConfigureSetting', $configure);
             }
 
+            // Debug logging
+            \Log::info('BasicControl helper called', [
+                'require_money_transfer_otp' => isset($configure->require_money_transfer_otp) ? $configure->require_money_transfer_otp : 'not set',
+                'require_payout_otp' => isset($configure->require_payout_otp) ? $configure->require_payout_otp : 'not set',
+                'cache_hit' => $configure === \Cache::get('ConfigureSetting'),
+                'url' => request()->url(),
+                'route' => request()->route() ? request()->route()->getName() : 'no route'
+            ]);
+
             return $configure;
         } catch (\Exception $e) {
             \Cache::forget('ConfigureSetting');
