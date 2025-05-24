@@ -173,7 +173,7 @@
                         directReferralUsers.forEach(function (directReferralUser) {
                             referralData += `
                         <tr id="user-${directReferralUser.id}" data-level="${currentLevel}">
-                            <td data-label="@lang('Username')" style="padding-left: ${currentLevel * 35}px;">
+                            <td data-label="@lang('Username')" style="padding-left: 30px;">
                                 <a class="${directReferralUser.count_direct_referral > 0 ? 'nextDirectReferral' : ''} text-decoration-none" href="javascript:void(0)" style="border-bottom: none !important;" data-id="${directReferralUser.id}">
                                     ${directReferralUser.count_direct_referral > 0 ? ' <i class="far fa-circle-down color-primary"></i>' : ''}
                                     ${directReferralUser.username}
@@ -185,7 +185,7 @@
                             <td data-label="@lang('Placement')">
                                 ${directReferralUser.referral_node ? 
                                     `<span class="badge bg-${directReferralUser.referral_node === 'left' ? 'primary' : 'success'}">
-                                        ${directReferralUser.referral_node.charAt(0).toUpperCase() + directReferralUser.referral_node.slice(1)}
+                                        ${directReferralUser.referral_node === 'left' ? 'Alpha' : 'Beta'}
                                     </span>` : '-'}
                             </td>
                             <td data-label="Joined At">
@@ -247,6 +247,27 @@
 
         .text-decoration-none {
             color: var(--fontColor);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .cmn-table table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        
+        .cmn-table table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* Make username column have enough space for indentation */
+        .cmn-table table th:first-child,
+        .cmn-table table td:first-child {
+            min-width: 200px;
+            max-width: 450px;
         }
     </style>
 @endpush
