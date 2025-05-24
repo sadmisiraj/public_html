@@ -82,6 +82,32 @@
                             </div>
                         @endif
 
+                        @if(adminAccessRoute(config('role.gold_coin.access.view')))
+                            <span class="dropdown-header mt-4">@lang('Products')</span>
+                            <div class="nav-item">
+                                <a class="nav-link dropdown-toggle {{ menuActive(['admin.goldcoin.*'], 3) }}"
+                                   href="#navbarVerticalGoldCoinMenu"
+                                   role="button"
+                                   data-bs-toggle="collapse"
+                                   data-bs-target="#navbarVerticalGoldCoinMenu"
+                                   aria-expanded="false"
+                                   aria-controls="navbarVerticalGoldCoinMenu">
+                                    <i class="fa-solid fa-coins nav-icon"></i>
+                                    <span class="nav-link-title">@lang("Gold Coins")</span>
+                                </a>
+                                <div id="navbarVerticalGoldCoinMenu"
+                                     class="nav-collapse collapse {{ menuActive(['admin.goldcoin.*'], 2) }}"
+                                     data-bs-parent="#navbarVerticalGoldCoinMenu">
+                                    <a class="nav-link {{ menuActive(['admin.goldcoin.index', 'admin.goldcoin.create', 'admin.goldcoin.edit']) }}"
+                                       href="{{ route('admin.goldcoin.index') }}">@lang('Manage Coins')</a>
+                                    <a class="nav-link {{ menuActive(['admin.goldcoin.orders', 'admin.goldcoin.order.details']) }}"
+                                       href="{{ route('admin.goldcoin.orders', ['status' => 'pending']) }}">@lang('Pending Orders')</a>
+                                    <a class="nav-link {{ menuActive(['admin.goldcoin.order.history']) }}"
+                                       href="{{ route('admin.goldcoin.order.history') }}">@lang('Order History')</a>
+                                </div>
+                            </div>
+                        @endif
+
                         @if(adminAccessRoute(config('role.referral.access.view')))
                             <span class="dropdown-header mt-4">@lang('Commission Setting')</span>
                             <div class="nav-item">

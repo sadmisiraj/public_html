@@ -255,5 +255,16 @@ return [
             'edit' => ['admin.blogs.edit','admin.blogs.update','admin.blog-category.edit','admin.blog-category.update',],
             'delete' => ['admin.blogs.delete','admin.blog-category.delete'],
         ]
-    ]
+    ],
+
+    'gold_coin' => [
+        'label' => 'Gold Coin',
+        'access' => [
+            'view' => ['admin.goldcoin.index', 'admin.goldcoin.orders', 'admin.goldcoin.order.details', 'admin.goldcoin.order.history'],
+            'add' => ['admin.goldcoin.create', 'admin.goldcoin.store'],
+            'edit' => ['admin.goldcoin.edit', 'admin.goldcoin.update', 'admin.goldcoin.order.update.status'],
+            'delete' => ['admin.goldcoin.destroy'],
+        ],
+        'description' => 'Manage Gold Coins and Orders'
+    ],
 ];

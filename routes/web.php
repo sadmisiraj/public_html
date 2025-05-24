@@ -21,6 +21,7 @@ use App\Http\Controllers\TwoFaSecurityController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\User\PayoutOtpController;
 use App\Http\Controllers\User\MoneyTransferOtpController;
+use App\Http\Controllers\User\GoldCoinController;
 
 
 /*
@@ -128,6 +129,13 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             
             //plan
             Route::get('/plan', [HomeController::class, 'planList'])->name('plan');
+            
+            // Gold Coin Purchase
+            Route::get('/goldcoin', [GoldCoinController::class, 'index'])->name('goldcoin');
+            Route::get('/goldcoin/details/{id}', [GoldCoinController::class, 'coinDetails'])->name('goldcoin.details');
+            Route::post('/goldcoin/purchase', [GoldCoinController::class, 'purchaseGold'])->name('goldcoin.purchase');
+            Route::get('/goldcoin/orders', [GoldCoinController::class, 'orders'])->name('goldcoin.orders');
+            Route::get('/goldcoin/order/{trx_id}', [GoldCoinController::class, 'orderDetails'])->name('goldcoin.order.details');
             
             // referral bonus
             Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');

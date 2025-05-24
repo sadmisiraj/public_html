@@ -45,6 +45,7 @@ use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\SecuritySettingsController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\Admin\GoldCoinController;
 
 /*
 |--------------------------------------------------------------------------
@@ -484,6 +485,22 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
         Route::post('announcements/{id}/update', [AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        // Gold Coin Management
+        Route::prefix('goldcoin')->name('goldcoin.')->group(function () {
+            Route::get('/', [GoldCoinController::class, 'index'])->name('index');
+            Route::get('/create', [GoldCoinController::class, 'create'])->name('create');
+            Route::post('/store', [GoldCoinController::class, 'store'])->name('store');
+            Route::get('/edit/{id}', [GoldCoinController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [GoldCoinController::class, 'update'])->name('update');
+            Route::get('/destroy/{id}', [GoldCoinController::class, 'destroy'])->name('destroy');
+            
+            // Order Management
+            Route::get('/orders/{status?}', [GoldCoinController::class, 'orders'])->name('orders');
+            Route::get('/order/details/{id}', [GoldCoinController::class, 'orderDetails'])->name('order.details');
+            Route::post('/order/update-status/{id}', [GoldCoinController::class, 'updateOrderStatus'])->name('order.update.status');
+            Route::get('/order/history', [GoldCoinController::class, 'orderHistory'])->name('order.history');
+        });
 
     });
 

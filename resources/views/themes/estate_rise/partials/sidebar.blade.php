@@ -77,6 +77,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link collapsed {{menuActive(['user.goldcoin', 'user.goldcoin.details', 'user.goldcoin.orders', 'user.goldcoin.order.details'])}}" href="{{route('user.goldcoin')}}">
+                <i class="far fa-coins"></i>
+                <span>@lang('Purchase Gold')</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.transaction', 'user.transaction.search'])}}" href="{{route('user.transaction')}}">
                 <i class="fa-regular fa-arrow-right-arrow-left"></i>
                 <span>@lang('transaction')</span>
