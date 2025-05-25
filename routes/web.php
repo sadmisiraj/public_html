@@ -136,6 +136,8 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::post('/goldcoin/purchase', [GoldCoinController::class, 'purchaseGold'])->name('goldcoin.purchase');
             Route::get('/goldcoin/orders', [GoldCoinController::class, 'orders'])->name('goldcoin.orders');
             Route::get('/goldcoin/order/{trx_id}', [GoldCoinController::class, 'orderDetails'])->name('goldcoin.order.details');
+            Route::get('/goldcoin/orders/export/csv/{status?}', [GoldCoinController::class, 'exportOrdersCSV'])->name('goldcoin.orders.export.csv');
+            Route::get('/goldcoin/orders/export/pdf/{status?}', [GoldCoinController::class, 'exportOrdersPDF'])->name('goldcoin.orders.export.pdf');
             
             // referral bonus
             Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');

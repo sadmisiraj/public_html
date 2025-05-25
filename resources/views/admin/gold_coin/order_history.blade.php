@@ -8,6 +8,14 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">@lang('Gold Coin Order History')</h5>
+                        <div class="mt-2">
+                            <a href="{{ route('admin.goldcoin.order.history.export.pdf') }}" class="btn btn-sm btn-primary">
+                                <i class="fa fa-file-pdf"></i> @lang('Export as PDF')
+                            </a>
+                            <a href="{{ route('admin.goldcoin.order.history.export.csv') }}" class="btn btn-sm btn-success">
+                                <i class="fa fa-file-csv"></i> @lang('Export as CSV')
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.goldcoin.order.history') }}" method="GET" class="mb-4">

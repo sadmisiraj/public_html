@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use PDF;
 
 class GoldCoinController extends Controller
 {
@@ -141,5 +142,72 @@ class GoldCoinController extends Controller
         $basic = basicControl();
         
         return view(template() . 'user.gold_coin.order_details', compact('pageTitle', 'order', 'basic'));
+    }
+    
+    public function exportOrdersCSV($status = null)
+    {
+        $user = Auth::user();
+        $query = GoldCoinOrder::where('user_id', $user->id)->with('goldCoin');
+        
+        if ($status && $status != 'all') {
+            $query->where('status', $status);
+        }
+        
+        $orders = $query->latest()->get();
+        
+        $fileName = 'gold_coin_orders_' . ($status ? $status . '_' : '') . date('Y-m-d') . '.csv';
+        
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        
+        $columns = ['TRX ID', 'Gold Coin', 'Weight (g)', 'Price Per Gram', 'Subtotal', 'GST Amount', 'Total Price', 'Payment Source', 'Status', 'Date'];
+        
+        $callback = function() use($orders, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            
+            foreach ($orders as $order) {
+                $row['TRX ID'] = $order->trx_id;
+                $row['Gold Coin'] = $order->goldCoin->name . ' (' . $order->goldCoin->karat . ')';
+                $row['Weight (g)'] = $order->weight_in_grams;
+                $row['Price Per Gram'] = $order->price_per_gram;
+                $row['Subtotal'] = $order->subtotal;
+                $row['GST Amount'] = $order->gst_amount;
+                $row['Total Price'] = $order->total_price;
+                $row['Payment Source'] = ucfirst($order->payment_source);
+                $row['Status'] = ucfirst($order->status);
+                $row['Date'] = $order->created_at->format('d M, Y H:i:s');
+                
+                fputcsv($file, array($row['TRX ID'], $row['Gold Coin'], $row['Weight (g)'], $row['Price Per Gram'], $row['Subtotal'], $row['GST Amount'], $row['Total Price'], $row['Payment Source'], $row['Status'], $row['Date']));
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+    
+    public function exportOrdersPDF($status = null)
+    {
+        $user = Auth::user();
+        $query = GoldCoinOrder::where('user_id', $user->id)->with('goldCoin');
+        
+        if ($status && $status != 'all') {
+            $query->where('status', $status);
+        }
+        
+        $orders = $query->latest()->get();
+        $basic = basicControl();
+        
+        $pageTitle = 'Gold Coin Orders' . ($status ? ' - ' . ucfirst($status) : '');
+        
+        $pdf = PDF::loadView(template() . 'user.gold_coin.orders_pdf', compact('orders', 'pageTitle', 'basic', 'user'));
+        
+        return $pdf->download('gold_coin_orders_' . ($status ? $status . '_' : '') . date('Y-m-d') . '.pdf');
     }
 }

@@ -500,6 +500,8 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
             Route::get('/order/details/{id}', [GoldCoinController::class, 'orderDetails'])->name('order.details');
             Route::post('/order/update-status/{id}', [GoldCoinController::class, 'updateOrderStatus'])->name('order.update.status');
             Route::get('/order/history', [GoldCoinController::class, 'orderHistory'])->name('order.history');
+            Route::get('/order/history/export/csv', [GoldCoinController::class, 'exportOrderHistoryCSV'])->name('order.history.export.csv');
+            Route::get('/order/history/export/pdf', [GoldCoinController::class, 'exportOrderHistoryPDF'])->name('order.history.export.pdf');
         });
 
     });

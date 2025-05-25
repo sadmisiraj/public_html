@@ -18,9 +18,20 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">@lang('Order History')</h5>
-                <a href="{{ route('user.goldcoin') }}" class="btn cmn-btn">
-                    <i class="fa fa-plus-circle"></i> @lang('Purchase Gold')
-                </a>
+                <div>
+                    <div class="dropdown d-inline-block me-2">
+                        <button class="btn cmn-btn dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-download"></i> @lang('Export')
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                            <li><a class="dropdown-item" href="{{ route('user.goldcoin.orders.export.pdf') }}"><i class="fa fa-file-pdf"></i> @lang('Export as PDF')</a></li>
+                            <li><a class="dropdown-item" href="{{ route('user.goldcoin.orders.export.csv') }}"><i class="fa fa-file-csv"></i> @lang('Export as CSV')</a></li>
+                        </ul>
+                    </div>
+                    <a href="{{ route('user.goldcoin') }}" class="btn cmn-btn">
+                        <i class="fa fa-plus-circle"></i> @lang('Purchase Gold')
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

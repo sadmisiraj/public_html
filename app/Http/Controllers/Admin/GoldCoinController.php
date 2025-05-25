@@ -10,6 +10,7 @@ use App\Traits\Notify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use PDF;
 
 class GoldCoinController extends Controller
 {
@@ -257,5 +258,109 @@ class GoldCoinController extends Controller
         $basic = basicControl();
         
         return view('admin.gold_coin.order_history', compact('pageTitle', 'orders', 'basic'));
+    }
+    
+    public function exportOrderHistoryCSV(Request $request)
+    {
+        $orders = GoldCoinOrder::with(['user', 'goldCoin']);
+        
+        // Apply filters if set
+        if ($request->user) {
+            $orders = $orders->whereHas('user', function($q) use ($request) {
+                $q->where('username', 'like', "%{$request->user}%")
+                  ->orWhere('email', 'like', "%{$request->user}%");
+            });
+        }
+        
+        if ($request->status) {
+            $orders = $orders->where('status', $request->status);
+        }
+        
+        if ($request->from_date && $request->to_date) {
+            $orders = $orders->whereBetween('created_at', [
+                $request->from_date . ' 00:00:00', 
+                $request->to_date . ' 23:59:59'
+            ]);
+        }
+        
+        if ($request->trx_id) {
+            $orders = $orders->where('trx_id', 'like', "%{$request->trx_id}%");
+        }
+        
+        $orders = $orders->latest()->get();
+        
+        $fileName = 'gold_coin_order_history_' . date('Y-m-d') . '.csv';
+        
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        
+        $columns = ['TRX ID', 'User', 'Gold Coin', 'Weight (g)', 'Price Per Gram', 'Subtotal', 'GST Amount', 'Total Price', 'Payment Source', 'Status', 'Date'];
+        
+        $callback = function() use($orders, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            
+            foreach ($orders as $order) {
+                $row['TRX ID'] = $order->trx_id;
+                $row['User'] = $order->user->username;
+                $row['Gold Coin'] = $order->goldCoin->name . ' (' . $order->goldCoin->karat . ')';
+                $row['Weight (g)'] = $order->weight_in_grams;
+                $row['Price Per Gram'] = $order->price_per_gram;
+                $row['Subtotal'] = $order->subtotal;
+                $row['GST Amount'] = $order->gst_amount;
+                $row['Total Price'] = $order->total_price;
+                $row['Payment Source'] = ucfirst($order->payment_source);
+                $row['Status'] = ucfirst($order->status);
+                $row['Date'] = $order->created_at->format('d M, Y H:i:s');
+                
+                fputcsv($file, array($row['TRX ID'], $row['User'], $row['Gold Coin'], $row['Weight (g)'], $row['Price Per Gram'], $row['Subtotal'], $row['GST Amount'], $row['Total Price'], $row['Payment Source'], $row['Status'], $row['Date']));
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+    
+    public function exportOrderHistoryPDF(Request $request)
+    {
+        $orders = GoldCoinOrder::with(['user', 'goldCoin']);
+        
+        // Apply filters if set
+        if ($request->user) {
+            $orders = $orders->whereHas('user', function($q) use ($request) {
+                $q->where('username', 'like', "%{$request->user}%")
+                  ->orWhere('email', 'like', "%{$request->user}%");
+            });
+        }
+        
+        if ($request->status) {
+            $orders = $orders->where('status', $request->status);
+        }
+        
+        if ($request->from_date && $request->to_date) {
+            $orders = $orders->whereBetween('created_at', [
+                $request->from_date . ' 00:00:00', 
+                $request->to_date . ' 23:59:59'
+            ]);
+        }
+        
+        if ($request->trx_id) {
+            $orders = $orders->where('trx_id', 'like', "%{$request->trx_id}%");
+        }
+        
+        $orders = $orders->latest()->get();
+        $basic = basicControl();
+        
+        $pageTitle = 'Gold Coin Order History';
+        
+        $pdf = PDF::loadView('admin.gold_coin.order_history_pdf', compact('orders', 'pageTitle', 'basic'));
+        
+        return $pdf->download('gold_coin_order_history_' . date('Y-m-d') . '.pdf');
     }
 }
