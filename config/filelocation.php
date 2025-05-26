@@ -61,6 +61,12 @@ return [
         'size' => '450x450'
     ],
 
+    'gold_coin' => [
+        'path' => 'gold_coin',
+        'size' => '300x300',
+        'driver' => 'local'
+    ],
+
     'driver' => [
         'path' => 'driver',
         'size' => '300x250'

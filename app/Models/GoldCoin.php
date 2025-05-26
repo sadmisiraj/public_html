@@ -33,4 +33,9 @@ class GoldCoin extends Model
     {
         return $query->where('status', 1);
     }
+
+    public function getImageUrl()
+    {
+        return getFile($this->image_driver, $this->image, true);
+    }
 }

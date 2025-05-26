@@ -100,7 +100,7 @@
                                 
                                 @if($order->goldCoin->image)
                                     <div class="text-center mt-3">
-                                        <img src="{{ getFile($order->goldCoin->image_driver, $order->goldCoin->image, true) }}" alt="{{ $order->goldCoin->name }}" class="img-fluid" style="max-height: 150px;">
+                                        <img src="{{ $order->goldCoin->getImageUrl() }}" alt="{{ $order->goldCoin->name }}" class="img-fluid" style="max-height: 150px;">
                                     </div>
                                 @endif
                             </div>

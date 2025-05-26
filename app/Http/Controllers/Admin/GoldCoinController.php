@@ -7,6 +7,7 @@ use App\Models\GoldCoin;
 use App\Models\GoldCoinOrder;
 use App\Models\Transaction;
 use App\Traits\Notify;
+use App\Traits\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -14,7 +15,7 @@ use PDF;
 
 class GoldCoinController extends Controller
 {
-    use Notify;
+    use Notify, Upload;
     
     public function index()
     {
@@ -53,12 +54,13 @@ class GoldCoinController extends Controller
         $coin->status = $request->status;
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(20) . '.' . $image->getClientOriginalExtension();
-            $path = config('location.gold_coin.path');
-            $image->move($path, $imageName);
-            $coin->image = $imageName;
-            $coin->image_driver = config('location.gold_coin.driver');
+            try {
+                $file = $this->fileUpload($request->image, config('filelocation.gold_coin.path'), null, null, 'webp', 80);
+                $coin->image = $file['path'];
+                $coin->image_driver = $file['driver'];
+            } catch (\Exception $exp) {
+                return back()->with('error', 'Could not upload image: ' . $exp->getMessage())->withInput();
+            }
         }
 
         $coin->save();
@@ -97,18 +99,13 @@ class GoldCoinController extends Controller
         $coin->status = $request->status;
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(20) . '.' . $image->getClientOriginalExtension();
-            $path = config('location.gold_coin.path');
-            
-            // Remove old image if exists
-            if ($coin->image) {
-                @unlink($path . '/' . $coin->image);
+            try {
+                $file = $this->fileUpload($request->image, config('filelocation.gold_coin.path'), null, null, 'webp', 80, $coin->image, $coin->image_driver);
+                $coin->image = $file['path'];
+                $coin->image_driver = $file['driver'];
+            } catch (\Exception $exp) {
+                return back()->with('error', 'Could not upload image: ' . $exp->getMessage())->withInput();
             }
-            
-            $image->move($path, $imageName);
-            $coin->image = $imageName;
-            $coin->image_driver = config('location.gold_coin.driver');
         }
 
         $coin->save();
@@ -127,8 +124,7 @@ class GoldCoinController extends Controller
         
         // Remove image if exists
         if ($coin->image) {
-            $path = config('location.gold_coin.path');
-            @unlink($path . '/' . $coin->image);
+            $this->fileDelete($coin->image_driver, $coin->image);
         }
         
         $coin->delete();

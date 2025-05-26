@@ -32,7 +32,7 @@
                                     </div>
                                     @if($coin->image)
                                         <div class="text-center mt-3">
-                                            <img src="{{ getFile($coin->image_driver, $coin->image, true) }}" alt="{{ $coin->name }}" class="img-fluid" style="max-height: 150px;">
+                                            <img src="{{ $coin->getImageUrl() }}" alt="{{ $coin->name }}" class="img-fluid" style="max-height: 150px;">
                                         </div>
                                     @endif
                                     <div class="card-body">

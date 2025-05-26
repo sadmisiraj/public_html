@@ -29,7 +29,7 @@
                                 @forelse($coins as $coin)
                                     <tr>
                                         <td>
-                                            <img src="{{ getFile($coin->image_driver, $coin->image, true) }}" alt="{{ $coin->name }}" class="img-thumbnail" style="max-width: 80px;">
+                                            <img src="{{ $coin->getImageUrl() }}" alt="{{ $coin->name }}" class="img-thumbnail" style="max-width: 80px;">
                                         </td>
                                         <td>{{ $coin->name }}</td>
                                         <td>{{ $coin->karat }}</td>
@@ -44,7 +44,7 @@
                                         <td>
                                             <div class="btn-group">
                                                 <a href="{{ route('admin.goldcoin.edit', $coin->id) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fa fa-pencil-alt"></i>
+                                                    <i class="fa fa-pen-alt"></i>
                                                 </a>
                                                 <a href="{{ route('admin.goldcoin.destroy', $coin->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this coin?')">
                                                     <i class="fa fa-trash"></i>

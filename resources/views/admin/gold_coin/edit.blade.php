@@ -55,7 +55,7 @@
                                         <label for="image">@lang('Image')</label>
                                         @if($coin->image)
                                             <div class="mb-2">
-                                                <img src="{{ getFile($coin->image_driver, $coin->image, true) }}" alt="{{ $coin->name }}" class="img-thumbnail" style="max-width: 200px;">
+                                                <img src="{{ $coin->getImageUrl() }}" alt="{{ $coin->name }}" class="img-thumbnail" style="max-width: 200px;">
                                             </div>
                                         @endif
                                         <input type="file" name="image" id="image" class="form-control" accept="image/*">

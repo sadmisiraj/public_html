@@ -23,7 +23,7 @@
             <div class="card-body">
                 @if($coin->image)
                     <div class="text-center mb-4">
-                        <img src="{{ getFile($coin->image_driver, $coin->image, true) }}" alt="{{ $coin->name }}" class="img-fluid" style="max-height: 200px;">
+                        <img src="{{ $coin->getImageUrl() }}" alt="{{ $coin->name }}" class="img-fluid" style="max-height: 200px;">
                     </div>
                 @endif
                 
