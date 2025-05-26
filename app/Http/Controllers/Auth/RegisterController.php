@@ -186,8 +186,8 @@ class RegisterController extends Controller
         }
         
         // Get referral position (node) from session
-        $referralNode = session()->get('referral_node');
-        
+        $referralNode = isset($data['referral_node']) ? $data['referral_node'] : session()->get('referral_node');
+
         $user = User::create([
             'firstname' => null,
             'lastname' => null,

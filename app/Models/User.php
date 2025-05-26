@@ -74,6 +74,7 @@ class User extends Authenticatable
         'zip_code',
         'address',
         'referral_id',
+        'referral_node',
         'language_id',
         'admin_update_badge',
         'last_lavel',
