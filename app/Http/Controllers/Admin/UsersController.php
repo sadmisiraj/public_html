@@ -390,6 +390,10 @@ class UsersController extends Controller
                 if ($request->balance_type == 1){
                     $user->balance += $request->amount;
                     $balance = $user->balance;
+                }elseif ($request->balance_type == 2){
+                    $walletType = "profit_balance";
+                    $user->profit_balance += $request->amount;
+                    $balance = $user->profit_balance;
                 }else{
                     $walletType = "profit";
                     $user->interest_balance += $request->amount;
@@ -412,7 +416,12 @@ class UsersController extends Controller
                 $transaction->final_balance = $balance;
                 $transaction->charge = 0;
                 $transaction->trx_type = '+';
-                $transaction->remarks = "Add Balance to $walletType";
+                $transaction->remarks = "Add Balance to " . match($walletType) {
+                    'profit' => 'Profit wallet',
+                    'wallet' => 'Deposit wallet',
+                    'profit_balance' => 'Performance wallet',
+                    default => $walletType
+                };
                 $transaction->trx_id = $fund->transaction;
                 $transaction->balance_type = $walletType;
                 $fund->transactional()->save($transaction);
@@ -437,12 +446,21 @@ class UsersController extends Controller
 
             } else {
 
-                if ($request->amount > $user->balance) {
-                    return back()->with('error', 'Insufficient Balance to deducted.');
-                }
                 if ($request->balance_type == 1){
+                    if ($request->amount > $user->balance) {
+                        return back()->with('error', 'Insufficient Balance to deducted.');
+                    }
                     $user->balance -= $request->amount;
+                }elseif ($request->balance_type == 2){
+                    if ($request->amount > $user->profit_balance) {
+                        return back()->with('error', 'Insufficient Performance Balance to deducted.');
+                    }
+                    $walletType = "profit_balance";
+                    $user->profit_balance -= $request->amount;
                 }else{
+                    if ($request->amount > $user->interest_balance) {
+                        return back()->with('error', 'Insufficient Interest Balance to deducted.');
+                    }
                     $walletType = "profit";
                     $user->interest_balance -= $request->amount;
                 }

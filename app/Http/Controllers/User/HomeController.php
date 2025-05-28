@@ -85,6 +85,11 @@ class HomeController extends Controller
 
         $data['totalInterestProfit'] = getAmount($this->user->transaction()->where('balance_type', 'interest_balance')->where('trx_type', '+')->sum('amount') + 0, 2);
 
+        // Add total earnings: sum of interest_balance and profit_balance transactions
+        $totalInterest = $this->user->transaction()->where('balance_type', 'interest_balance')->where('trx_type', '+')->sum('amount');
+        $totalProfit = $this->user->transaction()->where('balance_type', 'profit_balance')->where('trx_type', '+')->sum('amount');
+        $data['totalEarnings'] = getAmount($totalInterest + $totalProfit, 2);
+
         $roi = Investment::where('user_id', $user->id)
             ->selectRaw('SUM( amount ) AS totalInvestAmount')
             ->selectRaw('COUNT( id ) AS totalInvest')
@@ -376,7 +381,7 @@ class HomeController extends Controller
         $this->validate($request, [
             'username' => 'required',
             'amount' => 'required',
-            'wallet_type' => ['required', Rule::in(['balance', 'interest_balance'])],
+            'wallet_type' => ['required', Rule::in(['balance', 'interest_balance', 'profit_balance'])],
             'password' => 'required'
         ], [
             'wallet_type.required' => 'Please Select a wallet'

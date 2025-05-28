@@ -123,7 +123,7 @@
                                         <img src="{{asset(template(true).'img/box-card/money-motivation-90.png')}}" alt="icon">
                                     </div>
                                     <div class="text-box">
-                                        <h5 class="title mb-0">{{currencyPosition($totalInterestProfit+0)}} </h5>
+                                        <h5 class="title mb-0">{{currencyPosition($totalEarnings+0)}} </h5>
                                         <p class="mb-0">@lang('Total Earnings')</p>
                                     </div>
                                 </div>
@@ -200,7 +200,7 @@
                                                 <img src="{{asset(template(true).'img/box-card/money-motivation-90.png')}}" alt="">
                                             </div>
                                             <div class="text-box">
-                                                <h5 class="title mb-0">{{currencyPosition($totalInterestProfit+0)}} </h5>
+                                                <h5 class="title mb-0">{{currencyPosition($totalEarnings+0)}} </h5>
                                                 <p class="mb-0">@lang('Total Earnings')</p>
                                             </div>
                                         </div>

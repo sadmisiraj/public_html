@@ -41,6 +41,14 @@
                           <span class="form-check-label"> @lang("Interest Balance")</span>
                         </span>
                         </label>
+
+                        <label class="form-control" for="editUserModalBalanceTypeModalRadioEg1_3">
+                        <span class="form-check">
+                          <input type="radio" class="form-check-input" name="balance_type"
+                                 id="editUserModalBalanceTypeModalRadioEg1_3" value="2">
+                          <span class="form-check-label"> @lang("Performance Balance")</span>
+                        </span>
+                        </label>
                     </div>
                     <div class="input-group input-group-sm-vertical mt-3">
                         <label class="form-control" for="editUserModalAccountTypeModalRadioEg1_2">
