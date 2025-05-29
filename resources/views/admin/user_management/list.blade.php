@@ -139,6 +139,11 @@
                         </div>
                     </div>
 
+                    <a class="btn btn-primary btn-sm exportAllBtn" href="javascript:void(0)" data-bs-toggle="modal"
+                       data-bs-target="#exportAllUsersModal">
+                        <i class="fa-regular fa-file-excel"></i> @lang('Export All Users')
+                    </a>
+
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100"
                                 id="dropdownMenuClickable" data-bs-auto-close="false"
@@ -365,6 +370,46 @@
     @include('admin.user_management.components.multiple_user_delete_modal')
     @include('admin.user_management.components.login_as_user')
     @include('admin.user_management.components.update_balance_modal')
+
+    <!-- Export All Users Modal -->
+    <div class="modal fade" id="exportAllUsersModal" tabindex="-1" role="dialog" aria-labelledby="exportAllUsersModalLabel" data-bs-backdrop="static"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="exportAllUsersModalLabel"><i
+                            class="fa-light fa-square-check"></i> @lang('Export All Users')</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{route('admin.user.details.export')}}" method="get">
+                    <div class="modal-body">
+                        <p>@lang('Do you want to export all users?')</p>
+                        <div class="mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="export_format" id="exportExcel" value="excel" checked>
+                                <label class="form-check-label" for="exportExcel">
+                                    @lang('Excel Format')
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="export_format" id="exportPdf" value="pdf">
+                                <label class="form-check-label" for="exportPdf">
+                                    @lang('PDF Format')
+                                </label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="export_type" value="all">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-bs-dismiss="modal">@lang('Close')</button>
+                        <button type="submit" class="btn btn-primary">@lang('Download')</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End Export All Users Modal -->
 
 @endsection
 

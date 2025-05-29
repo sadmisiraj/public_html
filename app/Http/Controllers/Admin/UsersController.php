@@ -1341,18 +1341,43 @@ class UsersController extends Controller
 
     public function export(Request $request)
     {
-        $users = User::whereIn('id', $request->user_ids??[])->get()->toArray();
-        $data = $users;
-        $fileName = 'user_details.xlsx';
-
-        if (empty($data)) {
-            return;  // Prevent downloading if no data
+        // Check export type (all or selected)
+        $exportType = $request->export_type ?? 'selected';
+        
+        // Get users based on export type
+        if ($exportType === 'all') {
+            // Export all users
+            $users = User::all()->toArray();
+        } else {
+            // Export only selected users
+            $users = User::whereIn('id', $request->user_ids??[])->get()->toArray();
         }
+        
+        $data = $users;
+        
+        if (empty($data)) {
+            return back()->with('error', 'No users found to export.');  // Provide feedback if no data
+        }
+        
         $headers = array_keys($data[0]);
-
         $footer = $request->footer_data ?? null;
-        $export = new ReportExport($data, $headers, $footer);
-        return Excel::download($export, $fileName);
+        
+        // Check export format
+        $exportFormat = $request->export_format ?? 'excel';
+        
+        $fileName = 'user_details';
+        
+        if ($exportFormat === 'pdf') {
+            $fileName .= '.pdf';
+            // Use PDF export (requires dompdf package)
+            $export = new ReportExport($data, $headers, $footer);
+            return Excel::download($export, $fileName, \Maatwebsite\Excel\Excel::DOMPDF);
+        } else {
+            $fileName .= '.xlsx';
+            // Default to Excel export
+            $export = new ReportExport($data, $headers, $footer);
+            return Excel::download($export, $fileName);
+        }
     }
 
 
