@@ -464,6 +464,17 @@ class HomeController extends Controller
                     $transaction->final_balance = $user[$wallet_type];
                     $transaction->save();
 
+                    // Add transaction record for receiver
+                    $receiverTransaction = new Transaction();
+                    $receiverTransaction->user_id = $receiver->id;
+                    $receiverTransaction->amount = round($request->amount, 2);
+                    $receiverTransaction->charge = 0;
+                    $receiverTransaction->trx_type = '+';
+                    $receiverTransaction->balance_type = $wallet_type;
+                    $receiverTransaction->remarks = 'Balance Received from ' . $user->username;
+                    $receiverTransaction->trx_id = $sendTaka->trx;
+                    $receiverTransaction->final_balance = $receiver[$wallet_type];
+                    $receiverTransaction->save();
 
                     $currentDate = dateTime(Carbon::now());
                     $msg = [
