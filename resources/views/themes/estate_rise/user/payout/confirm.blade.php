@@ -61,6 +61,54 @@
                                                     </div>
                                                 @endif
 
+                                                <!-- Bank Account Option -->
+                                                <div class="col-md-12 mt-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="useBankAccount" name="use_bank_account" value="1" {{ $useBankAccount ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="useBankAccount">
+                                                            @lang('Use Bank Account for Withdrawal')
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Bank Account Details (Hidden by default) -->
+                                                <div id="bankAccountDetails" class="col-md-12 mt-3" style="display: none;">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h5>@lang('Your Bank Account Details')</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            @if($bankDetails)
+                                                                <div class="row">
+                                                                    <div class="col-md-12 mb-2">
+                                                                        <strong>@lang('Bank Name'):</strong> {{ $bankDetails->bank_name }}
+                                                                        <input type="hidden" name="bank_name" value="{{ $bankDetails->bank_name }}">
+                                                                    </div>
+                                                                    <div class="col-md-12 mb-2">
+                                                                        <strong>@lang('Account Number'):</strong> {{ $bankDetails->account_number }}
+                                                                        <input type="hidden" name="account_number" value="{{ $bankDetails->account_number }}">
+                                                                    </div>
+                                                                    <div class="col-md-12 mb-2">
+                                                                        <strong>@lang('IFSC Code'):</strong> {{ $bankDetails->ifsc_code }}
+                                                                        <input type="hidden" name="ifsc_code" value="{{ $bankDetails->ifsc_code }}">
+                                                                    </div>
+                                                                    <div class="col-md-12 mb-2">
+                                                                        <strong>@lang('Verification Status'):</strong> 
+                                                                        @if($bankDetails->is_verified)
+                                                                            <span class="badge bg-success">@lang('Verified')</span>
+                                                                        @else
+                                                                            <span class="badge bg-warning">@lang('Pending Verification')</span>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            @else
+                                                                <div class="alert alert-warning">
+                                                                    @lang('No bank account details found. Please update your KYC information to add bank details.')
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 @if(isset($payoutMethod->inputForm))
 
@@ -189,7 +237,63 @@
             }
             reader.readAsDataURL(this.files[0]);
         });
+        
+        // Toggle bank account details visibility
+        $(document).ready(function() {
+            // Show bank account details immediately if checkbox is checked
+            if($('#useBankAccount').is(':checked')) {
+                $('#bankAccountDetails').show();
+                
+                // If bank account is selected, hide other form fields that might be redundant
+                if($('#bankAccountDetails').find('input[name="bank_name"]').length > 0) {
+                    $('input[name="bank_name"]').not('#bankAccountDetails input[name="bank_name"]').closest('.input-box').hide();
+                }
+                if($('#bankAccountDetails').find('input[name="account_number"]').length > 0) {
+                    $('input[name="account_number"]').not('#bankAccountDetails input[name="account_number"]').closest('.input-box').hide();
+                }
+                if($('#bankAccountDetails').find('input[name="ifsc_code"]').length > 0) {
+                    $('input[name="ifsc_code"]').not('#bankAccountDetails input[name="ifsc_code"]').closest('.input-box').hide();
+                }
+            }
+            
+            $('#useBankAccount').change(function() {
+                if($(this).is(':checked')) {
+                    $('#bankAccountDetails').show();
+                    
+                    // If bank account is selected, we can hide other form fields that might be redundant
+                    if($('#bankAccountDetails').find('input[name="bank_name"]').length > 0) {
+                        $('input[name="bank_name"]').not('#bankAccountDetails input[name="bank_name"]').closest('.input-box').hide();
+                    }
+                    if($('#bankAccountDetails').find('input[name="account_number"]').length > 0) {
+                        $('input[name="account_number"]').not('#bankAccountDetails input[name="account_number"]').closest('.input-box').hide();
+                    }
+                    if($('#bankAccountDetails').find('input[name="ifsc_code"]').length > 0) {
+                        $('input[name="ifsc_code"]').not('#bankAccountDetails input[name="ifsc_code"]').closest('.input-box').hide();
+                    }
+                } else {
+                    $('#bankAccountDetails').hide();
+                    
+                    // Show all form fields again when bank account is unchecked
+                    $('input[name="bank_name"]').closest('.input-box').show();
+                    $('input[name="account_number"]').closest('.input-box').show();
+                    $('input[name="ifsc_code"]').closest('.input-box').show();
+                }
+            });
+        });
     </script>
+
+    @if ($errors->any())
+        @php
+            $collection = collect($errors->all());
+            $errors = $collection->unique();
+        @endphp
+        <script>
+            "use strict";
+            @foreach ($errors as $error)
+            Notiflix.Notify.failure("{{ trans($error) }}");
+            @endforeach
+        </script>
+    @endif
 @endpush
 @push('style')
     <style>
@@ -237,22 +341,4 @@
             box-shadow: none;
         }
     </style>
-@endpush
-@push('script')
-    <script type="text/javascript">
-
-    </script>
-
-    @if ($errors->any())
-        @php
-            $collection = collect($errors->all());
-            $errors = $collection->unique();
-        @endphp
-        <script>
-            "use strict";
-            @foreach ($errors as $error)
-            Notiflix.Notify.failure("{{ trans($error) }}");
-            @endforeach
-        </script>
-    @endif
 @endpush

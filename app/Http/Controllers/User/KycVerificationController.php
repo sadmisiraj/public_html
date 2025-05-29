@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Kyc;
 use App\Models\UserKyc;
+use App\Models\UserBankDetail;
 use App\Traits\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -29,7 +30,6 @@ class KycVerificationController extends Controller
 
     public function verificationSubmit(Request $request)
     {
-
         $kyc = Kyc::where('id', $request->type)->where('status', 1)->firstOrFail();
 
         $params = $kyc->input_form;
@@ -53,8 +53,11 @@ class KycVerificationController extends Controller
             }
         }
 
+        // Add validation rules for bank details
+        $rules['BankName'] = ['required', 'string', 'max:191'];
+        $rules['AccountNumber'] = ['required', 'string', 'max:191'];
+        $rules['IFSCCode'] = ['required', 'string', 'max:191'];
 
-        $params = $kyc->input_form;
         $validator = Validator::make($reqData, $rules);
         if ($validator->fails()) {
             $validator->errors()->add($kyc->name, '1');
@@ -62,7 +65,8 @@ class KycVerificationController extends Controller
         }
 
         $reqField = [];
-        foreach ($request->except('_token', '_method', 'type') as $k => $v) {
+
+        foreach ($request->except('_token', '_method', 'type', 'BankName', 'AccountNumber', 'IFSCCode') as $k => $v) {
             foreach ($params as $inKey => $inVal) {
                 if ($k == $inKey) {
                     if ($inVal->type == 'file' && $request->hasFile($inKey)) {
@@ -93,12 +97,69 @@ class KycVerificationController extends Controller
             }
         }
 
+        // Get current user
+        $user = auth()->user();
+        $userId = $user->id;
+
         UserKyc::create([
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'kyc_id' => $kyc->id,
             'kyc_type' => $kyc->name,
             'kyc_info' => $reqField
         ]);
+
+        // Get bank details from request
+        $bankName = $request->input('BankName');
+        $accountNumber = $request->input('AccountNumber');
+        $ifscCode = $request->input('IFSCCode');
+        
+        if ($bankName && $accountNumber && $ifscCode) {
+            \Log::info('Saving bank details', [
+                'user_id' => $userId,
+                'bank_name' => $bankName,
+                'account_number' => $accountNumber,
+                'ifsc_code' => $ifscCode
+            ]);
+            
+            try {
+                // Check if user already has bank details
+                $existingBankDetails = UserBankDetail::where('user_id', $userId)->first();
+                
+                if ($existingBankDetails) {
+                    // Update existing record
+                    $existingBankDetails->update([
+                        'bank_name' => $bankName,
+                        'account_number' => $accountNumber,
+                        'ifsc_code' => $ifscCode,
+                        'is_verified' => false // will be verified by admin
+                    ]);
+                    
+                    \Log::info('Updated existing bank details', ['id' => $existingBankDetails->id]);
+                } else {
+                    // Create new record
+                    $newBankDetails = new UserBankDetail();
+                    $newBankDetails->user_id = $userId;
+                    $newBankDetails->bank_name = $bankName;
+                    $newBankDetails->account_number = $accountNumber;
+                    $newBankDetails->ifsc_code = $ifscCode;
+                    $newBankDetails->is_verified = false;
+                    $newBankDetails->save();
+                    
+                    \Log::info('Created new bank details', ['id' => $newBankDetails->id]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error saving bank details', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+        } else {
+            \Log::warning('Bank details not saved - missing required fields', [
+                'bankName' => $bankName,
+                'accountNumber' => $accountNumber,
+                'ifscCode' => $ifscCode,
+            ]);
+        }
 
         return back()->with('success', 'KYC Sent Successfully');
     }

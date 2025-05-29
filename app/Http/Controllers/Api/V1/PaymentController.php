@@ -361,4 +361,42 @@ class PaymentController extends Controller
             return response()->json($this->withErrors($e->getMessage()));
         }
     }
+    
+    /**
+     * Get authenticated user's bank details
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserBankDetails()
+    {
+        try {
+            $user = Auth::user();
+            $bankDetails = $user->bankDetails;
+            
+            if (!$bankDetails) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bank details not found. Please complete your KYC verification.',
+                    'data' => null
+                ], 404);
+            }
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Bank details retrieved successfully',
+                'data' => [
+                    'bank_name' => $bankDetails->bank_name,
+                    'account_number' => $bankDetails->account_number,
+                    'ifsc_code' => $bankDetails->ifsc_code,
+                    'is_verified' => $bankDetails->is_verified
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
 }

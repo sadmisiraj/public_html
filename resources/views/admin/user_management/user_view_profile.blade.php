@@ -55,6 +55,46 @@
                             </div>
                         </div>
 
+                        <!-- Card for Bank Details -->
+                        @if($user->bankDetails)
+                        <div class="card mb-3 mb-lg-5">
+                            <div class="card-header card-header-content-between">
+                                <h4 class="card-header-title">@lang('Bank Account Details')</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled list-py-2 text-dark mb-0">
+                                    <li>
+                                        <i class="bi bi-bank dropdown-item-icon"></i> <strong>@lang('Bank Name'):</strong> {{ $user->bankDetails->bank_name }}
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-credit-card dropdown-item-icon"></i> <strong>@lang('Account Number'):</strong> {{ $user->bankDetails->account_number }}
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-upc dropdown-item-icon"></i> <strong>@lang('IFSC Code'):</strong> {{ $user->bankDetails->ifsc_code }}
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-patch-check dropdown-item-icon"></i> <strong>@lang('Verification Status'):</strong> 
+                                        @if($user->bankDetails->is_verified)
+                                            <span class="badge bg-soft-success text-success">@lang('Verified')</span>
+                                        @else
+                                            <span class="badge bg-soft-warning text-warning">@lang('Pending Verification')</span>
+                                        @endif
+                                    </li>
+                                    @if(adminAccessRoute(config('role.user_management.access.edit')))
+                                    <li class="pt-2">
+                                        <a href="{{ route('admin.bank.details.verify', $user->bankDetails->id) }}" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-check-circle me-1"></i> @lang('Verify Bank Account')
+                                        </a>
+                                        <a href="{{ route('admin.bank.details.reject', $user->bankDetails->id) }}" class="btn btn-sm btn-outline-danger ms-2">
+                                            <i class="bi bi-x-circle me-1"></i> @lang('Reject Bank Account')
+                                        </a>
+                                    </li>
+                                    @endif
+                                </ul>
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- Card -->
                         <div class="card card-lg mb-3 mb-lg-5">
                             <div class="card-body text-center">
@@ -294,7 +334,7 @@
                                                             class="badge bg-soft-danger text-danger">@lang('Cancel')</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ dateTime($payment->created_at, 'd M Y h:i A') }}</td>
+                                                <td>{{ dateTime($withdraw->created_at, 'd M Y h:i A') }}</td>
                                             </tr>
                                         @empty
 

@@ -155,6 +155,72 @@
                     @endif
 
                 </div>
+                
+                <!-- Bank Details Card -->
+                <div class="card mb-3 mb-lg-5">
+                    <div class="card-header card-header-content-between">
+                        <h4 class="card-header-title">@lang('Bank Account Details')</h4>
+                        @if(optional($userKyc->user)->bankDetails)
+                            @if(optional($userKyc->user->bankDetails)->is_verified)
+                                <span class="badge bg-soft-success text-success">
+                                    <span class="legend-indicator bg-success"></span>@lang("Verified")
+                                </span>
+                            @else
+                                <span class="badge bg-soft-warning text-warning">
+                                    <span class="legend-indicator bg-warning"></span>@lang("Pending")
+                                </span>
+                            @endif
+                        @endif
+                    </div>
+
+                    @if(optional($userKyc->user)->bankDetails)
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush list-group-no-gutters">
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5>@lang("Bank Name")</h5>
+                                        <ul class="list-unstyled list-py-2 text-body">
+                                            <li>{{ optional($userKyc->user->bankDetails)->bank_name }}</li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5>@lang("Account Number")</h5>
+                                        <ul class="list-unstyled list-py-2 text-body">
+                                            <li>{{ optional($userKyc->user->bankDetails)->account_number }}</li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5>@lang("IFSC Code")</h5>
+                                        <ul class="list-unstyled list-py-2 text-body">
+                                            <li>{{ optional($userKyc->user->bankDetails)->ifsc_code }}</li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                            @if(!optional($userKyc->user->bankDetails)->is_verified && $userKyc->status == 1 && adminAccessRoute(config('role.kyc_request.access.edit')))
+                                <div class="d-flex justify-content-end gap-3 mt-2">
+                                    <a href="{{ route('admin.bank.details.verify', optional($userKyc->user->bankDetails)->id) }}" 
+                                       class="btn btn-success">@lang('Verify Bank Details')</a>
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        <div class="card-body card-body-height text-center">
+                            <img class="avatar avatar-xxl mb-3"
+                                 src="{{ asset('assets/admin/img/oc-error.svg') }}"
+                                 alt="Image Description" data-hs-theme-appearance="default"/>
+                            <img class="avatar avatar-xxl mb-3"
+                                 src="{{ asset('assets/admin/img/oc-error.svg') }}"
+                                 alt="Image Description" data-hs-theme-appearance="dark"/>
+                            <p class="card-text">@lang('No bank details available')</p>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 

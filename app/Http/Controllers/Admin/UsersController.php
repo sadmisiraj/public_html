@@ -653,7 +653,7 @@ class UsersController extends Controller
 
     public function userViewProfile($id)
     {
-        $data['user'] = User::findOrFail($id);
+        $data['user'] = User::with('bankDetails')->findOrFail($id);
         $data['basic'] = basicControl();
         $data['transactions'] = Transaction::with('user')->where('user_id', $id)->orderBy('id', 'DESC')
             ->limit(5)->get();

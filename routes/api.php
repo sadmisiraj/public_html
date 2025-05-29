@@ -105,7 +105,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('user-kyc', [KycController::class, 'userKyc']);
         Route::get('payout-history', [HomeController::class,'payoutHistory']);
         Route::get('payout-history/search', [HomeController::class,'payoutHistorySearch']);
-        
+
+        // Bank Details for Payment
+        Route::get('user-bank-details', [PaymentController::class, 'getUserBankDetails']);
+
         // Only payout routes need KYC verification
         Route::middleware('apiKycCheck')->group(function () {
             // Payout routes

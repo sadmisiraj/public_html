@@ -46,6 +46,7 @@ use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\SecuritySettingsController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Admin\GoldCoinController;
+use App\Http\Controllers\Admin\UserBankDetailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -290,6 +291,12 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::get('kyc/search/{status?}', [KycController::class, 'userKycSearch'])->name('kyc.search');
         Route::get('kyc/view/{id}', [KycController::class, 'view'])->name('kyc.view');
         Route::post('user/kyc/action/{id}', [KycController::class, 'action'])->name('kyc.action');
+
+        /*= MANAGE USER BANK DETAILS =*/
+        Route::get('bank-details/{status?}', [UserBankDetailController::class, 'index'])->name('bank.details.list');
+        Route::get('bank-details/search/{status?}', [UserBankDetailController::class, 'search'])->name('bank.details.search');
+        Route::get('bank-details/verify/{id}', [UserBankDetailController::class, 'verify'])->name('bank.details.verify');
+        Route::get('bank-details/reject/{id}', [UserBankDetailController::class, 'reject'])->name('bank.details.reject');
 
         /*= Frontend Manage =*/
         Route::get('frontend/pages/{theme}', [PageController::class, 'index'])->name('page.index');

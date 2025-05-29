@@ -435,8 +435,44 @@
 
                                                 @endforeach
 
+                                                <!-- Bank Details Fields -->
+                                                <div class="col-12 mt-4">
+                                                    <h4>@lang('Bank Account Details')</h4>
+                                                    <p class="text-muted small">@lang('These details will be used for payment processing')</p>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="BankName" class="form-label">@lang('Bank Name')</label>
+                                                    <input type="text" name="BankName" class="form-control" 
+                                                           value="{{ old('BankName', auth()->user()->bankDetails->bank_name ?? '') }}" 
+                                                           id="BankName" required>
+                                                    @if($errors->has('BankName'))
+                                                        <div class="error text-danger">@lang($errors->first('BankName'))</div>
+                                                    @endif
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="AccountNumber" class="form-label">@lang('Account Number')</label>
+                                                    <input type="text" name="AccountNumber" class="form-control" 
+                                                           value="{{ old('AccountNumber', auth()->user()->bankDetails->account_number ?? '') }}" 
+                                                           id="AccountNumber" required>
+                                                    @if($errors->has('AccountNumber'))
+                                                        <div class="error text-danger">@lang($errors->first('AccountNumber'))</div>
+                                                    @endif
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="IFSCCode" class="form-label">@lang('IFSC Code')</label>
+                                                    <input type="text" name="IFSCCode" class="form-control" 
+                                                           value="{{ old('IFSCCode', auth()->user()->bankDetails->ifsc_code ?? '') }}" 
+                                                           id="IFSCCode" required>
+                                                    @if($errors->has('IFSCCode'))
+                                                        <div class="error text-danger">@lang($errors->first('IFSCCode'))</div>
+                                                    @endif
+                                                </div>
+
                                             </div>
-                                            <div class="btn-area d-flex g-3">
+                                            <div class="btn-area d-flex g-3 mt-4">
                                                 <button type="submit" class="cmn-btn">@lang('submit')</button>
                                             </div>
 

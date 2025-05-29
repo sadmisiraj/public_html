@@ -404,5 +404,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(User::class, 'rgp_parent_id');
     }
+    
+    public function bankDetails()
+    {
+        return $this->hasOne(UserBankDetail::class);
+    }
 
 }

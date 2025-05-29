@@ -275,7 +275,7 @@ class KycController extends Controller
     public function view($id)
     {
         try {
-            $data['userKyc'] = UserKyc::with('user')->where('id', $id)->firstOr(function () {
+            $data['userKyc'] = UserKyc::with(['user.bankDetails'])->where('id', $id)->firstOr(function () {
                 throw new Exception('No KYC found.');
             });
             return view('admin.kyc.view', $data);
