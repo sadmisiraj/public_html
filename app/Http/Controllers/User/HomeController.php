@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Hash;
 use Facades\App\Services\BasicService;
 use App\Models\UserPlan;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\MoneyTransferLimitHelper;
 
 
 class HomeController extends Controller
@@ -373,7 +374,8 @@ class HomeController extends Controller
     public function moneyTransfer()
     {
         $page_title = "Balance Transfer";
-        return view(template() . 'user.money_transfer.index', compact('page_title'));
+        $limitInfo = MoneyTransferLimitHelper::getLimitInfo();
+        return view(template() . 'user.money_transfer.index', compact('page_title', 'limitInfo'));
     }
 
     public function moneyTransferConfirm(Request $request)
@@ -386,6 +388,13 @@ class HomeController extends Controller
         ], [
             'wallet_type.required' => 'Please Select a wallet'
         ]);
+
+        // Check transfer limits first
+        $limitCheck = MoneyTransferLimitHelper::checkTransferLimit();
+        if (!$limitCheck['allowed']) {
+            session()->flash('error', $limitCheck['message']);
+            return back()->withInput();
+        }
 
         $basic = basicControl();
         $username = trim($request->username);

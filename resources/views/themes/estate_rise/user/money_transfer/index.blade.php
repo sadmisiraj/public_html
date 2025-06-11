@@ -18,6 +18,23 @@
         <div class="transactions-section mt-50">
             <div class="row d-flex justify-content-center">
                 <div class="col-md-8">
+                    @if($limitInfo['enabled'])
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle text-info me-2"></i>
+                                <div>
+                                    <h6 class="mb-1">@lang('Transfer Limits')</h6>
+                                    <p class="mb-0 text-muted">{{ $limitInfo['message'] }}</p>
+                                    @if($limitInfo['reset_date'])
+                                        <small class="text-muted">@lang('Next reset'): {{ $limitInfo['reset_date']->format('M d, Y h:i A') }}</small>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="card">
                         <div class="card-header">
                             <h4>@lang('Balance Transfer')</h4>
@@ -71,7 +88,14 @@
                                     </div>
 
                                     <div class="btn-area">
-                                        <button type="submit" class="cmn-btn w-100">@lang('send money')</button>
+                                        <button type="submit" class="cmn-btn w-100" 
+                                            @if($limitInfo['enabled'] && $limitInfo['remaining_transfers'] == 0) disabled @endif>
+                                            @if($limitInfo['enabled'] && $limitInfo['remaining_transfers'] == 0)
+                                                @lang('Transfer Limit Reached')
+                                            @else
+                                                @lang('send money')
+                                            @endif
+                                        </button>
                                     </div>
                                 </div>
                             </form>

@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Helpers\MoneyTransferLimitHelper;
 
 class HomeController extends Controller
 {
@@ -173,6 +174,12 @@ class HomeController extends Controller
 
         if ($validateUser->fails()) {
             return response()->json($this->withErrors(collect($validateUser->errors())->collapse()[0]));
+        }
+
+        // Check transfer limits first
+        $limitCheck = MoneyTransferLimitHelper::checkTransferLimit();
+        if (!$limitCheck['allowed']) {
+            return response()->json($this->withErrors($limitCheck['message']));
         }
 
         $basic = basicControl();

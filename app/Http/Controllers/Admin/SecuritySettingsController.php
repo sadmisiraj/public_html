@@ -33,8 +33,15 @@ class SecuritySettingsController extends Controller
      */
     public function updatePayoutSettings(Request $request)
     {
+        $request->validate([
+            'money_transfer_limit_type' => 'required_if:money_transfer_limit_enabled,1|in:daily,weekly,custom_days',
+            'money_transfer_limit_count' => 'required_if:money_transfer_limit_enabled,1|integer|min:1|max:100',
+            'money_transfer_limit_days' => 'required_if:money_transfer_limit_type,custom_days|integer|min:1|max:365',
+        ]);
+
         $requirePayoutOtp = $request->has('require_payout_otp') ? 1 : 0;
         $requireMoneyTransferOtp = $request->has('require_money_transfer_otp') ? 1 : 0;
+        $moneyTransferLimitEnabled = $request->has('money_transfer_limit_enabled') ? 1 : 0;
 
         try {
             $basic = basicControl();
@@ -43,6 +50,10 @@ class SecuritySettingsController extends Controller
             ], [
                 'require_payout_otp' => $requirePayoutOtp,
                 'require_money_transfer_otp' => $requireMoneyTransferOtp,
+                'money_transfer_limit_enabled' => $moneyTransferLimitEnabled,
+                'money_transfer_limit_type' => $request->money_transfer_limit_type ?? 'daily',
+                'money_transfer_limit_count' => $request->money_transfer_limit_count ?? 1,
+                'money_transfer_limit_days' => $request->money_transfer_limit_days ?? 1,
             ]);
 
             if (!$response) {

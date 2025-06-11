@@ -1431,7 +1431,23 @@ function getContent()
 if (!function_exists('getFirebaseFileName')) {
     function getFirebaseFileName()
     {
-        return 'firebase-service.json';
+        $basicControl = basicControl();
+        $fileName = $basicControl->google_translate_credential ?? null;
+        return $fileName ? storage_path('app/googleTranslateCredential/' . $fileName) : null;
+    }
+}
+
+if (!function_exists('checkMoneyTransferLimit')) {
+    function checkMoneyTransferLimit($userId = null)
+    {
+        return \App\Helpers\MoneyTransferLimitHelper::checkTransferLimit($userId);
+    }
+}
+
+if (!function_exists('getMoneyTransferLimitInfo')) {
+    function getMoneyTransferLimitInfo($userId = null)
+    {
+        return \App\Helpers\MoneyTransferLimitHelper::getLimitInfo($userId);
     }
 }
 
