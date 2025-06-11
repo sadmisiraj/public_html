@@ -26,10 +26,7 @@
                 </ol>
             </nav>
         </div>
-        <div class="profile-content">
-                         
-                          <h4>user<span>{{'@'.auth()->user()->username}}</span></h4> 
-                        </div>
+     
         <!-- Page title end -->
         <div class="dashboard-top">
             <div class="row g-4 align-items-center">
@@ -41,6 +38,9 @@
                             <div class="icon-box">
                                 <i class="fa-regular fa-money-bill"></i>
                             </div>
+                        </div>   <div class="profile-content">
+                         
+                          <h4>user<span>{{'@'.auth()->user()->username}}</span></h4> 
                         </div>
                         <h2 class="title mb-1">
                             {!! styleSentence($content['single']['heading']??'',5) !!}

@@ -350,8 +350,8 @@
             // Basic validation for bank amount
             $(document).on('input', '#bank-amount', function() {
                 let amount = $(this).val();
-                let minLimit = $(this).data('min-limit') || 100;
-                let maxLimit = $(this).data('max-limit') || 1000;
+                let minLimit = $(this).data('min-limit') || 1000;
+                let maxLimit = $(this).data('max-limit') || 50000;
                 
                 if(amount <= 0 || isNaN(amount)) {
                     $(this).addClass('is-invalid');
@@ -418,8 +418,8 @@
                 
                 // Simple validation
                 let amount = $('#bank-amount').val();
-                let minLimit = $('#bank-amount').data('min-limit') || 100;
-                let maxLimit = $('#bank-amount').data('max-limit') || 1000;
+                let minLimit = $('#bank-amount').data('min-limit') || 1000;
+                let maxLimit = $('#bank-amount').data('max-limit') || 50000;
                 
                 if (!amount || amount <= 0 || isNaN(amount)) {
                     $('#bank-amount').addClass('is-invalid');

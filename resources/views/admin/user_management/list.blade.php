@@ -289,16 +289,17 @@
                         </th>
                         <th class="table-column-ps-0">@lang('Full Name')</th>
                         
-                        <th>@lang('Balance')</th>
+                        <th>@lang('Deposit')</th>
                         <th>@lang('Profit')</th>
-                        <th>@lang('Total Deposit')</th>
+                        <th>@lang('Performance')</th>
                         <th>@lang('RGP L')</th>
                         <th>@lang('RGP R')</th>
-                        <th>@lang('Pair Match')</th>
+                        <th>@lang('Investment')</th>
                         <th>@lang('Status')</th>
                         <th>@lang('Referred By')</th>
                         <th>@lang('Referral Node')</th>
-                        <th>@lang('Action')</th>
+                         <th>@lang('Level')</th>
+                         <th>@lang('Action')</th>
                     </tr>
                     </thead>
 
@@ -451,13 +452,14 @@
                     {data: 'name', name: 'name'},
                     {data: 'balance', name: 'balance'},
                     {data: 'interest_balance', name: 'interest_balance'},
-                    {data: 'total_deposit', name: 'total_deposit'},
+                    {data: 'profit_balance', name: 'total_deposit'},
                     {data: 'rgp_l', name: 'rgp_l'},
                     {data: 'rgp_r', name: 'rgp_r'},
-                    {data: 'rgp_pair_matching', name: 'rgp_pair_matching'},
+                    {data: 'total_invest', name: 'total_invest'},
                     {data: 'status', name: 'status'},
                     {data: 'referred_by', name: 'referred_by'},
                     {data: 'referral_node', name: 'referral_node'},
+                    {data: 'last_lavel', name: 'last_lavel'},
                     {data: 'action', name: 'action'},
                 ],
                 select: {
