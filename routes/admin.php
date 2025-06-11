@@ -47,6 +47,7 @@ use App\Http\Controllers\Admin\SecuritySettingsController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Admin\GoldCoinController;
 use App\Http\Controllers\Admin\UserBankDetailController;
+use App\Http\Controllers\Admin\PurchaseChargeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +127,13 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         /* ===== Security Settings ===== */
         Route::get('security/payout', [SecuritySettingsController::class, 'payoutSettings'])->name('security.payout');
         Route::post('security/payout/update', [SecuritySettingsController::class, 'updatePayoutSettings'])->name('security.payout.update');
+
+        /* ===== Purchase Charges ===== */
+        Route::get('purchase-charges', [PurchaseChargeController::class, 'index'])->name('purchase.charges');
+        Route::post('purchase-charges/store', [PurchaseChargeController::class, 'store'])->name('purchase.charges.store');
+        Route::put('purchase-charges/update/{id}', [PurchaseChargeController::class, 'update'])->name('purchase.charges.update');
+        Route::get('purchase-charges/destroy/{id}', [PurchaseChargeController::class, 'destroy'])->name('purchase.charges.destroy');
+        Route::post('purchase-charges/status/{id}', [PurchaseChargeController::class, 'updateStatus'])->name('purchase.charges.status');
 
         /* ===== Cookie Settings ===== */
 

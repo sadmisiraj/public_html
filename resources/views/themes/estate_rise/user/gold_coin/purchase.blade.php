@@ -66,16 +66,30 @@
                         </div>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label for="gst_amount">@lang('GST (18%)')</label>
-                        <div class="input-group">
-                            <span class="input-group-text">{{ $basic->currency_symbol }}</span>
-                            <input type="text" id="gst_amount" name="gst_amount" class="form-control" readonly>
+                    <!-- Dynamic Charges Breakdown -->
+                    @if($purchaseCharges->count() > 0)
+                        <div id="charges-breakdown">
+                            @foreach($purchaseCharges as $charge)
+                                <div class="form-group mb-3">
+                                    <label for="charge_{{ $charge->id }}">
+                                        {{ $charge->label }}
+                                        @if($charge->type == 'percentage')
+                                            ({{ $charge->value }}%)
+                                        @else
+                                            ({{ currencyPosition($charge->value) }})
+                                        @endif
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ $basic->currency_symbol }}</span>
+                                        <input type="text" id="charge_{{ $charge->id }}" class="form-control charge-amount" readonly>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                    </div>
+                    @endif
                     
                     <div class="form-group mb-3">
-                        <label for="total_price"><strong>@lang('Total Price (with GST)')</strong></label>
+                        <label for="total_price"><strong>@lang('Total Price')</strong></label>
                         <div class="input-group">
                             <span class="input-group-text">{{ $basic->currency_symbol }}</span>
                             <input type="text" id="total_price" name="total_price" class="form-control" readonly>
@@ -104,21 +118,38 @@
 @push('script')
 <script>
     $(document).ready(function() {
+        // Purchase charges data from backend
+        const purchaseCharges = @json($purchaseCharges);
+        
         function calculateTotal() {
             const weight = parseFloat($('#weight').val()) || 0;
             const pricePerGram = parseFloat('{{ $coin->price_per_gram }}');
             const subtotal = weight * pricePerGram;
             
-            // Calculate GST (18%)
-            const gstRate = 0.18;
-            const gstAmount = subtotal * gstRate;
-            
-            // Calculate total price with GST
-            const totalPrice = subtotal + gstAmount;
-            
-            // Update the form fields
+            // Update subtotal
             $('#subtotal').val(subtotal.toFixed(8));
-            $('#gst_amount').val(gstAmount.toFixed(8));
+            
+            let totalCharges = 0;
+            
+            // Calculate each charge
+            purchaseCharges.forEach(function(charge) {
+                let chargeAmount = 0;
+                
+                if (charge.type === 'percentage') {
+                    chargeAmount = (subtotal * charge.value) / 100;
+                } else {
+                    chargeAmount = parseFloat(charge.value);
+                }
+                
+                // Update the charge field
+                $('#charge_' + charge.id).val(chargeAmount.toFixed(8));
+                totalCharges += chargeAmount;
+            });
+            
+            // Calculate total price with all charges
+            const totalPrice = subtotal + totalCharges;
+            
+            // Update the total price field
             $('#total_price').val(totalPrice.toFixed(8));
         }
         

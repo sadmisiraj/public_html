@@ -88,10 +88,27 @@
                                         <td>@lang('Subtotal'):</td>
                                         <td>{{ isset($order->subtotal) ? currencyPosition($order->subtotal) : currencyPosition($order->total_price) }}</td>
                                     </tr>
-                                    <tr>
-                                        <td>@lang('GST (18%)'):</td>
-                                        <td>{{ isset($order->gst_amount) ? currencyPosition($order->gst_amount) : 'N/A' }}</td>
-                                    </tr>
+                                    
+                                    <!-- Dynamic Charges Breakdown -->
+                                    @if($order->getChargesBreakdown())
+                                        @foreach($order->getChargesBreakdown() as $charge)
+                                            <tr>
+                                                <td>{{ $charge['label'] }}
+                                                    @if($charge['type'] == 'percentage')
+                                                        ({{ $charge['value'] }}%)
+                                                    @endif
+                                                :</td>
+                                                <td>{{ currencyPosition($charge['amount']) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @elseif(isset($order->gst_amount) && $order->gst_amount > 0)
+                                        <!-- Fallback for old orders with GST only -->
+                                        <tr>
+                                            <td>@lang('GST (18%)'):</td>
+                                            <td>{{ currencyPosition($order->gst_amount) }}</td>
+                                        </tr>
+                                    @endif
+                                    
                                     <tr class="table-primary">
                                         <td><strong>@lang('Total Price'):</strong></td>
                                         <td><strong>{{ currencyPosition($order->total_price) }}</strong></td>

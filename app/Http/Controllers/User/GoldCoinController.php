@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\GoldCoin;
 use App\Models\GoldCoinOrder;
+use App\Models\PurchaseCharge;
 use App\Models\Transaction;
 use App\Models\InAppNotification;
 use Carbon\Carbon;
@@ -31,8 +32,9 @@ class GoldCoinController extends Controller
         $coin = GoldCoin::where('status', 1)->findOrFail($id);
         $user = Auth::user();
         $basic = basicControl();
+        $purchaseCharges = PurchaseCharge::getActiveCharges();
         
-        return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic'));
+        return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic', 'purchaseCharges'));
     }
     
     public function purchaseGold(Request $request)
@@ -53,12 +55,30 @@ class GoldCoinController extends Controller
         $weight = $request->weight;
         $subtotal = $weight * $coin->price_per_gram;
         
-        // Calculate GST (18%)
-        $gstRate = 0.18;
-        $gstAmount = $subtotal * $gstRate;
+        // Calculate purchase charges using configurable charges
+        $purchaseCharges = PurchaseCharge::getActiveCharges();
+        $chargesBreakdown = [];
+        $totalCharges = 0;
+        $gstAmount = 0; // Keep for backward compatibility
         
-        // Calculate total price with GST
-        $totalPrice = $subtotal + $gstAmount;
+        foreach ($purchaseCharges as $charge) {
+            $chargeAmount = $charge->calculateChargeAmount($subtotal);
+            $chargesBreakdown[] = [
+                'label' => $charge->label,
+                'type' => $charge->type,
+                'value' => $charge->value,
+                'amount' => $chargeAmount
+            ];
+            $totalCharges += $chargeAmount;
+            
+            // Set GST amount for backward compatibility (first charge named GST or any charge)
+            if (stripos($charge->label, 'gst') !== false || $gstAmount == 0) {
+                $gstAmount = $chargeAmount;
+            }
+        }
+        
+        // Calculate total price with charges
+        $totalPrice = $subtotal + $totalCharges;
         
         // Check if user has sufficient balance
         if ($request->payment_source == 'deposit' && $user->balance < $totalPrice) {
@@ -90,7 +110,9 @@ class GoldCoinController extends Controller
         $order->weight_in_grams = $weight;
         $order->price_per_gram = $coin->price_per_gram;
         $order->subtotal = $subtotal;
-        $order->gst_amount = $gstAmount;
+        $order->purchase_charges = $chargesBreakdown;
+        $order->total_charges = $totalCharges;
+        $order->gst_amount = $gstAmount; // Keep for backward compatibility
         $order->total_price = $totalPrice;
         $order->payment_source = $request->payment_source;
         $order->status = 'pending';
@@ -98,12 +120,13 @@ class GoldCoinController extends Controller
         $order->save();
         
         // Record the transaction
+        $chargesList = implode(', ', array_column($chargesBreakdown, 'label'));
         Transaction::create([
             'user_id' => $user->id,
             'amount' => $totalPrice,
             'charge' => 0,
             'type' => 'GOLD_COIN_PURCHASE',
-            'remarks' => 'Gold coin purchase of ' . $weight . 'g ' . $coin->name . ' with GST',
+            'remarks' => 'Gold coin purchase of ' . $weight . 'g ' . $coin->name . ' with charges: ' . $chargesList,
             'trx_id' => $trxId
         ]);
         
@@ -165,7 +188,7 @@ class GoldCoinController extends Controller
             "Expires"             => "0"
         );
         
-        $columns = ['TRX ID', 'Gold Coin', 'Weight (g)', 'Price Per Gram', 'Subtotal', 'GST Amount', 'Total Price', 'Payment Source', 'Status', 'Date'];
+        $columns = ['TRX ID', 'Gold Coin', 'Weight (g)', 'Price Per Gram', 'Subtotal', 'Total Charges', 'Total Price', 'Payment Source', 'Status', 'Date'];
         
         $callback = function() use($orders, $columns) {
             $file = fopen('php://output', 'w');
@@ -177,13 +200,13 @@ class GoldCoinController extends Controller
                 $row['Weight (g)'] = $order->weight_in_grams;
                 $row['Price Per Gram'] = $order->price_per_gram;
                 $row['Subtotal'] = $order->subtotal;
-                $row['GST Amount'] = $order->gst_amount;
+                $row['Total Charges'] = $order->getTotalChargesAmount();
                 $row['Total Price'] = $order->total_price;
                 $row['Payment Source'] = ucfirst($order->payment_source);
                 $row['Status'] = ucfirst($order->status);
                 $row['Date'] = $order->created_at->format('d M, Y H:i:s');
                 
-                fputcsv($file, array($row['TRX ID'], $row['Gold Coin'], $row['Weight (g)'], $row['Price Per Gram'], $row['Subtotal'], $row['GST Amount'], $row['Total Price'], $row['Payment Source'], $row['Status'], $row['Date']));
+                fputcsv($file, array($row['TRX ID'], $row['Gold Coin'], $row['Weight (g)'], $row['Price Per Gram'], $row['Subtotal'], $row['Total Charges'], $row['Total Price'], $row['Payment Source'], $row['Status'], $row['Date']));
             }
             
             fclose($file);

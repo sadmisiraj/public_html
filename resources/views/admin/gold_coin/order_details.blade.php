@@ -41,12 +41,29 @@
                                         <th>@lang('Subtotal')</th>
                                         <td>{{ isset($order->subtotal) ? currencyPosition($order->subtotal) : currencyPosition($order->total_price) }}</td>
                                     </tr>
-                                    <tr>
-                                        <th>@lang('GST (18%)')</th>
-                                        <td>{{ isset($order->gst_amount) ? currencyPosition($order->gst_amount) : 'N/A' }}</td>
-                                    </tr>
+                                    
+                                    <!-- Dynamic Charges Breakdown -->
+                                    @if($order->getChargesBreakdown())
+                                        @foreach($order->getChargesBreakdown() as $charge)
+                                            <tr>
+                                                <th>{{ $charge['label'] }}
+                                                    @if($charge['type'] == 'percentage')
+                                                        ({{ $charge['value'] }}%)
+                                                    @endif
+                                                </th>
+                                                <td>{{ currencyPosition($charge['amount']) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @elseif(isset($order->gst_amount) && $order->gst_amount > 0)
+                                        <!-- Fallback for old orders with GST only -->
+                                        <tr>
+                                            <th>@lang('GST (18%)')</th>
+                                            <td>{{ currencyPosition($order->gst_amount) }}</td>
+                                        </tr>
+                                    @endif
+                                    
                                     <tr class="table-primary">
-                                        <th><strong>@lang('Total Price (with GST)')</strong></th>
+                                        <th><strong>@lang('Total Price')</strong></th>
                                         <td><strong>{{ currencyPosition($order->total_price) }}</strong></td>
                                     </tr>
                                     <tr>

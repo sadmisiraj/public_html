@@ -11,6 +11,11 @@ return [
             'icon' => 'bi bi-shield-lock',
             'short_description' => 'Configure payout security settings such as OTP verification requirements.',
         ],
+        'purchase-charges' => [
+            'route' => 'admin.purchase.charges',
+            'icon' => 'bi bi-receipt',
+            'short_description' => 'Configure purchase charges such as GST, taxes, processing fees and other charges applied to gold purchases.',
+        ],
         'GDPR Cookie' => [
             'route' => 'admin.cookie',
             'icon' => 'fa-thin fa-cookie',
