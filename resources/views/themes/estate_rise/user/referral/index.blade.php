@@ -72,6 +72,7 @@
                             <thead>
                             <tr>
                                 <th scope="col">@lang('User ID')</th>
+                            
                                 <th scope="col">@lang('Level')</th>
                                 <th scope="col">@lang('Placement')</th>
                                 <th scope="col">@lang('Joined At')</th>
@@ -91,9 +92,10 @@
                                             @if($countUser > 0)
                                                 <i class="far fa-circle-down color-primary"></i>
                                             @endif
-                                            @lang($user->username)
+                                            @lang($user->fullname)
                                         </a>
                                     </td>
+                                    
                                     <td data-label="@lang('Level')">
                                         @lang('Level 1')
                                     </td>

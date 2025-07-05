@@ -48,6 +48,8 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Admin\GoldCoinController;
 use App\Http\Controllers\Admin\UserBankDetailController;
 use App\Http\Controllers\Admin\PurchaseChargeController;
+use App\Http\Controllers\Admin\RgpTransactionController as AdminRgpTransactionController;
+use App\Http\Controllers\Admin\RgpTreeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -389,6 +391,17 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         // Transaction export routes
         Route::get('export/transaction/excel', [ExportController::class, 'exportTransactionExcel'])->name('export.transaction.excel');
         Route::get('export/transaction/pdf', [ExportController::class, 'exportTransactionPdf'])->name('export.transaction.pdf');
+
+        /* ====== RGP Transaction Log =====*/
+        Route::get('rgp-transactions', [AdminRgpTransactionController::class, 'index'])->name('rgp.transactions');
+        Route::get('user/{id}/rgp-transactions', [AdminRgpTransactionController::class, 'userTransactions'])->name('user.rgp.transactions');
+        
+        // RGP Tree Routes
+        Route::get('rgp-tree', [RgpTreeController::class, 'index'])->name('rgp.tree');
+        Route::post('rgp-tree/search', [RgpTreeController::class, 'search'])->name('rgp.tree.search');
+        Route::post('rgp-tree/get-children', [RgpTreeController::class, 'getChildren'])->name('rgp.tree.get-children');
+        Route::get('rgp-tree/visual', [RgpTreeController::class, 'visualTree'])->name('rgp.tree.visual');
+        Route::post('rgp-tree/node-details', [RgpTreeController::class, 'getNodeDetails'])->name('rgp.tree.node-details');
 
         /* ====== Payment Log =====*/
         Route::get('payment/log', [PaymentLogController::class, 'index'])->name('payment.log');

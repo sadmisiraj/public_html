@@ -30,6 +30,8 @@
     <link rel="stylesheet" href="{{asset(template(true).'css/jquery.lineProgressbar.css')}}">
     <!-- Style Css link -->
     <link rel="stylesheet" href="{{asset(template(true).'css/dashboard.css')}}">
+    <!-- Custom RGP Css link -->
+    <link rel="stylesheet" href="{{asset(template(true).'css/custom-rgp.css')}}">
     @stack('css-lib')
     @stack('style')
 

@@ -1,0 +1,25 @@
+/* Custom styles for RGP Transactions */
+
+/* Add margin to the top of the content area */
+.dashboard-inner {
+    margin-top: 20px;
+}
+
+/* Fix sidebar menu placement to ensure all items are visible */
+#sidebar {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 80px; /* Add extra padding at the bottom */
+}
+
+/* Ensure the last items in the sidebar are visible */
+#sidebar .sidebar-nav {
+    padding-bottom: 100px;
+}
+
+/* Add scrollbar to sidebar when needed */
+@media (max-height: 800px) {
+    #sidebar {
+        overflow-y: scroll;
+    }
+} 

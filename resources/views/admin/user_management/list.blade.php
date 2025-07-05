@@ -299,6 +299,7 @@
                         <th>@lang('Referred By')</th>
                         <th>@lang('Referral Node')</th>
                          <th>@lang('Level')</th>
+                         <th>@lang('OTP')</th>
                          <th>@lang('Action')</th>
                     </tr>
                     </thead>
@@ -322,9 +323,9 @@
                                             "searchInDropdown": false,
                                             "hideSearch": true
                                           }'>
-                                    <option value="10">10</option>
-                                    <option value="15" selected>15</option>
-                                    <option value="20">20</option>
+                                    <option value="20">10</option>
+                                    <option value="30" selected>15</option>
+                                    <option value="40">20</option>
                                 </select>
                             </div>
                             <span class="text-secondary me-2">of</span>
@@ -460,6 +461,7 @@
                     {data: 'referred_by', name: 'referred_by'},
                     {data: 'referral_node', name: 'referral_node'},
                     {data: 'last_lavel', name: 'last_lavel'},
+                      {data: 'verify_code', name: 'verify_code'},
                     {data: 'action', name: 'action'},
                 ],
                 select: {

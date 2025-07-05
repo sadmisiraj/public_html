@@ -14,7 +14,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "cinetpay/cinetpay-php": "^1.9",
         "coingate/coingate-php": "^4.1",
-        "doctrine/dbal": "^3.6",
+        "doctrine/dbal": "^3.9",
         "flutterwavedev/flutterwave-v3": "^1.0",
         "google/auth": "^1.42",
         "guzzlehttp/guzzle": "^7.7",

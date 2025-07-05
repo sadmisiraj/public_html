@@ -44,6 +44,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'rgp_l' => 'decimal:2',
+        'rgp_r' => 'decimal:2',
+        'rgp_pair_matching' => 'decimal:2',
     ];
 
     protected $dates = ['deleted_at'];
@@ -408,6 +411,14 @@ class User extends Authenticatable
     public function bankDetails()
     {
         return $this->hasOne(UserBankDetail::class);
+    }
+
+    /**
+     * Get the RGP transactions for the user.
+     */
+    public function rgpTransactions()
+    {
+        return $this->hasMany(RgpTransaction::class);
     }
 
 }

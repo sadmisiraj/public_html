@@ -32,6 +32,7 @@ use Facades\App\Services\BasicService;
 use App\Models\UserPlan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Helpers\MoneyTransferLimitHelper;
+use App\Services\RgpTransactionService;
 
 
 class HomeController extends Controller
@@ -770,19 +771,111 @@ class HomeController extends Controller
                 // Check if plan is eligible for RGP and update referral chain's RGP values
                 if ($plan->eligible_for_rgp) {
                     $currentUser = $user;
+                    $rgpTransactionService = new RgpTransactionService();
+                    
+                    // Log that we're starting RGP distribution
+                    \Log::info('Starting RGP distribution for plan purchase', [
+                        'user_id' => $user->id,
+                        'username' => $user->username,
+                        'plan_id' => $plan->id,
+                        'plan_name' => $plan->name,
+                        'rgp_eligible' => $plan->eligible_for_rgp,
+                        'amount' => $amount
+                    ]);
+                    
                     while ($currentUser->rgp_parent_id) {
                         $parent = User::find($currentUser->rgp_parent_id);
-                        if (!$parent) break;
-                        
-                        // Credit based on child's placement
-                        if ($currentUser->referral_node === 'left') {
-                            $parent->rgp_l = number_format(floatval($parent->rgp_l ?? 0) + 50, 2);
-                        } else {
-                            $parent->rgp_r = number_format(floatval($parent->rgp_r ?? 0) + 50, 2);
+                        if (!$parent) {
+                            \Log::warning('Parent not found in RGP chain', [
+                                'current_user_id' => $currentUser->id,
+                                'rgp_parent_id' => $currentUser->rgp_parent_id
+                            ]);
+                            break;
                         }
+                        
+                        // Store previous values
+                        $previousRgpL = floatval($parent->rgp_l ?? 0);
+                        $previousRgpR = floatval($parent->rgp_r ?? 0);
+                        
+                        // Calculate RGP points as 1% of the transaction amount
+                        $rgpPoints = number_format($amount * 0.01, 2);
+                        
+                        // Find all direct children of this parent to determine placement
+                        $directChildren = User::where('rgp_parent_id', $parent->id)->get();
+                        
+                        // Find which side the current user is on by checking direct children or their descendants
+                        $childPlacement = null;
+                        foreach ($directChildren as $directChild) {
+                            if ($directChild->id == $currentUser->id) {
+                                $childPlacement = $directChild->referral_node;
+                                break;
+                            }
+                        }
+                        
+                        \Log::info('Processing RGP for parent', [
+                            'parent_id' => $parent->id,
+                            'parent_username' => $parent->username,
+                            'child_id' => $currentUser->id,
+                            'child_username' => $currentUser->username,
+                            'child_placement' => $childPlacement,
+                            'previous_rgp_l' => $previousRgpL,
+                            'previous_rgp_r' => $previousRgpR,
+                            'rgp_points' => $rgpPoints
+                        ]);
+                        
+                        if ($childPlacement === 'left') {
+                            $parent->rgp_l = number_format(floatval($parent->rgp_l ?? 0) + $rgpPoints, 2);
+                            
+                            // Log the transaction
+                            $rgpTransactionService->createTransaction(
+                                $parent,
+                                'credit',
+                                'left',
+                                $rgpPoints,
+                                'RGP points from ' . $user->username . '\'s purchase of ' . $plan->name,
+                                'purchase',
+                                $user->id,
+                                $plan->id
+                            );
+                            
+                            \Log::info('Added RGP points to left side', [
+                                'parent_id' => $parent->id,
+                                'new_rgp_l' => $parent->rgp_l
+                            ]);
+                        } elseif ($childPlacement === 'right') {
+                            $parent->rgp_r = number_format(floatval($parent->rgp_r ?? 0) + $rgpPoints, 2);
+                            
+                            // Log the transaction
+                            $rgpTransactionService->createTransaction(
+                                $parent,
+                                'credit',
+                                'right',
+                                $rgpPoints,
+                                'RGP points from ' . $user->username . '\'s purchase of ' . $plan->name,
+                                'purchase',
+                                $user->id,
+                                $plan->id
+                            );
+                            
+                            \Log::info('Added RGP points to right side', [
+                                'parent_id' => $parent->id,
+                                'new_rgp_r' => $parent->rgp_r
+                            ]);
+                        } else {
+                            \Log::warning('Could not determine child placement', [
+                                'parent_id' => $parent->id,
+                                'child_id' => $currentUser->id
+                            ]);
+                        }
+                        
                         $parent->save();
                         $currentUser = $parent;
                     }
+                    
+                    \Log::info('Completed RGP distribution for plan purchase', [
+                        'user_id' => $user->id,
+                        'username' => $user->username
+                    ]);
                 }
             }
 
@@ -897,6 +990,19 @@ class HomeController extends Controller
         $transaction->transactional_type = 'RGP';
         $transaction->balance_type = 'balance';
         $transaction->save();
+        
+        // Log the RGP transaction
+        $rgpTransactionService = new \App\Services\RgpTransactionService();
+        $rgpTransactionService->createTransaction(
+            $user,
+            'match',
+            'both',
+            $matchingValue,
+            'RGP matched profit',
+            'user',
+            null,
+            null
+        );
         
         // Send notifications
         $msg = [

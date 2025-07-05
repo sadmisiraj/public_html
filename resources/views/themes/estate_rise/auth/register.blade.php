@@ -69,6 +69,16 @@
                                                 <div id="sponsor-feedback" class="invalid-feedback">@lang('A valid referral code is required')</div>
                                                 @error('sponsor')<span class="text-danger mt-1">@lang($message)</span>@enderror
                                             </div>
+                                           <div class="col-md-6">
+                                                <input type="text" name="first_name" class="form-control" id="exampleInputEmail0"
+                                                       placeholder="@lang('First Name')">
+                                                @error('first_name')<span class="text-danger mt-1">@lang($message)</span>@enderror
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" name="last_name" class="form-control" id="exampleInputEmail0"
+                                                       placeholder="@lang('Last Name')">
+                                                @error('last_name')<span class="text-danger mt-1">@lang($message)</span>@enderror
+                                            </div>
                                             
                                             <!-- Email Field -->
                                             <div class="col-md-12">

@@ -130,6 +130,12 @@
                 <span>@lang('support ticket')</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link collapsed {{menuActive(['user.rgp.transactions'])}}" href="{{route('user.rgp.transactions')}}">
+                <i class="fal fa-network-wired"></i>
+                <span>@lang('RGP Transactions')</span>
+            </a>
+        </li>
         <br>
         <br>
     </ul>

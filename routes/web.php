@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\User\PayoutOtpController;
 use App\Http\Controllers\User\MoneyTransferOtpController;
 use App\Http\Controllers\User\GoldCoinController;
+use App\Http\Controllers\Admin\RgpTransactionController as AdminRgpTransactionController;
+use App\Http\Controllers\User\RgpTransactionController as UserRgpTransactionController;
 
 
 /*
@@ -195,6 +197,9 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
                 Route::post('payout-bank-form', [PayoutController::class, 'getBankForm'])->name('payout.getBankForm');
                 Route::post('payout-bank-list', [PayoutController::class, 'getBankList'])->name('payout.getBankList');
             });
+
+            // RGP Transactions
+            Route::get('rgp-transactions', [UserRgpTransactionController::class, 'index'])->name('rgp.transactions');
         });
     });
 
@@ -246,6 +251,11 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
     Route::get("/{slug?}", [FrontendController::class, 'page'])->name('page');
 
     Route::post('users/badge-update/{id}', [UsersController::class, 'badgeUpdate'])->name('users.badgeUpdate');
+});
+
+// Admin Routes
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'admin']], function () {
+    // ... existing admin routes ...
 });
 
 

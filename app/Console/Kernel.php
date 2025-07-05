@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\DistributeProfit;
 use App\Console\Commands\PayoutCryptoCurrencyUpdateCron;
 use App\Console\Commands\PayoutCurrencyUpdateCron;
+use App\Console\Commands\RecalculateRgpPoints;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -15,7 +16,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         PayoutCurrencyUpdateCron::class,
         PayoutCryptoCurrencyUpdateCron::class,
-        DistributeProfit::class
+        DistributeProfit::class,
+        RecalculateRgpPoints::class
     ];
 
     /**

@@ -173,6 +173,20 @@
                                 </a>
                             </div>
                         @endif
+                        <div class="nav-item">
+                            <a class="nav-link {{ menuActive(['admin.rgp.transactions']) }}"
+                               href="{{ route('admin.rgp.transactions') }}" data-placement="left">
+                                <i class="bi bi-diagram-3 nav-icon"></i>
+                                <span class="nav-link-title">@lang("RGP Transactions")</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link {{ menuActive(['admin.rgp.tree']) }}"
+                               href="{{ route('admin.rgp.tree') }}" data-placement="left">
+                                <i class="bi bi-diagram-3-fill nav-icon"></i>
+                                <span class="nav-link-title">@lang("RGP Tree")</span>
+                            </a>
+                        </div>
                         @if(adminAccessRoute(config('role.withdraw.access.view')))
                             <div class="nav-item">
                                 <a class="nav-link {{ menuActive(['admin.payout.log']) }}"

@@ -1451,6 +1451,27 @@ if (!function_exists('getMoneyTransferLimitInfo')) {
     }
 }
 
+if (!function_exists('getPaginate')) {
+    function getPaginate($limit = null)
+    {
+        return $limit ?? 20;
+    }
+}
+
+if (!function_exists('paginateLinks')) {
+    function paginateLinks($data)
+    {
+        return $data->appends(request()->all())->links();
+    }
+}
+
+if (!function_exists('showDateTime')) {
+    function showDateTime($date, $format = 'd M, Y h:i A')
+    {
+        return \Carbon\Carbon::parse($date)->format($format);
+    }
+}
+
 
 
 

@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
 use App\Exports\ReportExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\RgpTransactionService;
 
 class UsersController extends Controller
 {
@@ -1246,17 +1247,58 @@ class UsersController extends Controller
             });
             
             // Store original RGP values
-            $rgpL = floatval($request->rgp_l);
-            $rgpR = floatval($request->rgp_r);
+            $previousRgpL = floatval($user->rgp_l ?? 0);
+            $previousRgpR = floatval($user->rgp_r ?? 0);
+            
+            // New values from the form
+            $newRgpL = floatval($request->rgp_l);
+            $newRgpR = floatval($request->rgp_r);
             
             // Calculate the pair matching value automatically
-            $pairMatching = min($rgpL, $rgpR);
+            $pairMatching = min($newRgpL, $newRgpR);
 
             $user->update([
                 'rgp_l' => $request->rgp_l,
                 'rgp_r' => $request->rgp_r,
                 'rgp_pair_matching' => $pairMatching,
             ]);
+            
+            // Log the RGP transactions if values changed
+            $rgpTransactionService = new RgpTransactionService();
+            
+            // Log changes to RGP L if it changed
+            if ($newRgpL != $previousRgpL) {
+                $transactionType = $newRgpL > $previousRgpL ? 'credit' : 'debit';
+                $amount = abs($newRgpL - $previousRgpL);
+                
+                $rgpTransactionService->createTransaction(
+                    $user,
+                    $transactionType,
+                    'left',
+                    $amount,
+                    'RGP L value updated by admin',
+                    'admin',
+                    null,
+                    null
+                );
+            }
+            
+            // Log changes to RGP R if it changed
+            if ($newRgpR != $previousRgpR) {
+                $transactionType = $newRgpR > $previousRgpR ? 'credit' : 'debit';
+                $amount = abs($newRgpR - $previousRgpR);
+                
+                $rgpTransactionService->createTransaction(
+                    $user,
+                    $transactionType,
+                    'right',
+                    $amount,
+                    'RGP R value updated by admin',
+                    'admin',
+                    null,
+                    null
+                );
+            }
 
             return back()->with('success', 'RGP values updated successfully. Current pair matching value is ' . $pairMatching);
 
@@ -1314,6 +1356,19 @@ class UsersController extends Controller
             $transaction->transactional_type = 'RGP';
             $transaction->balance_type = 'profit_balance';
             $transaction->save();
+            
+            // Log the RGP transaction
+            $rgpTransactionService = new RgpTransactionService();
+            $rgpTransactionService->createTransaction(
+                $user,
+                'match',
+                'both',
+                $matchingPoints,
+                'RGP matched profit by admin',
+                'admin',
+                null,
+                null
+            );
             
             // Send notifications
             $msg = [
