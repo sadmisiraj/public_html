@@ -178,7 +178,7 @@
                             <td data-label="@lang('Username')" style="padding-left: 30px;">
                                 <a class="${directReferralUser.count_direct_referral > 0 ? 'nextDirectReferral' : ''} text-decoration-none" href="javascript:void(0)" style="border-bottom: none !important;" data-id="${directReferralUser.id}">
                                     ${directReferralUser.count_direct_referral > 0 ? ' <i class="far fa-circle-down color-primary"></i>' : ''}
-                                    ${directReferralUser.username}
+                                    ${directReferralUser.fullname}
                                 </a>
                             </td>
                             <td data-label="@lang('Level')">

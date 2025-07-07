@@ -623,6 +623,9 @@ class HomeController extends Controller
             return [
                 'id' => $user->id,
                 'username' => $user->username,
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'fullname' => trim($user->firstname . ' ' . $user->lastname),
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'count_direct_referral' => count(getDirectReferralUsers($user->id)),
