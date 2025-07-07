@@ -57,6 +57,11 @@ class KycVerificationController extends Controller
         $rules['BankName'] = ['required', 'string', 'max:191'];
         $rules['AccountNumber'] = ['required', 'string', 'max:191'];
         $rules['IFSCCode'] = ['required', 'string', 'max:191'];
+        
+        // Add validation rules for Aadhar card
+        $rules['aadhar_number'] = ['required', 'string', 'size:12'];
+        $rules['aadhar_front'] = ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'];
+        $rules['aadhar_back'] = ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'];
 
         $validator = Validator::make($reqData, $rules);
         if ($validator->fails()) {
@@ -66,7 +71,7 @@ class KycVerificationController extends Controller
 
         $reqField = [];
 
-        foreach ($request->except('_token', '_method', 'type', 'BankName', 'AccountNumber', 'IFSCCode') as $k => $v) {
+        foreach ($request->except('_token', '_method', 'type', 'BankName', 'AccountNumber', 'IFSCCode', 'aadhar_number', 'aadhar_front', 'aadhar_back') as $k => $v) {
             foreach ($params as $inKey => $inVal) {
                 if ($k == $inKey) {
                     if ($inVal->type == 'file' && $request->hasFile($inKey)) {
@@ -96,6 +101,50 @@ class KycVerificationController extends Controller
                 }
             }
         }
+
+        // Process Aadhar card fields
+        if ($request->hasFile('aadhar_front')) {
+            try {
+                $aadharFrontFile = $this->fileUpload($request['aadhar_front'], config('filelocation.kyc.path'), null, null, 'webp', 80);
+                $reqField['aadhar_front'] = [
+                    'field_name' => 'aadhar_front',
+                    'field_label' => 'Aadhar Card Front Side',
+                    'field_value' => $aadharFrontFile['path'],
+                    'field_driver' => $aadharFrontFile['driver'],
+                    'validation' => 'required',
+                    'type' => 'file',
+                ];
+            } catch (\Exception $exp) {
+                session()->flash('error', 'Could not upload your Aadhar Card Front Side');
+                return back()->withInput();
+            }
+        }
+
+        if ($request->hasFile('aadhar_back')) {
+            try {
+                $aadharBackFile = $this->fileUpload($request['aadhar_back'], config('filelocation.kyc.path'), null, null, 'webp', 80);
+                $reqField['aadhar_back'] = [
+                    'field_name' => 'aadhar_back',
+                    'field_label' => 'Aadhar Card Back Side',
+                    'field_value' => $aadharBackFile['path'],
+                    'field_driver' => $aadharBackFile['driver'],
+                    'validation' => 'required',
+                    'type' => 'file',
+                ];
+            } catch (\Exception $exp) {
+                session()->flash('error', 'Could not upload your Aadhar Card Back Side');
+                return back()->withInput();
+            }
+        }
+
+        // Add Aadhar number to reqField
+        $reqField['aadhar_number'] = [
+            'field_name' => 'aadhar_number',
+            'field_label' => 'Aadhar Card Number',
+            'validation' => 'required',
+            'field_value' => $request->aadhar_number,
+            'type' => 'text',
+        ];
 
         // Get current user
         $user = auth()->user();

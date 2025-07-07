@@ -18,6 +18,46 @@
 
 
         <div class="row">
+            <!-- Admin Dashboard Tile -->
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon ">
+                            <i class="bi bi-shield-lock text-primary"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>Admin Dashboard</h5>
+                            <span class="">Go to the main admin dashboard.</span>
+                            <span class="mt-1 link-text">
+                                <a href="/security" target="_blank">@lang('Go to Dashboard')
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Admin Dashboard Tile -->
+            <!-- Offer Images Tile -->
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon ">
+                            <i class="bi bi-images text-primary"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>Offer Images</h5>
+                            <span class="">Manage dashboard offer images and banners.</span>
+                            <span class="mt-1 link-text">
+                                <a href="/security/offer-images" target="_blank">@lang('Manage Images')
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Offer Images Tile -->
             @forelse($settingsDetails as $key => $detail)
                 @if(isset($detail['route']))
                     <div class="col-lg-4 col-sm-6 mb-4">

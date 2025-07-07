@@ -217,6 +217,13 @@ class UsersController extends Controller
             return response()->json(['error' => 1]);
         } else {
             User::whereIn('id', $request->strIds)->get()->map(function ($user) {
+                // Find any users who have this user as their rgp_parent_id
+                // and update their parent to this user's parent
+                if ($user->rgp_parent_id) {
+                    User::where('rgp_parent_id', $user->id)
+                        ->update(['rgp_parent_id' => $user->rgp_parent_id]);
+                }
+                
                 UserAllRecordDeleteJob::dispatch($user);
                 $user->forceDelete();
             });
@@ -561,6 +568,13 @@ class UsersController extends Controller
             $user = User::where('id', $id)->firstOr(function () {
                 throw new \Exception('User not found!');
             });
+
+            // Find any users who have this user as their rgp_parent_id
+            // and update their parent to this user's parent
+            if ($user->rgp_parent_id) {
+                User::where('rgp_parent_id', $user->id)
+                    ->update(['rgp_parent_id' => $user->rgp_parent_id]);
+            }
 
             UserAllRecordDeleteJob::dispatch($user);
             $user->forceDelete();

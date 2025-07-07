@@ -50,6 +50,7 @@ use App\Http\Controllers\Admin\UserBankDetailController;
 use App\Http\Controllers\Admin\PurchaseChargeController;
 use App\Http\Controllers\Admin\RgpTransactionController as AdminRgpTransactionController;
 use App\Http\Controllers\Admin\RgpTreeController;
+use App\Http\Controllers\Admin\OfferImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,9 +127,17 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::get('app-settings', [BasicControlController::class, 'appSettings'])->name('app.settings');
         Route::post('app-settings/update', [BasicControlController::class, 'appSettingUpdate'])->name('app.settings.update');
 
+        /* ===== Dashboard Popup Settings ===== */
+        Route::get('dashboard-popup', [BasicControlController::class, 'dashboardPopupSettings'])->name('dashboard.popup');
+        Route::post('dashboard-popup/update', [BasicControlController::class, 'dashboardPopupUpdate'])->name('dashboard.popup.update');
+
         /* ===== Security Settings ===== */
         Route::get('security/payout', [SecuritySettingsController::class, 'payoutSettings'])->name('security.payout');
         Route::post('security/payout/update', [SecuritySettingsController::class, 'updatePayoutSettings'])->name('security.payout.update');
+        Route::get('security', [SecuritySettingsController::class, 'index'])->name('security.index');
+        Route::get('security/dashboard-popup', [SecuritySettingsController::class, 'dashboardPopupSettings'])->name('security.dashboard.popup');
+        Route::post('security/dashboard-popup/update', [SecuritySettingsController::class, 'updateDashboardPopupSettings'])->name('security.dashboard.popup.update');
+        Route::get('security/offer-images', [SecuritySettingsController::class, 'offerImagesSettings'])->name('security.offer-images');
 
         /* ===== Purchase Charges ===== */
         Route::get('purchase-charges', [PurchaseChargeController::class, 'index'])->name('purchase.charges');
@@ -435,6 +444,9 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('blogs/slug/update', [BlogController::class, 'slugUpdate'])->name('slug.update');
         Route::get('blogs/seo-page/{id}', [BlogController::class, 'blogSeo'])->name('blog.seo');
         Route::post('blogs/seo-update/{id}', [BlogController::class, 'blogSeoUpdate'])->name('blog.seo.update');
+
+        /* ====== Offer Images ===== */
+        Route::resource('offer-images', OfferImageController::class);
 
         /* ====== manage schedule =====*/
         Route::get('schedules', [ManageTimeController::class, 'index'])->name('schedule');

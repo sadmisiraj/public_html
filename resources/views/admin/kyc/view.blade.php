@@ -156,6 +156,62 @@
 
                 </div>
                 
+                <!-- Aadhar Card Details -->
+                @if(isset($userKyc->kyc_info->aadhar_number))
+                <div class="card mb-3 mb-lg-5">
+                    <div class="card-header card-header-content-between">
+                        <h4 class="card-header-title">@lang('Aadhar Card Information')</h4>
+                    </div>
+                    
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush list-group-no-gutters">
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5>@lang("Aadhar Card Number")</h5>
+                                    <ul class="list-unstyled list-py-2 text-body">
+                                        <li>{{ $userKyc->kyc_info->aadhar_number->field_value }}</li>
+                                    </ul>
+                                </div>
+                            </li>
+                            
+                            @if(isset($userKyc->kyc_info->aadhar_front))
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5>@lang("Aadhar Card Front")</h5>
+                                    <ul class="list-unstyled list-py-2 text-body">
+                                        <li>
+                                            <a href="{{ getFile($userKyc->kyc_info->aadhar_front->field_driver, $userKyc->kyc_info->aadhar_front->field_value) }}"
+                                               target="_blank">
+                                                <img src="{{ getFile($userKyc->kyc_info->aadhar_front->field_driver, $userKyc->kyc_info->aadhar_front->field_value) }}"
+                                                     class="kycInfoImg">
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            @endif
+                            
+                            @if(isset($userKyc->kyc_info->aadhar_back))
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5>@lang("Aadhar Card Back")</h5>
+                                    <ul class="list-unstyled list-py-2 text-body">
+                                        <li>
+                                            <a href="{{ getFile($userKyc->kyc_info->aadhar_back->field_driver, $userKyc->kyc_info->aadhar_back->field_value) }}"
+                                               target="_blank">
+                                                <img src="{{ getFile($userKyc->kyc_info->aadhar_back->field_driver, $userKyc->kyc_info->aadhar_back->field_value) }}"
+                                                     class="kycInfoImg">
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+                @endif
+                
                 <!-- Bank Details Card -->
                 <div class="card mb-3 mb-lg-5">
                     <div class="card-header card-header-content-between">

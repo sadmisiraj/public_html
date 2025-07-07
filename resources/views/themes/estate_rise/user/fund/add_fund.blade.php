@@ -215,10 +215,36 @@
                                                 </select>`;
                             $('.add-select-field').append(select);
 
+                            // Check if this is bank transfer and only has INR option
+                            let isBankTransfer = false;
+                            let hasOnlyINR = false;
+                            
+                            // Check if selected gateway name is "Bank Transfer" 
+                            $(".payment-container-list .item").each(function() {
+                                if ($(this).find("input").is(":checked") && $(this).find("h5").text() === "Bank Transfer") {
+                                    isBankTransfer = true;
+                                }
+                            });
+                            
+                            // Check if only INR is available
+                            if (response.data && response.data.length === 1 && response.data[0] === "INR") {
+                                hasOnlyINR = true;
+                            }
+                            
                             $(response.data).each(function (index, value) {
-                                let markup = `<option value="${value}">${value}</option>`;
+                                let selected = "";
+                                // Auto-select INR if bank transfer and only INR is available
+                                if (isBankTransfer && value === "INR") {
+                                    selected = "selected";
+                                }
+                                let markup = `<option value="${value}" ${selected}>${value}</option>`;
                                 $('#supported_currency').append(markup);
                             });
+                            
+                            // Trigger change event to update the form if INR was auto-selected
+                            if (isBankTransfer && hasOnlyINR) {
+                                $('#supported_currency').trigger('change');
+                            }
                         }
 
                         let markup2 = '<option value="">'+'{{trans('Select Crypto Currency')}}'+'</option>';
@@ -319,6 +345,77 @@
 
             function showCharge(response, currency) {
 
+                // Function to convert number to words
+                function numberToWords(num) {
+                    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 
+                        'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+                    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+                    
+                    if (num === 0) return 'Zero';
+                    
+                    function convertLessThanOneThousand(num) {
+                        if (num === 0) return '';
+                        if (num < 20) return ones[num];
+                        const ten = Math.floor(num / 10);
+                        const unit = num % 10;
+                        return tens[ten] + (unit ? ' ' + ones[unit] : '');
+                    }
+                    
+                    function convert(num) {
+                        if (num === 0) return 'Zero';
+                        let result = '';
+                        
+                        // Handle crores (10,000,000+)
+                        if (num >= 10000000) {
+                            result += convert(Math.floor(num / 10000000)) + ' Crore ';
+                            num %= 10000000;
+                        }
+                        
+                        // Handle lakhs (100,000+)
+                        if (num >= 100000) {
+                            result += convert(Math.floor(num / 100000)) + ' Lakh ';
+                            num %= 100000;
+                        }
+                        
+                        // Handle thousands (1,000+)
+                        if (num >= 1000) {
+                            result += convertLessThanOneThousand(Math.floor(num / 1000)) + ' Thousand ';
+                            num %= 1000;
+                        }
+                        
+                        // Handle hundreds
+                        if (num >= 100) {
+                            result += ones[Math.floor(num / 100)] + ' Hundred ';
+                            num %= 100;
+                        }
+                        
+                        // Handle tens and ones
+                        if (num > 0) {
+                            if (result !== '') result += 'and ';
+                            result += convertLessThanOneThousand(num);
+                        }
+                        
+                        return result;
+                    }
+                    
+                    // Split number into integer and decimal parts
+                    const parts = num.toString().split('.');
+                    let result = convert(parseInt(parts[0]));
+                    
+                    // Handle decimal part
+                    if (parts.length > 1) {
+                        result += ' Point';
+                        for (let i = 0; i < parts[1].length; i++) {
+                            result += ' ' + ones[parseInt(parts[1][i])];
+                        }
+                    }
+                    
+                    return result;
+                }
+                
+                // Convert amount to words
+                const amountInWords = numberToWords(parseFloat(response.amount));
+
                 let txnDetails =  ` <div class="side-box">
                     <div class="transfer-details-section">
                         <ul class="transfer-list">
@@ -328,6 +425,11 @@
                         <li class="item">
                             <span>{{ __('Amount In') }} ${response.currency} </span>
                             <span class="text-success"> ${response.amount} ${response.currency}</span>
+                        </li>
+                        
+                        <li class="item">
+                            <span>{{ __('Amount In Words') }}</span>
+                            <span class="text-success"> ${amountInWords} ${response.currency}</span>
                         </li>
 
                         <li class="item">

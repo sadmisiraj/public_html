@@ -15,6 +15,33 @@
             })
             ->pluck('text');
     @endphp
+    
+    <!-- Dashboard Popup Modal -->
+    @if(basicControl()->show_dashboard_popup && basicControl()->dashboard_popup_image)
+    <div class="modal fade" id="dashboardPopupModal" tabindex="-1" role="dialog" aria-labelledby="dashboardPopupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <button type="button" class="close" id="closePopupBtn" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    @if(basicControl()->dashboard_popup_url)
+                        <a href="{{ basicControl()->dashboard_popup_url }}" target="_blank">
+                            <img src="{{ getFile(basicControl()->dashboard_popup_image_driver, basicControl()->dashboard_popup_image) }}" 
+                                 class="img-fluid" alt="Dashboard Popup" style="cursor: pointer;">
+                        </a>
+                    @else
+                        <img src="{{ getFile(basicControl()->dashboard_popup_image_driver, basicControl()->dashboard_popup_image) }}" 
+                             class="img-fluid" alt="Dashboard Popup">
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    
     <div class="main-wrapper">
         <!-- Page title start -->
         <div class="pagetitle">
@@ -118,14 +145,45 @@
                                 </div>
                             </div>
                             <div class="item">
-                                <div class="box-card2">
-                                    <div class="img-box">
-                                        <img src="{{asset(template(true).'img/box-card/money-motivation-90.png')}}" alt="icon">
-                                    </div>
-                                    <div class="text-box">
-                                        <h5 class="title mb-0">{{currencyPosition($totalEarnings+0)}} </h5>
-                                        <p class="mb-0">@lang('Total Earnings')</p>
-                                    </div>
+                                <div class="offer-slider-container">
+                                    @php
+                                        $offerImages = \App\Models\OfferImage::where('status', true)->orderBy('order', 'asc')->get();
+                                        if ($offerImages->isEmpty()) {
+                                            // Create a default offer image for testing
+                                            $defaultImage = new \App\Models\OfferImage([
+                                                'title' => 'Default Offer',
+                                                'image' => 'offerImage/test-offer.png',
+                                                'image_driver' => 'local',
+                                                'url' => null,
+                                                'order' => 1,
+                                                'status' => true
+                                            ]);
+                                            $offerImages = collect([$defaultImage]);
+                                        }
+                                    @endphp
+                                    @if($offerImages->count() > 0)
+                                        <div class="offer-slider">
+                                            @foreach($offerImages as $offerImage)
+                                                <div class="offer-slide">
+                                                    @php
+                                                        $imageUrl = $offerImage->getImageUrl();
+                                                    @endphp
+                                                    <!-- Debug: {{ $imageUrl }} -->
+                                                    @if($offerImage->url)
+                                                        <a href="{{ $offerImage->url }}" target="_blank">
+                                                            <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
+                                                        </a>
+                                                    @else
+                                                        <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="no-offers">
+                                            <p>@lang('No offers available')</p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -195,14 +253,45 @@
                                         </div>
                                     </div>
                                     <div class="item">
-                                        <div class="box-card2">
-                                            <div class="img-box">
-                                                <img src="{{asset(template(true).'img/box-card/money-motivation-90.png')}}" alt="">
-                                            </div>
-                                            <div class="text-box">
-                                                <h5 class="title mb-0">{{currencyPosition($totalEarnings+0)}} </h5>
-                                                <p class="mb-0">@lang('Total Earnings')</p>
-                                            </div>
+                                        <div class="offer-slider-container">
+                                            @php
+                                                $offerImages = \App\Models\OfferImage::where('status', true)->orderBy('order', 'asc')->get();
+                                                if ($offerImages->isEmpty()) {
+                                                    // Create a default offer image for testing
+                                                    $defaultImage = new \App\Models\OfferImage([
+                                                        'title' => 'Default Offer',
+                                                        'image' => 'offerImage/test-offer.png',
+                                                        'image_driver' => 'local',
+                                                        'url' => null,
+                                                        'order' => 1,
+                                                        'status' => true
+                                                    ]);
+                                                    $offerImages = collect([$defaultImage]);
+                                                }
+                                            @endphp
+                                            @if($offerImages->count() > 0)
+                                                <div class="offer-slider-mobile">
+                                                    @foreach($offerImages as $offerImage)
+                                                        <div class="offer-slide">
+                                                            @php
+                                                                $imageUrl = $offerImage->getImageUrl();
+                                                            @endphp
+                                                            <!-- Debug: {{ $imageUrl }} -->
+                                                            @if($offerImage->url)
+                                                                <a href="{{ $offerImage->url }}" target="_blank">
+                                                                    <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
+                                                                </a>
+                                                            @else
+                                                                <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <div class="no-offers">
+                                                    <p>@lang('No offers available')</p>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -470,6 +559,29 @@
     </style>
     <script>
         $(document).ready(function (){
+            // Show dashboard popup modal
+            if (!sessionStorage.getItem('dashboardPopupShown')) {
+                $('#dashboardPopupModal').modal({
+                    show: true,
+                    backdrop: true,
+                    keyboard: true
+                });
+                // Set flag in session storage
+                sessionStorage.setItem('dashboardPopupShown', 'true');
+            }
+            
+            // Handle close button click
+            $('#closePopupBtn').on('click', function() {
+                $('#dashboardPopupModal').modal('hide');
+            });
+            
+            // Also allow clicking anywhere on the modal to close it
+            $('#dashboardPopupModal').on('click', function(e) {
+                if ($(e.target).closest('.modal-content').length === 0 || $(e.target).is('#dashboardPopupModal')) {
+                    $('#dashboardPopupModal').modal('hide');
+                }
+            });
+            
             // Circle progress start
             @php
                 // Get configs
@@ -631,5 +743,145 @@
                 }, 1000)
             }
         })
+    </script>
+@endpush
+
+@push('style')
+    <style>
+        .offer-slider-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .offer-slider, .offer-slider-mobile {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .offer-slide {
+            position: relative;
+            overflow: hidden;
+            height: 150px;
+        }
+        
+        .offer-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .offer-slide a:hover img {
+            transform: scale(1.05);
+        }
+        
+        .no-offers {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            text-align: center;
+        }
+        
+        /* Slick slider custom styles */
+        .slick-dots {
+            bottom: 10px;
+        }
+        
+        .slick-dots li button:before {
+            color: #fff;
+            opacity: 0.5;
+        }
+        
+        .slick-dots li.slick-active button:before {
+            color: #fff;
+            opacity: 1;
+        }
+    </style>
+@endpush
+
+@push('script')
+    <script>
+        $(document).ready(function(){
+            console.log('Document ready');
+            console.log('Offer images count:', $('.offer-slider .offer-slide').length);
+            
+            // Check if slick is available
+            if (typeof $.fn.slick === 'undefined') {
+                console.error('Slick slider library is not loaded');
+                
+                // Load slick dynamically
+                var slickCss = document.createElement('link');
+                slickCss.rel = 'stylesheet';
+                slickCss.href = 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css';
+                document.head.appendChild(slickCss);
+                
+                var slickThemeCss = document.createElement('link');
+                slickThemeCss.rel = 'stylesheet';
+                slickThemeCss.href = 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css';
+                document.head.appendChild(slickThemeCss);
+                
+                var slickScript = document.createElement('script');
+                slickScript.src = 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js';
+                slickScript.onload = function() {
+                    console.log('Slick library loaded dynamically');
+                    initSliders();
+                };
+                document.body.appendChild(slickScript);
+            } else {
+                console.log('Slick library is available');
+                initSliders();
+            }
+            
+            function initSliders() {
+                try {
+                    $('.offer-slider').slick({
+                        dots: true,
+                        arrows: false,
+                        autoplay: true,
+                        autoplaySpeed: 3000,
+                        fade: true,
+                        cssEase: 'linear'
+                    });
+                    console.log('Desktop slider initialized');
+                    
+                    $('.offer-slider-mobile').slick({
+                        dots: true,
+                        arrows: false,
+                        autoplay: true,
+                        autoplaySpeed: 3000,
+                        fade: true,
+                        cssEase: 'linear'
+                    });
+                    console.log('Mobile slider initialized');
+                } catch (e) {
+                    console.error('Error initializing sliders:', e);
+                }
+            }
+        });
+    </script>
+@endpush
+
+@push('js')
+    <script>
+        "use strict";
+        $(document).ready(function () {
+            $('#dashboardPopupModal').modal('show');
+            
+            @if(basicControl()->dashboard_popup_url)
+            // Make the entire modal body clickable if URL is provided
+            $('#dashboardPopupModal .modal-body').css('cursor', 'pointer');
+            $('#dashboardPopupModal .modal-body').click(function(e) {
+                if (!$(e.target).is('a')) {
+                    window.open('{{ basicControl()->dashboard_popup_url }}', '_blank');
+                }
+            });
+            @endif
+        });
     </script>
 @endpush

@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BasicControl;
+use App\Models\OfferImage;
+use App\Traits\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Exception;
 
 class SecuritySettingsController extends Controller
 {
+    use Upload;
+    
     /**
      * Show the security settings index page
      */
@@ -65,5 +69,66 @@ class SecuritySettingsController extends Controller
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+    
+    /**
+     * Show the dashboard popup settings page
+     */
+    public function dashboardPopupSettings()
+    {
+        $data['basicControl'] = basicControl();
+        return view('admin.security.dashboard_popup', $data);
+    }
+    
+    /**
+     * Update dashboard popup settings
+     */
+    public function updateDashboardPopupSettings(Request $request)
+    {
+        $request->validate([
+            'dashboard_popup_image' => 'nullable|max:3072|image|mimes:jpg,jpeg,png',
+            'dashboard_popup_url' => 'nullable|url|max:255',
+            'show_dashboard_popup' => 'required|in:0,1'
+        ]);
+
+        try {
+            $basic = basicControl();
+            
+            if ($request->hasFile('dashboard_popup_image')) {
+                $image = $this->fileUpload($request->dashboard_popup_image, config('filelocation.popup.path'), null, null, 'webp', 80, $basic->dashboard_popup_image, $basic->dashboard_popup_image_driver);
+                if ($image) {
+                    $path = $image['path'];
+                    $driver = $image['driver'];
+                } else {
+                    return back()->with('error', 'Image could not be uploaded.');
+                }
+            }
+
+            $response = BasicControl::updateOrCreate([
+                'id' => $basic->id ?? ''
+            ], [
+                'dashboard_popup_image' => $path ?? $basic->dashboard_popup_image,
+                'dashboard_popup_image_driver' => $driver ?? $basic->dashboard_popup_image_driver,
+                'dashboard_popup_url' => $request->dashboard_popup_url,
+                'show_dashboard_popup' => $request->show_dashboard_popup
+            ]);
+
+            if (!$response) {
+                throw new Exception('Something went wrong when updating data');
+            }
+
+            Artisan::call('optimize:clear');
+            return back()->with('success', 'Dashboard popup settings updated successfully');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the offer images settings page
+     */
+    public function offerImagesSettings()
+    {
+        return redirect()->route('admin.offer-images.index');
     }
 }

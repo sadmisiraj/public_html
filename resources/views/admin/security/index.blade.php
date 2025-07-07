@@ -55,6 +55,44 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon">
+                            <i class="text-primary bi bi-image"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>@lang('Dashboard Popup')</h5>
+                            <span>@lang('Configure popup image shown to users when they first login')</span>
+                            <span class="mt-1 link-text">
+                                <a href="{{ route('admin.security.dashboard.popup') }}">@lang('Change Setting')
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon">
+                            <i class="text-primary bi bi-images"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>@lang('Offer Images')</h5>
+                            <span>@lang('Manage offer images displayed in user dashboard')</span>
+                            <span class="mt-1 link-text">
+                                <a href="{{ route('admin.security.offer-images') }}">@lang('Manage Images')
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- This can be expanded later with more security settings -->
         </div>

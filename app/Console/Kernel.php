@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
         PayoutCurrencyUpdateCron::class,
         PayoutCryptoCurrencyUpdateCron::class,
         DistributeProfit::class,
-        RecalculateRgpPoints::class
+        RecalculateRgpPoints::class,
+        Commands\UpdateKycStatus::class
     ];
 
     /**

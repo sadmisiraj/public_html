@@ -68,6 +68,10 @@ class SmsConfigController extends Controller
                 'VONAGE_FROM' => $request->postmark_token ?? "VONAGE_FROM",
                 'VONAGE_API_KEY' => $request->postmark_token ?? $smsControlMethod['vonage']['vonage_api_key']['value'],
                 'VONAGE_API_SECRET' => $request->postmark_token ?? $smsControlMethod['vonage']['vonage_api_secret']['value'],
+                'SMSROOT_API_KEY' => $request->smsroot_api_key ?? $smsControlMethod['smsroot']['smsroot_api_key']['value'],
+                'SMSROOT_ROUTE_ID' => $request->smsroot_route_id ?? $smsControlMethod['smsroot']['smsroot_route_id']['value'],
+                'SMSROOT_SENDER_ID' => $request->smsroot_sender_id ?? $smsControlMethod['smsroot']['smsroot_sender_id']['value'],
+                'SMSROOT_TEMPLATE_ID' => $request->smsroot_template_id ?? $smsControlMethod['smsroot']['smsroot_template_id']['value'],
             ];
 
             BasicService::setEnv($env);

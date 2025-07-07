@@ -201,79 +201,117 @@ trait Notify
 
     public function verifyToSms($user, $templateKey, $params = [], $requestMessage = null)
     {
+        $phone = $user->phone_code . '' . $user->phone;
+            
+        // Build the SMS URL with parameters
+        $baseUrl = 'https://sms.hitechsms.com/app/smsapi/index.php';
+        $params = [
+            'key' => '368677E4D31644',
+            'campaign' => '0',
+            'routeid' => '13',
+            'type' => 'text',
+            'contacts' => $user->phone,
+            'senderid' => 'REINOG',
+            'msg' => 'Dear User,
+Your Authentication OTP for  to Reino Gold portal is ' . $user->verify_code . ' Valid for 30 minutes. Please do not share this OTP.
+Regards,
+Reino Gold / MIGOZA PRIVATE LIMITED',
+            'template_id' => '1207175145415676177'
+        ];
+        
+        $actionUrl = $baseUrl . '?' . http_build_query($params);
 
-        $basic = basicControl();
-        if ($basic->sms_verification == 1) {
-            return false;
-        }
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $actionUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET'
+        ));
 
-        $smsControl = ManualSmsConfig::firstOrCreate(['id' => 1]);
-        $templateObj = NotificationTemplate::where('template_key', $templateKey)->where('language_id', $user->language_id)->where('notify_for', 0)->first();
-        if (!$templateObj) {
-            $templateObj = NotificationTemplate::where('template_key', $templateKey)->where('notify_for', 0)->first();
-        }
-
-
-        if (!$templateObj || $templateObj->status['sms'] == 0) {
-            return false;
-        }
-
-
-        if (!$templateObj && $requestMessage == null) {
-            return false;
-        } else {
-            if ($templateObj) {
-                $template = $templateObj->sms;
-                foreach ($params as $code => $value) {
-                    $template = str_replace('[[' . $code . ']]', $value, $template);
-                }
-            } else {
-                $template = $requestMessage;
-            }
-        }
-
-        if (config('SMSConfig.default') == 'manual') {
-
-            $phone = $user->phone_code . '' . $user->phone;
-            $headerData = is_null($smsControl->header_data) ? [] : json_decode($smsControl->header_data, true);
-            $paramData = is_null($smsControl->header_data) ? [] : json_decode($smsControl->header_data, true);
-            $paramData = http_build_query($paramData);
-            $actionUrl = $smsControl->header_data;
-            $actionMethod = $smsControl->action_method;
-            $formData = is_null($smsControl->form_data) ? [] : json_decode($smsControl->form_data, true);
-            $formData = recursive_array_replace("[[receiver]]", $phone, recursive_array_replace("[[message]]", $template, $formData));
-            $formData = isset($headerData['Content-Type']) && $headerData['Content-Type'] == "application/x-www-form-urlencoded" ? http_build_query($formData) : (isset($headerData['Content-Type']) && $headerData['Content-Type'] == "application/json" ? json_encode($formData) : $formData);
-
-            foreach ($headerData as $key => $data) {
-                $headerData[] = "{$key}:$data";
-            }
-
-            if ($actionMethod == 'GET') {
-                $actionUrl = $actionUrl . '?' . $paramData;
-            }
-
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => $actionUrl,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => $actionMethod,
-                CURLOPT_POSTFIELDS => $formData,
-                CURLOPT_HTTPHEADER => $headerData
-            ));
-
-            $response = curl_exec($curl);
-            curl_close($curl);
-            return $response;
-        } else {
-            BaseSmsService::sendSMS($user->phone_code . $user->phone, $template);
-            return true;
-        }
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
     }
+    // public function verifyToSms($user, $templateKey, $params = [], $requestMessage = null)
+    // {
+
+    //     $basic = basicControl();
+    //     if ($basic->sms_verification == 1) {
+    //         return false;
+    //     }
+
+    //     $smsControl = ManualSmsConfig::firstOrCreate(['id' => 1]);
+    //     $templateObj = NotificationTemplate::where('template_key', $templateKey)->where('language_id', $user->language_id)->where('notify_for', 0)->first();
+    //     if (!$templateObj) {
+    //         $templateObj = NotificationTemplate::where('template_key', $templateKey)->where('notify_for', 0)->first();
+    //     }
+
+
+    //     if (!$templateObj || $templateObj->status['sms'] == 0) {
+    //         return false;
+    //     }
+
+
+    //     if (!$templateObj && $requestMessage == null) {
+    //         return false;
+    //     } else {
+    //         if ($templateObj) {
+    //             $template = $templateObj->sms;
+    //             foreach ($params as $code => $value) {
+    //                 $template = str_replace('[[' . $code . ']]', $value, $template);
+    //             }
+    //         } else {
+    //             $template = $requestMessage;
+    //         }
+    //     }
+
+    //     if (config('SMSConfig.default') == 'manual') {
+
+    //         $phone = $user->phone_code . '' . $user->phone;
+    //         $headerData = is_null($smsControl->header_data) ? [] : json_decode($smsControl->header_data, true);
+    //         $paramData = is_null($smsControl->header_data) ? [] : json_decode($smsControl->header_data, true);
+    //         $paramData = http_build_query($paramData);
+    //         $actionUrl = $smsControl->header_data;
+    //         $actionMethod = $smsControl->action_method;
+    //         $formData = is_null($smsControl->form_data) ? [] : json_decode($smsControl->form_data, true);
+    //         $formData = recursive_array_replace("[[receiver]]", $phone, recursive_array_replace("[[message]]", $template, $formData));
+    //         $formData = isset($headerData['Content-Type']) && $headerData['Content-Type'] == "application/x-www-form-urlencoded" ? http_build_query($formData) : (isset($headerData['Content-Type']) && $headerData['Content-Type'] == "application/json" ? json_encode($formData) : $formData);
+
+    //         foreach ($headerData as $key => $data) {
+    //             $headerData[] = "{$key}:$data";
+    //         }
+
+    //         if ($actionMethod == 'GET') {
+    //             $actionUrl = $actionUrl . '?' . $paramData;
+    //         }
+
+    //         $curl = curl_init();
+    //         curl_setopt_array($curl, array(
+    //             CURLOPT_URL => $actionUrl,
+    //             CURLOPT_RETURNTRANSFER => true,
+    //             CURLOPT_ENCODING => '',
+    //             CURLOPT_MAXREDIRS => 10,
+    //             CURLOPT_TIMEOUT => 0,
+    //             CURLOPT_FOLLOWLOCATION => true,
+    //             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    //             CURLOPT_CUSTOMREQUEST => $actionMethod,
+    //             CURLOPT_POSTFIELDS => $formData,
+    //             CURLOPT_HTTPHEADER => $headerData
+    //         ));
+
+    //         $response = curl_exec($curl);
+    //         curl_close($curl);
+    //         return $response;
+    //     } else {
+    //         BaseSmsService::sendSMS($user->phone_code . $user->phone, $template);
+    //         return true;
+    //     }
+    // }
 
     public function userFirebasePushNotification($user, $templateKey, $params = [], $action = null)
     {

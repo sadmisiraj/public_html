@@ -113,6 +113,14 @@ return [
     ],
     'cookie' => [
         'path' => 'cookie'
+    ],
+    'popup' => [
+        'path' => 'popup',
+        'size' => '800x600'
+    ],
+    'offerImage' => [
+        'path' => 'offerImage',
+        'size' => '600x400'
     ]
 
 

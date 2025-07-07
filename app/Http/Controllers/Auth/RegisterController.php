@@ -146,6 +146,8 @@ class RegisterController extends Controller
             ];
         }
 
+        $rules['first_name'] = ['nullable', 'string', 'max:50'];
+        $rules['last_name'] = ['nullable', 'string', 'max:50'];
         $rules['email'] = ['required', 'string', 'email', 'max:255',  'unique:users,email'];
         $rules['phone'] = ['required', 'string', 'unique:users,phone', new PhoneLength($phoneCode)];
         $rules['phone_code'] = ['required', 'string', 'max:15'];
@@ -189,8 +191,8 @@ class RegisterController extends Controller
         $referralNode = isset($data['referral_node']) ? $data['referral_node'] : session()->get('referral_node');
 
         $user = User::create([
-            'firstname' => null,
-            'lastname' => null,
+            'firstname' => $data['first_name'] ?? null,
+            'lastname' => $data['last_name'] ?? null,
             'username' => $username,
             'email' => $data['email'],
             'referral_id' => $sponsorId,

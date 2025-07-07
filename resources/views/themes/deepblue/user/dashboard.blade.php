@@ -18,8 +18,31 @@
         <!-- /PAGE-NAVIGATOR -->
     @endpush
 
-
-
+    <!-- Dashboard Popup Modal -->
+    @if(basicControl()->show_dashboard_popup && basicControl()->dashboard_popup_image)
+    <div class="modal fade" id="dashboardPopupModal" tabindex="-1" role="dialog" aria-labelledby="dashboardPopupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    @if(basicControl()->dashboard_popup_url)
+                        <a href="{{ basicControl()->dashboard_popup_url }}" target="_blank">
+                            <img src="{{ getFile(basicControl()->dashboard_popup_image_driver, basicControl()->dashboard_popup_image) }}" 
+                                 class="img-fluid" alt="Dashboard Popup" style="cursor: pointer;">
+                        </a>
+                    @else
+                        <img src="{{ getFile(basicControl()->dashboard_popup_image_driver, basicControl()->dashboard_popup_image) }}" 
+                             class="img-fluid" alt="Dashboard Popup">
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- DASHBOARD -->
     <section id="dashboard">
@@ -543,5 +566,34 @@
             document.execCommand("copy");
             Notiflix.Notify.success(`Copied: ${copyText.value}`);
         }
+
+        // Dashboard Popup Modal
+        $(document).ready(function() {
+            // Check if we've shown the popup in this session
+            if (!sessionStorage.getItem('dashboardPopupShown')) {
+                $('#dashboardPopupModal').modal('show');
+                // Set flag in session storage
+                sessionStorage.setItem('dashboardPopupShown', 'true');
+            }
+        });
+    </script>
+@endpush
+
+@push('js')
+    <script>
+        "use strict";
+        $(document).ready(function () {
+            $('#dashboardPopupModal').modal('show');
+            
+            @if(basicControl()->dashboard_popup_url)
+            // Make the entire modal body clickable if URL is provided
+            $('#dashboardPopupModal .modal-body').css('cursor', 'pointer');
+            $('#dashboardPopupModal .modal-body').click(function(e) {
+                if (!$(e.target).is('a')) {
+                    window.open('{{ basicControl()->dashboard_popup_url }}', '_blank');
+                }
+            });
+            @endif
+        });
     </script>
 @endpush

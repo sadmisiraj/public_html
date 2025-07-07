@@ -28,6 +28,9 @@
     <link rel="stylesheet" href="{{asset(template(true).'css/jquery-ui.structure.min.css')}}">
     <!-- Line progressbar Css link -->
     <link rel="stylesheet" href="{{asset(template(true).'css/jquery.lineProgressbar.css')}}">
+    <!-- Slick Slider CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css">
     <!-- Style Css link -->
     <link rel="stylesheet" href="{{asset(template(true).'css/dashboard.css')}}">
     <!-- Custom RGP Css link -->
@@ -100,6 +103,8 @@
 <script src="{{asset(template(true).'js/circle-progress.min.js')}}"></script>
 <!-- Line progressbar Js link -->
 <script src="{{asset(template(true).'js/jquery.lineProgressbar.js')}}"></script>
+<!-- Slick Slider JS -->
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <!-- Main Js slink -->
 <script src="{{asset(template(true).'js/dashboard.js')}}"></script>
 

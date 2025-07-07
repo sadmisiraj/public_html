@@ -14,6 +14,7 @@
                         <div class="col-md-4 mb-3 mb-md-0">
                             <small class="text-cap text-secondary mb-0">@lang('Amount paid:')</small>
                             <h5 class="amount"></h5>
+                            <small class="amount-in-words text-success"></small>
                         </div>
 
                         <div class="col-md-4 mb-3 mb-md-0">
@@ -61,6 +62,75 @@
 @push('script')
     <script>
         "use strict";
+        
+        // Function to convert number to words
+        function numberToWords(num) {
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 
+                'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            
+            if (num === 0) return 'Zero';
+            
+            function convertLessThanOneThousand(num) {
+                if (num === 0) return '';
+                if (num < 20) return ones[num];
+                const ten = Math.floor(num / 10);
+                const unit = num % 10;
+                return tens[ten] + (unit ? ' ' + ones[unit] : '');
+            }
+            
+            function convert(num) {
+                if (num === 0) return 'Zero';
+                let result = '';
+                
+                // Handle crores (10,000,000+)
+                if (num >= 10000000) {
+                    result += convert(Math.floor(num / 10000000)) + ' Crore ';
+                    num %= 10000000;
+                }
+                
+                // Handle lakhs (100,000+)
+                if (num >= 100000) {
+                    result += convert(Math.floor(num / 100000)) + ' Lakh ';
+                    num %= 100000;
+                }
+                
+                // Handle thousands (1,000+)
+                if (num >= 1000) {
+                    result += convertLessThanOneThousand(Math.floor(num / 1000)) + ' Thousand ';
+                    num %= 1000;
+                }
+                
+                // Handle hundreds
+                if (num >= 100) {
+                    result += ones[Math.floor(num / 100)] + ' Hundred ';
+                    num %= 100;
+                }
+                
+                // Handle tens and ones
+                if (num > 0) {
+                    if (result !== '') result += 'and ';
+                    result += convertLessThanOneThousand(num);
+                }
+                
+                return result;
+            }
+            
+            // Split number into integer and decimal parts
+            const parts = num.toString().split('.');
+            let result = convert(parseInt(parts[0]));
+            
+            // Handle decimal part
+            if (parts.length > 1) {
+                result += ' Point';
+                for (let i = 0; i < parts[1].length; i++) {
+                    result += ' ' + ones[parseInt(parts[1][i])];
+                }
+            }
+            
+            return result;
+        }
+        
         $(document).on("click", '.edit_btn', function (e) {
             let id = $(this).data('id');
             let status = $(this).data('status');
@@ -119,7 +189,21 @@
             $('.get-feedback').html(feedbackField)
             $('.payment_information').html(list);
             $('.image').html(list);
-            $('.amount').html($(this).data('amount'));
+            
+            // Set amount and convert to words
+            let amount = $(this).data('amount');
+            $('.amount').html(amount);
+            
+            // Extract the numeric value from the amount string (removing currency symbol and commas)
+            let numericAmount = amount.replace(/[^\d.-]/g, '');
+            let amountInWords = numberToWords(parseFloat(numericAmount));
+            
+            // Add currency code if present in the amount string
+            let currencyMatch = amount.match(/[A-Z]{3}$/);
+            let currencyCode = currencyMatch ? currencyMatch[0] : '';
+            
+            $('.amount-in-words').html(amountInWords + (currencyCode ? ' ' + currencyCode : ''));
+            
             $('.method').html($(this).data('method'));
             $('.date').html($(this).data('datepaid'));
 

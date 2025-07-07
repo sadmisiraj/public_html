@@ -22,6 +22,12 @@ return [
             'vonage_api_key' => ['value' => env('VONAGE_API_KEY'), 'is_protected' => true],
             'vonage_api_secret' => ['value' => env('VONAGE_API_SECRET'), 'is_protected' => true],
         ],
+        'smsroot' => [
+            'smsroot_api_key' => ['value' => env('SMSROOT_API_KEY'), 'is_protected' => true],
+            'smsroot_route_id' => ['value' => env('SMSROOT_ROUTE_ID', '13'), 'is_protected' => false],
+            'smsroot_sender_id' => ['value' => env('SMSROOT_SENDER_ID', '40885'), 'is_protected' => false],
+            'smsroot_template_id' => ['value' => env('SMSROOT_TEMPLATE_ID', '8931'), 'is_protected' => false],
+        ],
         'manual' => [
         ]
     ]

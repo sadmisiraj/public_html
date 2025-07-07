@@ -451,7 +451,7 @@ class HomeController extends Controller
                     $user[$wallet_type] = round(($user[$wallet_type] - ($transferCharge + $request->amount)), 2);
                     $user->save();
 
-                    $receiver[$wallet_type] += round($request->amount, 2);
+                    $receiver['balance'] += round($request->amount, 2);
                     $receiver->save();
 
 
@@ -480,10 +480,10 @@ class HomeController extends Controller
                     $receiverTransaction->amount = round($request->amount, 2);
                     $receiverTransaction->charge = 0;
                     $receiverTransaction->trx_type = '+';
-                    $receiverTransaction->balance_type = $wallet_type;
+                    $receiverTransaction->balance_type = 'balance';
                     $receiverTransaction->remarks = 'Balance Received from ' . $user->username;
                     $receiverTransaction->trx_id = $sendTaka->trx;
-                    $receiverTransaction->final_balance = $receiver[$wallet_type];
+                    $receiverTransaction->final_balance = $receiver['balance'];
                     $receiverTransaction->save();
 
                     $currentDate = dateTime(Carbon::now());

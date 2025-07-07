@@ -351,6 +351,64 @@
                                                                 <span
                                                                     class="KycverifiedMessage text-center text-success">@lang('Your KYC is Verified')</span>
                                         </div>
+                                        
+                                        <!-- Display Aadhar Card Information -->
+                                        @if(isset($user->userKyc) && isset($user->userKyc->kyc_info->aadhar_number))
+                                        <div class="row mt-4">
+                                            <div class="col-12 mb-3">
+                                                <h5>@lang('Aadhar Card Information')</h5>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">@lang('Aadhar Card Number')</label>
+                                                <p>{{ $user->userKyc->kyc_info->aadhar_number->field_value }}</p>
+                                            </div>
+                                            
+                                            <div class="col-md-12 mb-3">
+                                                <div class="row">
+                                                    @if(isset($user->userKyc->kyc_info->aadhar_front))
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label fw-bold">@lang('Aadhar Card Front')</label>
+                                                        <div>
+                                                            <img src="{{ getFile($user->userKyc->kyc_info->aadhar_front->field_driver, $user->userKyc->kyc_info->aadhar_front->field_value) }}" 
+                                                                 alt="Aadhar Front" class="img-thumbnail" style="max-height: 200px;">
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    
+                                                    @if(isset($user->userKyc->kyc_info->aadhar_back))
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label fw-bold">@lang('Aadhar Card Back')</label>
+                                                        <div>
+                                                            <img src="{{ getFile($user->userKyc->kyc_info->aadhar_back->field_driver, $user->userKyc->kyc_info->aadhar_back->field_value) }}" 
+                                                                 alt="Aadhar Back" class="img-thumbnail" style="max-height: 200px;">
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        
+                                        <!-- Display Bank Information -->
+                                        @if(isset($user->bankDetails))
+                                        <div class="row mt-4">
+                                            <div class="col-12 mb-3">
+                                                <h5>@lang('Bank Information')</h5>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label fw-bold">@lang('Bank Name')</label>
+                                                <p>{{ $user->bankDetails->bank_name }}</p>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label fw-bold">@lang('Account Number')</label>
+                                                <p>{{ $user->bankDetails->account_number }}</p>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label fw-bold">@lang('IFSC Code')</label>
+                                                <p>{{ $user->bankDetails->ifsc_code }}</p>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             @else
@@ -434,6 +492,40 @@
                                                         @endif
 
                                                 @endforeach
+
+                                                <!-- Aadhar Card Fields -->
+                                                <div class="col-12 mt-4">
+                                                    <h4>@lang('Aadhar Card Details')</h4>
+                                                    <p class="text-muted small">@lang('Please provide your Aadhar card information for verification')</p>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="aadhar_number" class="form-label">@lang('Aadhar Card Number')</label>
+                                                    <input type="text" name="aadhar_number" class="form-control" 
+                                                           value="{{ old('aadhar_number') ?? (isset($user->userKyc) && isset($user->userKyc->kyc_info->aadhar_number) ? $user->userKyc->kyc_info->aadhar_number->field_value : '') }}" 
+                                                           id="aadhar_number" required placeholder="Enter 12-digit Aadhar number">
+                                                    @if($errors->has('aadhar_number'))
+                                                        <div class="error text-danger">@lang($errors->first('aadhar_number'))</div>
+                                                    @endif
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="aadhar_front" class="form-label">@lang('Aadhar Card Front Side')</label>
+                                                    <input type="file" name="aadhar_front" class="form-control" 
+                                                           id="aadhar_front" accept="image/*" required>
+                                                    @if($errors->has('aadhar_front'))
+                                                        <div class="error text-danger">@lang($errors->first('aadhar_front'))</div>
+                                                    @endif
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="aadhar_back" class="form-label">@lang('Aadhar Card Back Side')</label>
+                                                    <input type="file" name="aadhar_back" class="form-control" 
+                                                           id="aadhar_back" accept="image/*" required>
+                                                    @if($errors->has('aadhar_back'))
+                                                        <div class="error text-danger">@lang($errors->first('aadhar_back'))</div>
+                                                    @endif
+                                                </div>
 
                                                 <!-- Bank Details Fields -->
                                                 <div class="col-12 mt-4">

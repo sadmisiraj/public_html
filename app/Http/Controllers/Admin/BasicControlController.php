@@ -262,4 +262,48 @@ class BasicControlController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+
+    public function dashboardPopupSettings()
+    {
+        return view('admin.control_panel.dashboard_popup');
+    }
+
+    public function dashboardPopupUpdate(Request $request)
+    {
+        $request->validate([
+            'dashboard_popup_image' => 'nullable|max:3072|image|mimes:jpg,jpeg,png',
+            'show_dashboard_popup' => 'required|in:0,1'
+        ]);
+
+        try {
+            $basic = BasicControl();
+            
+            if ($request->hasFile('dashboard_popup_image')) {
+                $image = $this->fileUpload($request->dashboard_popup_image, config('filelocation.popup.path'), null, null, 'webp', 80, $basic->dashboard_popup_image, $basic->dashboard_popup_image_driver);
+                if ($image) {
+                    $path = $image['path'];
+                    $driver = $image['driver'];
+                } else {
+                    return back()->with('error', 'Image could not be uploaded.');
+                }
+            }
+
+            $response = BasicControl::updateOrCreate([
+                'id' => $basic->id ?? ''
+            ], [
+                'dashboard_popup_image' => $path ?? $basic->dashboard_popup_image,
+                'dashboard_popup_image_driver' => $driver ?? $basic->dashboard_popup_image_driver,
+                'show_dashboard_popup' => $request->show_dashboard_popup
+            ]);
+
+            if (!$response) {
+                throw new Exception('Something went wrong when updating data');
+            }
+
+            session()->flash('success', 'Dashboard popup settings updated successfully');
+            return back();
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 }

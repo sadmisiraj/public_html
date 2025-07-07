@@ -413,6 +413,11 @@ class User extends Authenticatable
         return $this->hasOne(UserBankDetail::class);
     }
 
+    public function userKyc()
+    {
+        return $this->hasOne(UserKyc::class)->latest();
+    }
+
     /**
      * Get the RGP transactions for the user.
      */

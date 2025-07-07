@@ -16,6 +16,11 @@ return [
             'icon' => 'bi bi-receipt',
             'short_description' => 'Configure purchase charges such as GST, taxes, processing fees and other charges applied to gold purchases.',
         ],
+        'dashboard-popup' => [
+            'route' => 'admin.dashboard.popup',
+            'icon' => 'fa-thin fa-image',
+            'short_description' => 'Configure popup image shown to users when they first login to the dashboard.',
+        ],
         'GDPR Cookie' => [
             'route' => 'admin.cookie',
             'icon' => 'fa-thin fa-cookie',
