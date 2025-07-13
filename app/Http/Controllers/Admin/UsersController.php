@@ -264,6 +264,8 @@ class UsersController extends Controller
             'image' => 'nullable|mimes:jpeg,png,jpg,gif|sizes:2048',
             'language_id' => Rule::in($languages),
             'referral_node' => 'nullable|string|in:left,right,',
+            'dashboard_label' => 'nullable|string|max:255',
+            'dashboard_value' => 'nullable|string|max:255',
         ]);
 
 
@@ -298,6 +300,8 @@ class UsersController extends Controller
                 'image_driver' => $driver ?? $user->image_driver,
                 'status' => $request->status,
                 'referral_node' => $request->referral_node,
+                'dashboard_label' => $request->dashboard_label,
+                'dashboard_value' => $request->dashboard_value,
             ]);
 
             return back()->with('success', 'Basic Information Updated Successfully.');
@@ -393,6 +397,7 @@ class UsersController extends Controller
             $basic = basicControl();
             $balance = 0;
             $walletType = 'wallet';
+            $remarks = $request->input('remarks') ?? null;
             if ($request->balance_operation == 1) {
 
                 if ($request->balance_type == 1){
@@ -424,12 +429,12 @@ class UsersController extends Controller
                 $transaction->final_balance = $balance;
                 $transaction->charge = 0;
                 $transaction->trx_type = '+';
-                $transaction->remarks = "Add Balance to " . match($walletType) {
+                $transaction->remarks = $remarks ?: ("Add Balance to " . match($walletType) {
                     'profit' => 'Profit wallet',
                     'wallet' => 'Deposit wallet',
                     'profit_balance' => 'Performance wallet',
                     default => $walletType
-                };
+                });
                 $transaction->trx_id = $fund->transaction;
                 $transaction->balance_type = $walletType;
                 $fund->transactional()->save($transaction);
@@ -480,7 +485,7 @@ class UsersController extends Controller
                 $transaction->final_balance = $user->balance;
                 $transaction->charge = 0;
                 $transaction->trx_type = '-';
-                $transaction->remarks = "Deduction Balance from $walletType";
+                $transaction->remarks = $remarks ?: "Deduction Balance from $walletType";
                 $transaction->balance_type = $walletType;
                 $transaction->save();
 
@@ -1447,6 +1452,23 @@ class UsersController extends Controller
             $export = new ReportExport($data, $headers, $footer);
             return Excel::download($export, $fileName);
         }
+    }
+
+    public function dashboardTileUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'dashboard_label' => 'nullable|string|max:255',
+            'dashboard_value' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'dashboard_label' => $request->dashboard_label,
+            'dashboard_value' => $request->dashboard_value,
+        ]);
+
+        return back()->with('success', 'Dashboard Tile Updated Successfully.');
     }
 
 

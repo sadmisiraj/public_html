@@ -276,37 +276,37 @@ class PayoutController extends Controller
             
             $user = Auth::user();
 
-            // Check balance based on wallet type
+            // Calculate 10% fee and net payout
+            $fee = round($amount * 0.10, 2);
+            $netPayout = round($amount - $fee, 2);
+            // Check balance based on wallet type (user should have at least $amount)
             if ($request->wallet_type == 'balance'){
-                if ($user->balance < $checkAmountValidateData['net_amount_in_base_currency']){
+                if ($user->balance < $amount){
                     throw new \Exception('Insufficient Balance');
                 }
             } elseif ($request->wallet_type == 'interest_balance') {
-                if ($user->interest_balance < $checkAmountValidateData['net_amount_in_base_currency']){
+                if ($user->interest_balance < $amount){
                     throw new \Exception('Insufficient Performance Balance');
                 }
             } elseif ($request->wallet_type == 'profit_balance') {
-                if ($user->profit_balance < $checkAmountValidateData['net_amount_in_base_currency']){
+                if ($user->profit_balance < $amount){
                     throw new \Exception('Insufficient Profit Balance');
                 }
             }
-
+            // Save payout
             $payout = new Payout();
             $payout->user_id = $user->id;
-            $payout->payout_method_id = $checkAmountValidateData['payout_method_id'];
-            $payout->payout_currency_code = $checkAmountValidateData['currency'];
-            $payout->amount = $checkAmountValidateData['amount'];
-            $payout->charge = $checkAmountValidateData['payout_charge'];
-            $payout->net_amount = $checkAmountValidateData['net_payout_amount'];
-            $payout->amount_in_base_currency = $checkAmountValidateData['amount_in_base_currency'];
-            $payout->charge_in_base_currency = $checkAmountValidateData['charge_in_base_currency'];
-            $payout->net_amount_in_base_currency = $checkAmountValidateData['net_amount_in_base_currency'];
-            $payout->information = null;
-            $payout->feedback = null;
+            $payout->payout_method_id = $payoutMethodId;
+            $payout->payout_currency_code = $supportedCurrency;
+            $payout->amount = $amount;
+            $payout->charge = $fee;
+            $payout->net_amount = $netPayout;
             $payout->status = 0;
             $payout->wallet_type = $request->wallet_type;
             $payout->use_bank_account = $useBankAccount ? 1 : 0;
             $payout->save();
+            // Deduct balance
+            updateBalance($user->id, $amount, 0, $request->wallet_type);
             
             // If bank account is selected, process it directly without going to the confirm page
             if ($isBankAccount) {
@@ -854,6 +854,17 @@ class PayoutController extends Controller
         $this->sendMailSms($user, 'PAYOUT_REQUEST_FROM', $params);
         $this->userPushNotification($user, 'PAYOUT_REQUEST_FROM', $params, $action);
         $this->userFirebasePushNotification($user, 'PAYOUT_REQUEST_FROM', $params, $firebaseAction);
+    }
+
+    public function downloadInvoice($trx_id)
+    {
+        $payout = Payout::where('user_id', Auth::id())
+            ->where('trx_id', $trx_id)
+            ->with(['user', 'method'])
+            ->firstOrFail();
+        $user = Auth::user();
+        $pdf = \PDF::loadView('pdf.payout_invoice', compact('payout', 'user'));
+        return $pdf->download('sale_invoice_' . $payout->trx_id . '.pdf');
     }
 
 }

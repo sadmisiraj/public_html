@@ -62,6 +62,10 @@
                                         </tr>
                                     @endif
                                     
+                                    <tr>
+                                        <th>@lang('Address')</th>
+                                        <td>{{ $order->address ?? '-' }}</td>
+                                    </tr>
                                     <tr class="table-primary">
                                         <th><strong>@lang('Total Price')</strong></th>
                                         <td><strong>{{ currencyPosition($order->total_price) }}</strong></td>

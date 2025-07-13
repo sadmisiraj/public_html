@@ -57,248 +57,138 @@
         <!-- Page title end -->
         <div class="dashboard-top">
             <div class="row g-4 align-items-center">
-                <div class="col-lg-4">
-                    <div class="text-box text-center text-lg-start">
-                        <div
-                            class="d-flex align-items-center gap-3 justify-content-center justify-content-lg-start">
-                            <h2 class="title mb-1">@lang('Hi'), {{auth()->user()->fullname}}!</h2>
-                            <div class="icon-box">
-                                <i class="fa-regular fa-money-bill"></i>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-center" style="height: 100%;">
+                        <!-- Greeting Text (left, flex: 1) -->
+                        <div class="text-box text-center text-lg-start flex-grow-1" style="min-width:0;">
+                            <div class="d-flex align-items-center gap-3 justify-content-center justify-content-lg-start">
+                                <h2 class="title mb-1" style="font-size: 1.5rem;">@lang('Hi'), {{auth()->user()->fullname}}!</h2>
+                                <div class="icon-box">
+                                    <i class="fa-regular fa-money-bill"></i>
+                                </div>
                             </div>
-                        </div>   <div class="profile-content">
-                         
-                          <h4>user<span>{{'@'.auth()->user()->username}}</span></h4> 
+                            <div class="profile-content">
+                                <h4 style="font-size: 1rem;">user<span>{{'@'.auth()->user()->username}}</span></h4>
+                            </div>
+                            <h2 class="title mb-1" style="font-size: 1.2rem;">
+                                {!! styleSentence($content['single']['heading']??'',5) !!}
+                            </h2>
+                            <h5 class="sub-title " style="font-size: 1rem;">
+                                {!! $content['single']['sub_heading']??'' !!}
+                            </h5>
                         </div>
-                        <h2 class="title mb-1">
-                            {!! styleSentence($content['single']['heading']??'',5) !!}
-                        </h2>
-                        <h5 class="sub-title ">
-                            {!! $content['single']['sub_heading']??'' !!}
-                        </h5>
+                        <!-- Dashboard Tile (right of greeting, auto width) -->
+                        @if(auth()->user()->dashboard_label && auth()->user()->dashboard_value)
+                        <div class="card text-center ms-3" style="min-width:130px; max-width:180px; margin-bottom: 0;">
+                            <div class="card-body p-3">
+                                <h5 class="card-title mb-1" style="font-size:1.1em;">{{ auth()->user()->dashboard_label }}</h5>
+                                <p class="card-text mb-0" style="font-size:1.4em; font-weight:bold;">{{ auth()->user()->dashboard_value }}</p>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
-                <div class="col-lg-8">
-                    @if($announcements->count())
-                        <div class="mb-3">
-                            <marquee behavior="scroll" direction="left" style="background: #fffbe6; color: #b38b00; padding: 10px; border-radius: 5px; font-weight: bold;">
-                                {{ $announcements->implode(' | ') }}
-                            </marquee>
-                        </div>
-                    @endif
-                    <div class="desktop-view-card-section">
-                        <div class="grid-container">
-                            <div class="item">
-                                <div class="deposit-invest-box">
-                                    <div class="img-box">
-                                        <img src="{{asset(template(true).'img/box-card/market-analysis-31.png')}}" alt="icon">
+                <div class="col-lg-6">
+                    <!-- Offer Slider (right half, taller and image fits) -->
+                    <div class="offer-slider-container" style="height: 297px; display: flex; align-items: center;"> <!-- 270px * 1.1 = 297px -->
+                        @php
+                            $offerImages = \App\Models\OfferImage::where('status', true)->orderBy('order', 'asc')->get();
+                            if ($offerImages->isEmpty()) {
+                                // Create a default offer image for testing
+                                $defaultImage = new \App\Models\OfferImage([
+                                    'title' => 'Default Offer',
+                                    'image' => 'offerImage/test-offer.png',
+                                    'image_driver' => 'local',
+                                    'url' => null,
+                                    'order' => 1,
+                                    'status' => true
+                                ]);
+                                $offerImages = collect([$defaultImage]);
+                            }
+                        @endphp
+                        @if($offerImages->count() > 0)
+                            <div class="offer-slider" style="width: 100%; height: 100%;">
+                                @foreach($offerImages as $offerImage)
+                                    <div class="offer-slide" style="height: 100%;">
+                                        @php
+                                            $imageUrl = $offerImage->getImageUrl();
+                                        @endphp
+                                        @if($offerImage->url)
+                                            <a href="{{ $offerImage->url }}" target="_blank">
+                                                <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid" style="height: 100%; width: 100%; object-fit: contain;">
+                                            </a>
+                                        @else
+                                            <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid" style="height: 100%; width: 100%; object-fit: contain;">
+                                        @endif
                                     </div>
-                                    <div class="text-box">
-                                        <a href="{{route('user.plan')}}" class="cmn-btn"><i class="fa-regular fa-usd-circle"></i>
-                                            @lang('Purchase')</a>
-                                        <a href="{{route('user.addFund')}}" class="cmn-btn"><i class="fa-regular fa-wallet"></i>
-                                            @lang('Deposit')</a>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
-                            <div class="item">
-                                <div class="box-card2">
-                                    <div class="img-box">
-                                        <img src="{{asset(template(true).'img/box-card/bitcoin-46.png')}}" alt="icon">
-                                    </div>
-                                    <div class="text-box">
-                                        <h4 class="title mb-0">{{currencyPosition(auth()->user()->balance+0)}}</h4>
-                                        <p class="mb-0">@lang('Deposit Balance')</p>
-                                    </div>
-                                </div>
+                        @else
+                            <div class="no-offers" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <p>@lang('No offers available')</p>
                             </div>
-                            <div class="item">
-                                <div class="box-card2">
-                                    <div class="img-box">
-                                        <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="icon">
-                                    </div>
-                                    <div class="text-box">
-                                        <h5 class="mb-0">{{currencyPosition(auth()->user()->profit_balance+0)}}</h5>
-                                        <p class="mtitle b-0">@lang('Performance Balance')</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="box-card2">
-                                    <div class="img-box">
-                                        <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="icon">
-                                    </div>
-                                    <div class="text-box">
-                                        <h5 class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
-                                        <p class="mtitle b-0">@lang('Profit Balance')</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="box-card2">
-                                    <div class="img-box">
-                                        <img src="{{asset(template(true).'img/box-card/money-jar-54.png')}}" alt="icon">
-                                    </div>
-                                    <div class="text-box">
-                                        <h5 class="title mb-0">{{currencyPosition($totalDeposit+0)}} </h5>
-                                        <p class="mb-0">@lang('Total Deposit')</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="offer-slider-container">
-                                    @php
-                                        $offerImages = \App\Models\OfferImage::where('status', true)->orderBy('order', 'asc')->get();
-                                        if ($offerImages->isEmpty()) {
-                                            // Create a default offer image for testing
-                                            $defaultImage = new \App\Models\OfferImage([
-                                                'title' => 'Default Offer',
-                                                'image' => 'offerImage/test-offer.png',
-                                                'image_driver' => 'local',
-                                                'url' => null,
-                                                'order' => 1,
-                                                'status' => true
-                                            ]);
-                                            $offerImages = collect([$defaultImage]);
-                                        }
-                                    @endphp
-                                    @if($offerImages->count() > 0)
-                                        <div class="offer-slider">
-                                            @foreach($offerImages as $offerImage)
-                                                <div class="offer-slide">
-                                                    @php
-                                                        $imageUrl = $offerImage->getImageUrl();
-                                                    @endphp
-                                                    <!-- Debug: {{ $imageUrl }} -->
-                                                    @if($offerImage->url)
-                                                        <a href="{{ $offerImage->url }}" target="_blank">
-                                                            <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
-                                                        </a>
-                                                    @else
-                                                        <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
-                                                    @endif
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <div class="no-offers">
-                                            <p>@lang('No offers available')</p>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+                        @endif
                     </div>
-
-                    <!-- Tab mobile view carousel start -->
-                    <div class="tab-mobile-view-carousel-section">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="owl-carousel owl-theme carousel-1">
-                                    <div class="item">
-                                        <div class="deposit-invest-box">
-                                            <div class="img-box">
-                                                <img src="{{asset(template(true).'img/box-card/market-analysis-31.png')}}" alt="icon">
-                                            </div>
-                                            <div class="text-box">
-                                                <a href="{{route('user.plan')}}" class="cmn-btn"><i
-                                                        class="fa-regular fa-usd-circle"></i>
-                                                    @lang('Purchase')</a>
-                                                <a href="{{route('user.addFund')}}" class="cmn-btn"><i class="fa-regular fa-wallet"></i>
-                                                    @lang('Deposit')</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="box-card2">
-                                            <div class="img-box">
-                                                <img src="{{asset(template(true).'img/box-card/bitcoin-46.png')}}" alt="icon">
-                                            </div>
-                                            <div class="text-box">
-                                                <h4 class="title mb-0">{{currencyPosition(auth()->user()->balance+0)}}</h4>
-                                                <p class="mb-0">@lang('Deposit Balance')</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="box-card2">
-                                            <div class="img-box">
-                                                <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="interest balance icon image">
-                                            </div>
-                                            <div class="text-box">
-                                                <h5 class="title mb-0">{{currencyPosition(auth()->user()->profit_balance+0)}}</h5>
-                                                <p class="mb-0">@lang('Performance Balance')</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="box-card2">
-                                            <div class="img-box">
-                                                <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="interest balance icon image">
-                                            </div>
-                                            <div class="text-box">
-                                                <h5 class="title mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
-                                                <p class="mb-0">@lang('Profit Balance')</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="box-card2">
-                                            <div class="img-box">
-                                                <img src="{{asset(template(true).'img/box-card/savings-76.png')}}" alt="icon">
-                                            </div>
-                                            <div class="text-box">
-                                                <h5 class="title mb-0">{{currencyPosition($totalDeposit+0)}} </h5>
-                                                <p class="mb-0">@lang('Total Deposit')</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="offer-slider-container">
-                                            @php
-                                                $offerImages = \App\Models\OfferImage::where('status', true)->orderBy('order', 'asc')->get();
-                                                if ($offerImages->isEmpty()) {
-                                                    // Create a default offer image for testing
-                                                    $defaultImage = new \App\Models\OfferImage([
-                                                        'title' => 'Default Offer',
-                                                        'image' => 'offerImage/test-offer.png',
-                                                        'image_driver' => 'local',
-                                                        'url' => null,
-                                                        'order' => 1,
-                                                        'status' => true
-                                                    ]);
-                                                    $offerImages = collect([$defaultImage]);
-                                                }
-                                            @endphp
-                                            @if($offerImages->count() > 0)
-                                                <div class="offer-slider-mobile">
-                                                    @foreach($offerImages as $offerImage)
-                                                        <div class="offer-slide">
-                                                            @php
-                                                                $imageUrl = $offerImage->getImageUrl();
-                                                            @endphp
-                                                            <!-- Debug: {{ $imageUrl }} -->
-                                                            @if($offerImage->url)
-                                                                <a href="{{ $offerImage->url }}" target="_blank">
-                                                                    <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
-                                                                </a>
-                                                            @else
-                                                                <img src="{{ $imageUrl }}" alt="{{ $offerImage->title }}" class="img-fluid">
-                                                            @endif
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <div class="no-offers">
-                                                    <p>@lang('No offers available')</p>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+            </div>
+        </div>
+        <!-- Below the top row, show the grid/tile layout (no greeting tile) -->
+        <div class="grid-container">
+            <div class="item">
+                <div class="deposit-invest-box">
+                    <div class="img-box">
+                        <img src="{{asset(template(true).'img/box-card/market-analysis-31.png')}}" alt="icon">
                     </div>
-                    <!-- Tab mobile view carousel end -->
+                    <div class="text-box">
+                        <a href="{{route('user.plan')}}" class="cmn-btn"><i class="fa-regular fa-usd-circle"></i>
+                            @lang('Purchase')</a>
+                        <a href="{{route('user.addFund')}}" class="cmn-btn"><i class="fa-regular fa-wallet"></i>
+                            @lang('Deposit')</a>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="box-card2">
+                    <div class="img-box">
+                        <img src="{{asset(template(true).'img/box-card/bitcoin-46.png')}}" alt="icon">
+                    </div>
+                    <div class="text-box">
+                        <h4 class="title mb-0">{{currencyPosition(auth()->user()->balance+0)}}</h4>
+                        <p class="mb-0">@lang('Deposit Balance')</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="box-card2">
+                    <div class="img-box">
+                        <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="icon">
+                    </div>
+                    <div class="text-box">
+                        <h5 class="mb-0">{{currencyPosition(auth()->user()->profit_balance+0)}}</h5>
+                        <p class="mtitle b-0">@lang('Performance Balance')</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="box-card2">
+                    <div class="img-box">
+                        <img src="{{asset(template(true).'img/box-card/money-50.png')}}" alt="icon">
+                    </div>
+                    <div class="text-box">
+                        <h5 class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
+                        <p class="mtitle b-0">@lang('Profit Balance')</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="box-card2">
+                    <div class="img-box">
+                        <img src="{{asset(template(true).'img/box-card/money-jar-54.png')}}" alt="icon">
+                    </div>
+                    <div class="text-box">
+                        <h5 class="title mb-0">{{currencyPosition($totalDeposit+0)}} </h5>
+                        <p class="mb-0">@lang('Total Deposit')</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -460,18 +350,18 @@
                                         </div>
                                     </div>
                                 @endif
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="box-card3">
-                                                <div class="icon-box">
-                                                    <i class="fa-solid fa-sack-dollar"></i>
-                                                </div>
-
-                                                <div class="text-box">
-                                                    <h5 class="title">{{currencyPosition($totalTeamInvest+0)}}</h5>
-                                                    <h6>@lang('TRT')</h6>
-                                                </div>
+                                <div class="col-lg-12 col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                            <h5 class="mb-3">Bank Details</h5>
+                                            <div style="font-size: 0.95rem;">
+                                                <div><strong>ACCOUNT NAME:</strong> REINO GOLD PRIVATE LIMITED</div>
+                                                <div><strong>ACCOUNT NUMBER:</strong> 925020025550562</div>
+                                                <div><strong>IFSC CODE:</strong> UTIB0001919</div>
+                                                <div><strong>BRANCH:</strong> TOWN HALL, COIMBATORE</div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <img src="{{ asset('assets/qr.jpeg') }}" alt="UPI QR Code" style="max-width: 150px; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px;" />
                                             </div>
                                         </div>
                                     </div>
@@ -558,249 +448,209 @@
         }
     </style>
     <script>
-        $(document).ready(function (){
-            // Show dashboard popup modal
-            if (!sessionStorage.getItem('dashboardPopupShown')) {
-                $('#dashboardPopupModal').modal({
-                    show: true,
-                    backdrop: true,
-                    keyboard: true
-                });
-                // Set flag in session storage
-                sessionStorage.setItem('dashboardPopupShown', 'true');
+        $(document).ready(function () {
+            console.log('Dashboard script loaded');
+            console.log('Modal exists: ' + $('#dashboardPopupModal').length);
+
+            // Always show the dashboard popup modal if it exists
+            if ($('#dashboardPopupModal').length) {
+                setTimeout(function() {
+                    $('#dashboardPopupModal').modal('show');
+                }, 300);
             }
-            
             // Handle close button click
             $('#closePopupBtn').on('click', function() {
                 $('#dashboardPopupModal').modal('hide');
             });
+        });
+        
+        // Circle progress start
+        @php
+            // Get configs
+            $config1Raw = isset($configs[0]) ? $configs[0]->value : '0';
+            $config2Raw = isset($configs[1]) ? $configs[1]->value : '0';
+            $config3Raw = isset($configs[2]) ? $configs[2]->value : '0';
             
-            // Also allow clicking anywhere on the modal to close it
-            $('#dashboardPopupModal').on('click', function(e) {
-                if ($(e.target).closest('.modal-content').length === 0 || $(e.target).is('#dashboardPopupModal')) {
-                    $('#dashboardPopupModal').modal('hide');
+            // Check if values end with % to determine if they're percentages
+            $isConfig1Percent = str_ends_with($config1Raw, '%');
+            $isConfig2Percent = str_ends_with($config2Raw, '%');
+            $isConfig3Percent = str_ends_with($config3Raw, '%');
+            
+            // Strip % for percentage values and convert to integer
+            $config1Value = $isConfig1Percent ? (int)str_replace('%', '', $config1Raw) : $config1Raw;
+            $config2Value = $isConfig2Percent ? (int)str_replace('%', '', $config2Raw) : $config2Raw;
+            $config3Value = $isConfig3Percent ? (int)str_replace('%', '', $config3Raw) : $config3Raw;
+        @endphp
+
+        if ($('.circle').length) {
+            $('.first.circle').circleProgress({
+                value: {{ $isConfig1Percent ? $config1Value/100 : 0 }},
+                size: 70,
+                fill: {
+                    gradient: ["#ae8656"]
                 }
+            }).on('circle-animation-progress', function (event, progress) {
+                @if($isConfig1Percent)
+                    $(this).find('span').html(Math.round({{ $config1Value }} * progress) + '<i>%</i>');
+                @else
+                    $(this).find('span').html('{{ $config1Raw }}');
+                    // Show empty ring for non-percentage values
+                @endif
+                $(this).find('span').addClass('percent');
             });
-            
-            // Circle progress start
-            @php
-                // Get configs
-                $config1Raw = isset($configs[0]) ? $configs[0]->value : '0';
-                $config2Raw = isset($configs[1]) ? $configs[1]->value : '0';
-                $config3Raw = isset($configs[2]) ? $configs[2]->value : '0';
-                
-                // Check if values end with % to determine if they're percentages
-                $isConfig1Percent = str_ends_with($config1Raw, '%');
-                $isConfig2Percent = str_ends_with($config2Raw, '%');
-                $isConfig3Percent = str_ends_with($config3Raw, '%');
-                
-                // Strip % for percentage values and convert to integer
-                $config1Value = $isConfig1Percent ? (int)str_replace('%', '', $config1Raw) : $config1Raw;
-                $config2Value = $isConfig2Percent ? (int)str_replace('%', '', $config2Raw) : $config2Raw;
-                $config3Value = $isConfig3Percent ? (int)str_replace('%', '', $config3Raw) : $config3Raw;
-            @endphp
+        }
 
-            if ($('.circle').length) {
-                $('.first.circle').circleProgress({
-                    value: {{ $isConfig1Percent ? $config1Value/100 : 0 }},
-                    size: 70,
-                    fill: {
-                        gradient: ["#ae8656"]
+        if ($('.circle').length) {
+            $('.second.circle').circleProgress({
+                value: {{ $isConfig2Percent ? $config2Value/100 : 0 }},
+                size: 70,
+                fill: {
+                    gradient: ["#ae8656"]
+                }
+            }).on('circle-animation-progress', function (event, progress) {
+                @if($isConfig2Percent)
+                    $(this).find('span').html(Math.round({{ $config2Value }} * progress) + '<i>%</i>');
+                @else
+                    $(this).find('span').html('{{ $config2Raw }}');
+                    // Show empty ring for non-percentage values
+                @endif
+                $(this).find('span').addClass('percent');
+            });
+        }
+
+        if ($('.circle').length) {
+            $('.third.circle').circleProgress({
+                value: {{ $isConfig3Percent ? $config3Value/100 : 0 }},
+                size: 70,
+                fill: {
+                    gradient: ["#ae8656"]
+                }
+            }).on('circle-animation-progress', function (event, progress) {
+                @if($isConfig3Percent)
+                    $(this).find('span').html(Math.round({{ $config3Value }} * progress) + '<i>%</i>');
+                @else
+                    $(this).find('span').html('{{ $config3Raw }}');
+                    // Show empty ring for non-percentage values
+                @endif
+                $(this).find('span').addClass('percent');
+            });
+        }
+
+        // Circle progress end
+
+        if ($('#columnChart').length) {
+            var options = {
+                series: [{
+                    name: 'Purchase',
+                    color: '#567eae',
+                    data: {!! $monthly['investment']->flatten() !!}
+                }, {
+                    name: 'Payout',
+                    color: 'rgb(174,134,86)',
+                    data: {!! $monthly['payout']->flatten() !!}
+                },
+                    {
+                        name: 'Deposit',
+                        color: '#5a56ae',
+                        data: {!! $monthly['funding']->flatten() !!}
+                    },
+                    {
+                        name: 'Deposit Bonus',
+                        color: '#e7bb89',
+                        data: {!! $monthly['referralFundBonus']->flatten() !!}
                     }
-                }).on('circle-animation-progress', function (event, progress) {
-                    @if($isConfig1Percent)
-                        $(this).find('span').html(Math.round({{ $config1Value }} * progress) + '<i>%</i>');
-                    @else
-                        $(this).find('span').html('{{ $config1Raw }}');
-                        // Show empty ring for non-percentage values
-                    @endif
-                    $(this).find('span').addClass('percent');
-                });
-            }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 
-            if ($('.circle').length) {
-                $('.second.circle').circleProgress({
-                    value: {{ $isConfig2Percent ? $config2Value/100 : 0 }},
-                    size: 70,
-                    fill: {
-                        gradient: ["#ae8656"]
-                    }
-                }).on('circle-animation-progress', function (event, progress) {
-                    @if($isConfig2Percent)
-                        $(this).find('span').html(Math.round({{ $config2Value }} * progress) + '<i>%</i>');
-                    @else
-                        $(this).find('span').html('{{ $config2Raw }}');
-                        // Show empty ring for non-percentage values
-                    @endif
-                    $(this).find('span').addClass('percent');
-                });
-            }
+                },
 
-            if ($('.circle').length) {
-                $('.third.circle').circleProgress({
-                    value: {{ $isConfig3Percent ? $config3Value/100 : 0 }},
-                    size: 70,
-                    fill: {
-                        gradient: ["#ae8656"]
-                    }
-                }).on('circle-animation-progress', function (event, progress) {
-                    @if($isConfig3Percent)
-                        $(this).find('span').html(Math.round({{ $config3Value }} * progress) + '<i>%</i>');
-                    @else
-                        $(this).find('span').html('{{ $config3Raw }}');
-                        // Show empty ring for non-percentage values
-                    @endif
-                    $(this).find('span').addClass('percent');
-                });
-            }
-
-            // Circle progress end
-
-            if ($('#columnChart').length) {
-                var options = {
-                    series: [{
-                        name: 'Purchase',
-                        color: '#567eae',
-                        data: {!! $monthly['investment']->flatten() !!}
-                    }, {
-                        name: 'Payout',
-                        color: 'rgb(174,134,86)',
-                        data: {!! $monthly['payout']->flatten() !!}
-                    },
-                        {
-                            name: 'Deposit',
-                            color: '#5a56ae',
-                            data: {!! $monthly['funding']->flatten() !!}
-                        },
-                        {
-                            name: 'Deposit Bonus',
-                            color: '#e7bb89',
-                            data: {!! $monthly['referralFundBonus']->flatten() !!}
-                        }
-                    ],
-                    chart: {
-                        type: 'bar',
-                        height: 350
-                    },
-                    plotOptions: {
-                        bar: {
-                            horizontal: false,
-                            columnWidth: '55%',
-                            endingShape: 'rounded'
-                        },
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    stroke: {
-                        show: true,
-                        width: 2,
-                        colors: ['transparent']
-                    },
-                    xaxis: {
-                        categories: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-
-                    },
-
-                    fill: {
-                        opacity: 1
-                    },
-                    tooltip: {
-                        y: {
-                            formatter: function (val) {
-                                return "{{basicControl()->currency_symbol}}" + val
-                            }
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return "{{basicControl()->currency_symbol}}" + val
                         }
                     }
-                };
+                }
+            };
 
-                var chart = new ApexCharts(document.querySelector("#columnChart"), options);
-                chart.render();
+            var chart = new ApexCharts(document.querySelector("#columnChart"), options);
+            chart.render();
+        }
 
-            }
-        })
+    document.getElementById("copyLeftBtn").addEventListener("click", () => {
+        let leftReferralURL = document.getElementById("leftReferralURL");
+        leftReferralURL.select();
+        navigator.clipboard.writeText(leftReferralURL.value)
+        if (leftReferralURL.value) {
+            document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
+            setTimeout(() => {
+                document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
+            }, 1000)
+        }
+    })
 
-        document.getElementById("copyLeftBtn").addEventListener("click", () => {
-            let leftReferralURL = document.getElementById("leftReferralURL");
-            leftReferralURL.select();
-            navigator.clipboard.writeText(leftReferralURL.value)
-            if (leftReferralURL.value) {
-                document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
-                setTimeout(() => {
-                    document.getElementById("copyLeftBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
-                }, 1000)
-            }
-        })
-
-        document.getElementById("copyRightBtn").addEventListener("click", () => {
-            let rightReferralURL = document.getElementById("rightReferralURL");
-            rightReferralURL.select();
-            navigator.clipboard.writeText(rightReferralURL.value)
-            if (rightReferralURL.value) {
-                document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
-                setTimeout(() => {
-                    document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
-                }, 1000)
-            }
-        })
+    document.getElementById("copyRightBtn").addEventListener("click", () => {
+        let rightReferralURL = document.getElementById("rightReferralURL");
+        rightReferralURL.select();
+        navigator.clipboard.writeText(rightReferralURL.value)
+        if (rightReferralURL.value) {
+            document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-circle-check"></i>'+"{{trans('Copied')}}";
+            setTimeout(() => {
+                document.getElementById("copyRightBtn").innerHTML = '<i class="fa-regular fa-copy"></i>'+"{{trans('copy')}}";
+            }, 1000)
+        }
+    })
     </script>
 @endpush
 
 @push('style')
     <style>
-        .offer-slider-container {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* Default: 5 columns */
+            gap: 16px;
+            margin: 20px 0;
         }
-        
-        .offer-slider, .offer-slider-mobile {
-            width: 100%;
-            height: 100%;
+        @media (max-width: 991px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr); /* Tablet: 2 columns */
+            }
         }
-        
-        .offer-slide {
-            position: relative;
-            overflow: hidden;
-            height: 150px;
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr; /* Mobile: 1 column */
+            }
+            .grid-container .item {
+                margin-bottom: 16px;
+            }
         }
-        
-        .offer-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        
-        .offer-slide a:hover img {
-            transform: scale(1.05);
-        }
-        
-        .no-offers {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 150px;
-            background-color: #f8f9fa;
-            color: #6c757d;
-            text-align: center;
-        }
-        
-        /* Slick slider custom styles */
-        .slick-dots {
-            bottom: 10px;
-        }
-        
-        .slick-dots li button:before {
-            color: #fff;
-            opacity: 0.5;
-        }
-        
-        .slick-dots li.slick-active button:before {
-            color: #fff;
-            opacity: 1;
+        .img-box img {
+            max-width: 100%;
+            height: auto;
+            display: block;
         }
     </style>
 @endpush
@@ -871,8 +721,7 @@
     <script>
         "use strict";
         $(document).ready(function () {
-            $('#dashboardPopupModal').modal('show');
-            
+            // Modal show is now handled conditionally in the main script section
             @if(basicControl()->dashboard_popup_url)
             // Make the entire modal body clickable if URL is provided
             $('#dashboardPopupModal .modal-body').css('cursor', 'pointer');

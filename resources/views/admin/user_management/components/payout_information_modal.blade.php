@@ -148,6 +148,23 @@
                 }
             })
 
+            let amountValue = parseFloat(amount.toString().replace(/[^0-9.]/g, ''));
+            let fee = (amountValue * 0.10).toFixed(2);
+            let netPayout = (amountValue - fee).toFixed(2);
+            // Add fee and net payout rows to the summary
+            list.unshift(`<li class="list-group-item text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Fee (10%)</span>
+                    <span>₹${fee}</span>
+                </div>
+            </li>`);
+            list.unshift(`<li class="list-group-item text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Net Payout</span>
+                    <span>₹${netPayout}</span>
+                </div>
+            </li>`);
+
             let feedbackField = "";
             if (feedback == '') {
                 feedbackField = `<div class="mb-3">

@@ -22,6 +22,9 @@
                 <a href="{{ route('user.goldcoin.orders') }}" class="btn cmn-btn">
                     <i class="fa fa-arrow-left"></i> @lang('Back to Orders')
                 </a>
+                <a href="{{ route('user.goldcoin.order.invoice', $order->trx_id) }}" class="btn btn-primary" target="_blank">
+                    <i class="fa fa-download"></i> @lang('Download Invoice')
+                </a>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -59,6 +62,10 @@
                                     <tr>
                                         <td>@lang('Payment Source'):</td>
                                         <td>{{ ucfirst($order->payment_source) }} @lang('Balance')</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@lang('Address'):</td>
+                                        <td>{{ $order->address ?? '-' }}</td>
                                     </tr>
                                 </table>
                             </div>

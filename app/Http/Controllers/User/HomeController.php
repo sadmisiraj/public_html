@@ -67,10 +67,13 @@ class HomeController extends Controller
 
     public function index()
     {
-
+        $showDashboardPopup = false;
+        if (session()->has('show_dashboard_popup')) {
+            $showDashboardPopup = true;
+            session()->forget('show_dashboard_popup');
+        }
 
         $data['totalTeamInvest'] = teamInvest(Auth::user());
-
         $user = Auth::user();
         $data['user'] = $user;
         $data['firebaseNotify'] = config('firebase');
@@ -84,14 +87,10 @@ class HomeController extends Controller
         $data['investBonus'] = getAmount($this->user->referralBonusLog()->where('type', 'invest')->sum('amount'));
         $data['totalBonus'] = getAmount($this->user->referralBonusLog()->sum('amount'));
         $data['lastBonus'] = getAmount(optional($this->user->referralBonusLog()->latest()->first())->amount);
-
         $data['totalInterestProfit'] = getAmount($this->user->transaction()->where('balance_type', 'interest_balance')->where('trx_type', '+')->sum('amount') + 0, 2);
-
-        // Add total earnings: sum of interest_balance and profit_balance transactions
         $totalInterest = $this->user->transaction()->where('balance_type', 'interest_balance')->where('trx_type', '+')->sum('amount');
         $totalProfit = $this->user->transaction()->where('balance_type', 'profit_balance')->where('trx_type', '+')->sum('amount');
         $data['totalEarnings'] = getAmount($totalInterest + $totalProfit, 2);
-
         $roi = Investment::where('user_id', $user->id)
             ->selectRaw('SUM( amount ) AS totalInvestAmount')
             ->selectRaw('COUNT( id ) AS totalInvest')
@@ -102,10 +101,7 @@ class HomeController extends Controller
             ->get()->makeHidden('nextPayment')->toArray();
         $data['roi'] = collect($roi)->collapse();
         $data['ticket'] = SupportTicket::where('user_id', Auth::id())->count();
-        
-        // Fetch all configs from database for progress rings
         $data['configs'] = \App\Models\Config::all();
-
         $monthlyInvestment = collect(['January' => 0, 'February' => 0, 'March' => 0, 'April' => 0, 'May' => 0, 'June' => 0, 'July' => 0, 'August' => 0, 'September' => 0, 'October' => 0, 'November' => 0, 'December' => 0]);
         Investment::where('user_id', $this->user->id)
             ->whereBetween('created_at', [
@@ -121,8 +117,6 @@ class HomeController extends Controller
                 $monthlyInvestment->put($item['months'], round($item['totalAmount'], 2));
             });
         $monthly['investment'] = $monthlyInvestment;
-
-
         $monthlyPayout = collect(['January' => 0, 'February' => 0, 'March' => 0, 'April' => 0, 'May' => 0, 'June' => 0, 'July' => 0, 'August' => 0, 'September' => 0, 'October' => 0, 'November' => 0, 'December' => 0]);
         $this->user->payout()->whereStatus(2)
             ->whereBetween('created_at', [
@@ -138,8 +132,6 @@ class HomeController extends Controller
                 $monthlyPayout->put($item['months'], round($item['totalAmount'], 2));
             });
         $monthly['payout'] = $monthlyPayout;
-
-
         $monthlyFunding = collect(['January' => 0, 'February' => 0, 'March' => 0, 'April' => 0, 'May' => 0, 'June' => 0, 'July' => 0, 'August' => 0, 'September' => 0, 'October' => 0, 'November' => 0, 'December' => 0]);
         $this->user->deposits()
             ->where('depositable_type', 'App\Models\Deposit')
@@ -157,8 +149,6 @@ class HomeController extends Controller
                 $monthlyFunding->put($item['months'], round($item['totalAmount'], 2));
             });
         $monthly['funding'] = $monthlyFunding;
-
-
         $monthlyReferralInvestBonus = collect(['January' => 0, 'February' => 0, 'March' => 0, 'April' => 0, 'May' => 0, 'June' => 0, 'July' => 0, 'August' => 0, 'September' => 0, 'October' => 0, 'November' => 0, 'December' => 0]);
         $this->user->referralBonusLog()->where('type', 'invest')
             ->whereBetween('created_at', [
@@ -173,12 +163,8 @@ class HomeController extends Controller
             ->get()->map(function ($item) use ($monthlyReferralInvestBonus) {
                 $monthlyReferralInvestBonus->put($item['months'], round($item['totalAmount'], 2));
             });
-
         $monthly['referralInvestBonus'] = $monthlyReferralInvestBonus;
-
-
         $monthlyReferralFundBonus = collect(['January' => 0, 'February' => 0, 'March' => 0, 'April' => 0, 'May' => 0, 'June' => 0, 'July' => 0, 'August' => 0, 'September' => 0, 'October' => 0, 'November' => 0, 'December' => 0]);
-
         $this->user->referralBonusLog()->where('type', 'deposit')
             ->whereBetween('created_at', [
                 Carbon::now()->startOfYear(),
@@ -193,17 +179,24 @@ class HomeController extends Controller
                 $monthlyReferralFundBonus->put($item['months'], round($item['totalAmount'], 2));
             });
         $monthly['referralFundBonus'] = $monthlyReferralFundBonus;
-
         $latestRegisteredUser = User::where('referral_id', $this->user->id)->latest()->first();
-        return view(template() . 'user.dashboard', $data, compact('monthly', 'latestRegisteredUser'));
+        return view(template() . 'user.dashboard', $data, compact('monthly', 'latestRegisteredUser', 'showDashboardPopup'));
     }
 
 
     public function profile()
     {
-        $data['user'] = Auth::user();
+        $user = Auth::user();
+        $data['user'] = $user;
         $data['languages'] = Language::all();
         $data['kyc'] = Kyc::where('status', 1)->get();
+        // Total RGP L and RGP R (sum only 'credit' transactions)
+        $data['total_rgp_l'] = $user->rgpTransactions()->where('side', 'left')->where('transaction_type', 'credit')->sum('amount');
+        $data['total_rgp_r'] = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->sum('amount');
+        // Today's RGP L and RGP R (sum only 'credit' transactions)
+        $today = date('Y-m-d');
+        $data['today_rgp_l'] = $user->rgpTransactions()->where('side', 'left')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
+        $data['today_rgp_r'] = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
         return view(template() . 'user.profile.my_profile', $data);
     }
 

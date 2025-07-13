@@ -308,6 +308,47 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <!-- Desktop Table (hidden on mobile) -->
+                                        <div class="table-responsive d-none d-md-block">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>@lang('Total Earned')</th>
+                                                        <th>@lang('Earned Today')</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>@lang('RGP L')</td>
+                                                        <td>{{ $total_rgp_l ?? 0 }}</td>
+                                                        <td>{{ $today_rgp_l ?? 0 }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>@lang('RGP R')</td>
+                                                        <td>{{ $total_rgp_r ?? 0 }}</td>
+                                                        <td>{{ $today_rgp_r ?? 0 }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Mobile Cards (visible on mobile only) -->
+                                        <div class="rgp-mobile-cards d-block d-md-none">
+                                            <div class="rgp-card">
+                                                <div class="rgp-label">@lang('RGP L')</div>
+                                                <div class="rgp-row"><span>@lang('Total Earned'):</span> <span>{{ $total_rgp_l ?? 0 }}</span></div>
+                                                <div class="rgp-row"><span>@lang('Earned Today'):</span> <span>{{ $today_rgp_l ?? 0 }}</span></div>
+                                            </div>
+                                            <div class="rgp-card">
+                                                <div class="rgp-label">@lang('RGP R')</div>
+                                                <div class="rgp-row"><span>@lang('Total Earned'):</span> <span>{{ $total_rgp_r ?? 0 }}</span></div>
+                                                <div class="rgp-row"><span>@lang('Earned Today'):</span> <span>{{ $today_rgp_r ?? 0 }}</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -701,6 +742,41 @@
         .select2-dropdown {
             border: 1px solid #ced4da;
             border-radius: 4px;
+        }
+        /* Hide table and show cards on mobile */
+        .d-none { display: none !important; }
+        .d-block { display: block !important; }
+        @media (min-width: 768px) {
+            .d-md-block { display: block !important; }
+            .d-md-none { display: none !important; }
+        }
+        @media (max-width: 767.98px) {
+            .d-md-block { display: none !important; }
+            .d-md-none { display: block !important; }
+        }
+        .rgp-mobile-cards {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .rgp-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .rgp-label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #ae8656;
+        }
+        .rgp-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            margin-bottom: 4px;
         }
     </style>
 @endpush

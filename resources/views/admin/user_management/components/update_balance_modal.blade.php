@@ -25,6 +25,9 @@
                     @error('amount')
                     <span class="invalid-feedback d-block">{{ $message }}</span>
                     @enderror
+                    <!-- Add remarks field below amount -->
+                    <label class="form-label mt-3" for="remarks">@lang('Remarks (optional)')</label>
+                    <input type="text" class="form-control" name="remarks" id="remarks" placeholder="@lang('Enter remarks (optional)')" value="{{ old('remarks') }}" autocomplete="off">
                     <div class="input-group input-group-sm-vertical mt-3">
                         <label class="form-control" for="editUserModalBalanceTypeModalRadioEg1_2">
                             <span class="form-check">

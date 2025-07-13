@@ -91,6 +91,9 @@
                                             >
                                                 <i class="fa fa-info-circle"></i>
                                             </button>
+                                            <a href="{{ route('user.payout.invoice', $item->trx_id) }}" class="btn btn-primary btn-sm" target="_blank">
+                                                <i class="fa fa-download"></i> @lang('Invoice')
+                                            </a>
                                         @endif
 
                                     </td>

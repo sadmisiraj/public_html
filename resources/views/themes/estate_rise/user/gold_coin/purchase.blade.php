@@ -105,6 +105,11 @@
                         </select>
                     </div>
                     
+                    <div class="form-group mb-3">
+                        <label for="address">@lang('Address') <span class="text-danger">*</span></label>
+                        <input type="text" name="address" id="address" class="form-control" value="{{ old('address') }}" required>
+                    </div>
+                    
                     <div class="form-group">
                         <button type="submit" class="btn cmn-btn w-100">@lang('Purchase Now')</button>
                     </div>

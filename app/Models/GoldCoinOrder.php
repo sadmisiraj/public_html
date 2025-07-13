@@ -22,7 +22,8 @@ class GoldCoinOrder extends Model
         'payment_source',
         'status',
         'admin_feedback',
-        'trx_id'
+        'trx_id',
+        'address',
     ];
 
     protected $casts = [

@@ -115,6 +115,8 @@ class LoginController extends Controller
         }
         if ($this->guard()->validate($this->credentials($request))) {
             if (Auth::attempt([$this->username() => $request->username, 'password' => $request->password])) {
+                // Set session variable to show dashboard popup after login
+                session(['show_dashboard_popup' => true]);
                 return $this->sendLoginResponse($request);
             } else {
                 return back()->with('error', 'You are banned from this application. Please contact with system Administrator.');

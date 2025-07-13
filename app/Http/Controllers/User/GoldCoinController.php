@@ -43,6 +43,7 @@ class GoldCoinController extends Controller
             'coin_id' => 'required|exists:gold_coins,id',
             'weight' => 'required|numeric|min:0.01',
             'payment_source' => 'required|in:deposit,profit,performance',
+            'address' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -117,6 +118,7 @@ class GoldCoinController extends Controller
         $order->payment_source = $request->payment_source;
         $order->status = 'pending';
         $order->trx_id = $trxId;
+        $order->address = $request->address;
         $order->save();
         
         // Record the transaction
@@ -232,5 +234,17 @@ class GoldCoinController extends Controller
         $pdf = PDF::loadView(template() . 'user.gold_coin.orders_pdf', compact('orders', 'pageTitle', 'basic', 'user'));
         
         return $pdf->download('gold_coin_orders_' . ($status ? $status . '_' : '') . date('Y-m-d') . '.pdf');
+    }
+
+    public function downloadInvoice($trx_id)
+    {
+        $order = GoldCoinOrder::where('user_id', Auth::id())
+            ->where('trx_id', $trx_id)
+            ->with('goldCoin')
+            ->firstOrFail();
+        $basic = basicControl();
+        $user = Auth::user();
+        $pdf = \PDF::loadView('pdf.gold_coin_invoice', compact('order', 'basic', 'user'));
+        return $pdf->download('invoice_' . $order->trx_id . '.pdf');
     }
 }

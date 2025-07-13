@@ -99,7 +99,9 @@ class User extends Authenticatable
         'subs_expired_at',
         'rgp_l',
         'rgp_r',
-        'rgp_pair_matching'
+        'rgp_pair_matching',
+        'dashboard_label',
+        'dashboard_value',
     ];
 
     protected static function boot()

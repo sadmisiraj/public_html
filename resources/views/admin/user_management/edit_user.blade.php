@@ -392,6 +392,40 @@
 
                     @include('admin.user_management.components.rgp_section')
 
+                    <!-- Dashboard Tile Section -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h2 class="card-title h4">@lang('Dashboard Tile')</h2>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('admin.user.dashboard_tile.update', $user->id) }}" method="post">
+                                @csrf
+                                <div class="row mb-4">
+                                    <label for="dashboard_label" class="col-sm-3 col-form-label form-label">@lang('Tile Label')</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="dashboard_label" id="dashboard_label" placeholder="Label" value="{{ old('dashboard_label', $user->dashboard_label) }}" autocomplete="off">
+                                        @error('dashboard_label')
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <label for="dashboard_value" class="col-sm-3 col-form-label form-label">@lang('Tile Value')</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="dashboard_value" id="dashboard_value" placeholder="Value" value="{{ old('dashboard_value', $user->dashboard_value) }}" autocomplete="off">
+                                        @error('dashboard_value')
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">@lang('Save Tile')</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End Dashboard Tile Section -->
+
                     @include('admin.user_management.components.recent_devices_section')
 
                     @if(adminAccessRoute(config('role.user_management.access.delete')))

@@ -208,6 +208,10 @@
                                                         <div class="col-6"><strong>@lang('Total Deduction')</strong>:</div>
                                                         <div class="col-6 text-end"><strong><span id="summary-total">0</span> INR</strong></div>
                                                     </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-6">@lang('Gold Equivalent'):</div>
+                                                        <div class="col-6 text-end"><span id="summary-gold-grams">0</span> g</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -250,6 +254,9 @@
 @endsection
 
 @push('script')
+<script>
+    const todaysGoldRate = {{ (float) App\Models\Config::getConfig('config_3') }};
+</script>
     <script>
         'use strict';
 
@@ -386,26 +393,21 @@
             
             // Function to update the bank withdrawal summary
             function updateBankWithdrawalSummary(amount) {
-                // Parse amount to number
                 amount = parseFloat(amount);
-                
-                // Use the dynamically fetched charges from data attributes
-                let percentageCharge = $('#bank-amount').data('percentage-charge') || 0;
-                let fixedCharge = $('#bank-amount').data('fixed-charge') || 0;
-                
-                // Calculate fee based on percentage and fixed charge
-                let percentageFee = amount * (percentageCharge / 100);
-                let fee = (percentageFee + parseFloat(fixedCharge)).toFixed(2);
-                
-                // Calculate total (amount PLUS fee) - user gets amount but pays amount+fee
-                let total = (parseFloat(amount) + parseFloat(fee)).toFixed(2);
-                
+                // Always use 10% fee for this logic
+                let percentageFee = amount * 0.10;
+                let fee = percentageFee.toFixed(2);
+                let netPayout = (amount - percentageFee).toFixed(2);
                 // Update summary values
-                $('#summary-amount').text(amount.toFixed(2));
-                $('#summary-fee').text(fee);
-                $('#summary-total').text(total);
-                
-                // Show the summary
+                $('#summary-amount').text(netPayout); // You will receive
+                $('#summary-fee').text(fee); // Fee
+                $('#summary-total').text(amount.toFixed(2)); // Total Deduction (debited from wallet)
+                // Calculate gold equivalent for 90% of withdrawal amount
+                let goldAmount = 0;
+                if (todaysGoldRate > 0) {
+                    goldAmount = ((amount * 0.9) / todaysGoldRate).toFixed(4);
+                }
+                $('#summary-gold-grams').text(goldAmount);
                 $('#bank-withdrawal-summary').show();
             }
             

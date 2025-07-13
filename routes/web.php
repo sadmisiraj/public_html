@@ -246,6 +246,14 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
         return 'If you see this, the middleware did not redirect you, which means OTP verification is not required or has been completed.';
     });
 
+    // Temporary debug route
+    Route::get('/debug-session', function() {
+        dd([
+            'show_dashboard_popup' => session('show_dashboard_popup'),
+            'all_session' => session()->all()
+        ]);
+    })->middleware('auth');
+
     Auth::routes();
     /*= Frontend Manage Controller =*/
     Route::get("/{slug?}", [FrontendController::class, 'page'])->name('page');
@@ -253,9 +261,14 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
     Route::post('users/badge-update/{id}', [UsersController::class, 'badgeUpdate'])->name('users.badgeUpdate');
 });
 
-// Admin Routes
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'admin']], function () {
-    // ... existing admin routes ...
+// Security Routes
+Route::group(['prefix' => 'security', 'as' => 'admin.', 'middleware' => ['auth']], function () {
+    Route::post('/user/{id}/dashboard-tile', [\App\Http\Controllers\Admin\UsersController::class, 'dashboardTileUpdate'])->name('user.dashboard_tile.update');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('user/goldcoin/order/{trx_id}/invoice', [\App\Http\Controllers\User\GoldCoinController::class, 'downloadInvoice'])->name('user.goldcoin.order.invoice');
+    Route::get('user/payout/invoice/{trx_id}', [\App\Http\Controllers\User\PayoutController::class, 'downloadInvoice'])->name('user.payout.invoice');
 });
 
 
