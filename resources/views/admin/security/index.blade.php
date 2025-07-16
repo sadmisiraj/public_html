@@ -94,6 +94,25 @@
                 </div>
             </div>
 
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon">
+                            <i class="text-primary bi bi-key"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>Manual RGP Credit</h5>
+                            <span>Manually credit RGP points to a user's upline chain.</span>
+                            <span class="mt-1 link-text">
+                                <a href="{{ route('admin.security.manual_rgp_credit') }}">Manual Credit
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- This can be expanded later with more security settings -->
         </div>
     </div>

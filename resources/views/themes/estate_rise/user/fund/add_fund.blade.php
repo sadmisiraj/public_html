@@ -1,13 +1,13 @@
 @extends(template().'layouts.user')
-@section('title',trans('Fund Deposit'))
+@section('title',trans('Gold Booking'))
 @section('content')
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Fund Deposit')</h3>
+            <h3 class="mb-1">@lang('Gold Booking')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Fund Deposit')</li>
+                    <li class="breadcrumb-item active">@lang('Gold Booking')</li>
                 </ol>
             </nav>
         </div>
@@ -420,7 +420,7 @@
                     <div class="transfer-details-section">
                         <ul class="transfer-list">
                         <li class="item title">
-                             <h5>@lang('Deposit Summary')</h5>
+                             <h5>@lang('Booking Summary')</h5>
                          </li>
                         <li class="item">
                             <span>{{ __('Amount In') }} ${response.currency} </span>
@@ -450,7 +450,7 @@
                         </li>
 
                     </ul>
-                    <button type="submit" class="cmn-btn w-100">@lang('Make Payment')</button>
+                    <button type="submit" class="cmn-btn w-100">@lang('Make Gold Booking')</button>
                     </div>
                 </div>`
                 ;

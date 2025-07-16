@@ -195,8 +195,18 @@ class HomeController extends Controller
         $data['total_rgp_r'] = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->sum('amount');
         // Today's RGP L and RGP R (sum only 'credit' transactions)
         $today = date('Y-m-d');
-        $data['today_rgp_l'] = $user->rgpTransactions()->where('side', 'left')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
-        $data['today_rgp_r'] = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
+        $today_rgp_l = $user->rgpTransactions()->where('side', 'left')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
+        $today_rgp_r = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
+        
+        // If freeze_daily_credit_show is enabled, show 0 for today's values
+        if ($user->freeze_daily_credit_show) {
+            $data['today_rgp_l'] = 0;
+            $data['today_rgp_r'] = 0;
+        } else {
+            $data['today_rgp_l'] = $today_rgp_l;
+            $data['today_rgp_r'] = $today_rgp_r;
+        }
+        
         return view(template() . 'user.profile.my_profile', $data);
     }
 
@@ -563,6 +573,31 @@ class HomeController extends Controller
         return view(template() . 'user.transaction.index', compact('transactions'));
     }
 
+    public function dailyProfitTransaction(Request $request)
+    {
+        $trx_id = null;
+        if (isset($request->transaction_id) && $request->transaction_id) {
+            $trx_id = $request->transaction_id;
+        }
+        $dateSearch = null;
+        if (isset($request->date) && $request->date) {
+            $dateSearch = $request->date;
+        }
+
+        $user = Auth::user();
+
+        $transactions = $user->transaction()
+            ->where('remarks', 'LIKE', '%Daily Profit From%')
+            ->when($dateSearch, function ($query) use ($dateSearch) {
+                $query->whereDate('created_at', $dateSearch);
+            })
+            ->when($trx_id, function ($query) use ($trx_id) {
+                $query->where('trx_id', $trx_id);
+            })
+            ->orderBy('id', 'DESC')->paginate(12);
+        return view(template() . 'user.transaction.daily-profit', compact('transactions'));
+    }
+
     public function referral()
     {
         $userId = Auth::id();
@@ -768,6 +803,7 @@ class HomeController extends Controller
                 if ($plan->eligible_for_rgp) {
                     $currentUser = $user;
                     $rgpTransactionService = new RgpTransactionService();
+                    $creditedIds = []; // Track already credited users to prevent double crediting
                     
                     // Log that we're starting RGP distribution
                     \Log::info('Starting RGP distribution for plan purchase', [
@@ -779,6 +815,7 @@ class HomeController extends Controller
                         'amount' => $amount
                     ]);
                     
+                    // Start with the user's RGP parent (skip the purchasing user)
                     while ($currentUser->rgp_parent_id) {
                         $parent = User::find($currentUser->rgp_parent_id);
                         if (!$parent) {
@@ -789,14 +826,24 @@ class HomeController extends Controller
                             break;
                         }
                         
+                        // Skip if this parent has already been credited
+                        if (in_array($parent->id, $creditedIds)) {
+                            \Log::info('Parent already credited, skipping', [
+                                'parent_id' => $parent->id,
+                                'parent_username' => $parent->username
+                            ]);
+                            $currentUser = $parent;
+                            continue;
+                        }
+                        
                         // Store previous values
-                        $previousRgpL = floatval($parent->rgp_l ?? 0);
-                        $previousRgpR = floatval($parent->rgp_r ?? 0);
+                        $previousRgpL = $parent->rgp_l;
+                        $previousRgpR = $parent->rgp_r;
                         
                         // Calculate RGP points as 1% of the transaction amount
-                        $rgpPoints = number_format($amount * 0.01, 2);
+                        $rgpPoints = round($amount * 0.01, 2);
                         
-                        // Find all direct children of this parent to determine placement
+                        // Find which side the current user is on by checking direct children
                         $directChildren = User::where('rgp_parent_id', $parent->id)->get();
                         
                         // Find which side the current user is on by checking direct children or their descendants
@@ -820,9 +867,7 @@ class HomeController extends Controller
                         ]);
                         
                         if ($childPlacement === 'left') {
-                            $parent->rgp_l = number_format(floatval($parent->rgp_l ?? 0) + $rgpPoints, 2);
-                            
-                            // Log the transaction
+                            // Let the service handle the RGP value update
                             $rgpTransactionService->createTransaction(
                                 $parent,
                                 'credit',
@@ -839,9 +884,7 @@ class HomeController extends Controller
                                 'new_rgp_l' => $parent->rgp_l
                             ]);
                         } elseif ($childPlacement === 'right') {
-                            $parent->rgp_r = number_format(floatval($parent->rgp_r ?? 0) + $rgpPoints, 2);
-                            
-                            // Log the transaction
+                            // Let the service handle the RGP value update
                             $rgpTransactionService->createTransaction(
                                 $parent,
                                 'credit',
@@ -864,13 +907,92 @@ class HomeController extends Controller
                             ]);
                         }
                         
-                        $parent->save();
+                        $creditedIds[] = $parent->id; // Mark this parent as credited
                         $currentUser = $parent;
+                    }
+                    
+                    // After the loop, if we have a root user (no parent), credit them only if not already credited
+                    if ($currentUser && !$currentUser->rgp_parent_id && !in_array($currentUser->id, $creditedIds)) {
+                        // Store previous values
+                        $previousRgpL = $currentUser->rgp_l;
+                        $previousRgpR = $currentUser->rgp_r;
+                        
+                        // Calculate RGP points as 1% of the transaction amount
+                        $rgpPoints = round($amount * 0.01, 2);
+                        
+                        // Find which side the purchasing user is on relative to this root user
+                        $purchasingUser = $user;
+                        $childPlacement = null;
+                        
+                        // Trace back to find the placement
+                        $tempUser = $purchasingUser;
+                        while ($tempUser->rgp_parent_id && $tempUser->rgp_parent_id != $currentUser->id) {
+                            $tempUser = User::find($tempUser->rgp_parent_id);
+                        }
+                        
+                        if ($tempUser && $tempUser->rgp_parent_id == $currentUser->id) {
+                            $childPlacement = $tempUser->referral_node;
+                        }
+                        
+                        \Log::info('Processing RGP for root user', [
+                            'root_user_id' => $currentUser->id,
+                            'root_username' => $currentUser->username,
+                            'purchasing_user_id' => $purchasingUser->id,
+                            'purchasing_username' => $purchasingUser->username,
+                            'child_placement' => $childPlacement,
+                            'previous_rgp_l' => $previousRgpL,
+                            'previous_rgp_r' => $previousRgpR,
+                            'rgp_points' => $rgpPoints
+                        ]);
+                        
+                        if ($childPlacement === 'left') {
+                            // Let the service handle the RGP value update
+                            $rgpTransactionService->createTransaction(
+                                $currentUser,
+                                'credit',
+                                'left',
+                                $rgpPoints,
+                                'RGP points from ' . $user->username . '\'s purchase of ' . $plan->name,
+                                'purchase',
+                                $user->id,
+                                $plan->id
+                            );
+                            
+                            \Log::info('Added RGP points to root user left side', [
+                                'root_user_id' => $currentUser->id,
+                                'new_rgp_l' => $currentUser->rgp_l
+                            ]);
+                        } elseif ($childPlacement === 'right') {
+                            // Let the service handle the RGP value update
+                            $rgpTransactionService->createTransaction(
+                                $currentUser,
+                                'credit',
+                                'right',
+                                $rgpPoints,
+                                'RGP points from ' . $user->username . '\'s purchase of ' . $plan->name,
+                                'purchase',
+                                $user->id,
+                                $plan->id
+                            );
+                            
+                            \Log::info('Added RGP points to root user right side', [
+                                'root_user_id' => $currentUser->id,
+                                'new_rgp_r' => $currentUser->rgp_r
+                            ]);
+                        } else {
+                            \Log::warning('Could not determine child placement for root user', [
+                                'root_user_id' => $currentUser->id,
+                                'purchasing_user_id' => $purchasingUser->id
+                            ]);
+                        }
+                        
+                        $creditedIds[] = $currentUser->id; // Mark root as credited
                     }
                     
                     \Log::info('Completed RGP distribution for plan purchase', [
                         'user_id' => $user->id,
-                        'username' => $user->username
+                        'username' => $user->username,
+                        'credited_users' => $creditedIds
                     ]);
                 }
             }
@@ -953,22 +1075,34 @@ class HomeController extends Controller
         $user = auth()->user();
         
         // Calculate the matching value (minimum of left and right)
-        $rgpL = floatval($user->rgp_l ?? 0);
-        $rgpR = floatval($user->rgp_r ?? 0);
-        $matchingValue = min($rgpL, $rgpR);
+        $rgpL = $user->rgp_l;
+        $rgpR = $user->rgp_r;
+        $matchingPoints = min($rgpL, $rgpR);
+        $matchingValue = $matchingPoints * 10; // Convert RGP points to balance (10x multiplier)
         
         // Only process if there's a value to match
-        if ($matchingValue <= 0) {
+        if ($matchingPoints <= 0) {
             return redirect()->back()->with('error', 'There are no RGP values to match.');
         }
         
-        // Update the user's RGP values
-        $user->rgp_l = number_format($rgpL - $matchingValue, 2);
-        $user->rgp_r = number_format($rgpR - $matchingValue, 2);
+        // Log the RGP transaction - the service will update user's RGP values
+        $rgpTransactionService = new \App\Services\RgpTransactionService();
+        $rgpTransactionService->createTransaction(
+            $user,
+            'match',
+            'both',
+            $matchingPoints,
+            'RGP matched profit',
+            'user',
+            null,
+            null
+        );
+        
+        // Only update the pair matching and balance, NOT rgp_l/rgp_r (service already handled this)
         $user->rgp_pair_matching = 0; // Reset pair matching since we've matched it
         
         // Add the matching value to the user's balance
-        $user->balance += $matchingValue;
+        $user->balance = floatval($user->balance) + $matchingValue;
         $user->save();
         
         // Generate a unique transaction ID for RGP matching
@@ -986,19 +1120,6 @@ class HomeController extends Controller
         $transaction->transactional_type = 'RGP';
         $transaction->balance_type = 'balance';
         $transaction->save();
-        
-        // Log the RGP transaction
-        $rgpTransactionService = new \App\Services\RgpTransactionService();
-        $rgpTransactionService->createTransaction(
-            $user,
-            'match',
-            'both',
-            $matchingValue,
-            'RGP matched profit',
-            'user',
-            null,
-            null
-        );
         
         // Send notifications
         $msg = [

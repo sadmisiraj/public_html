@@ -5,11 +5,11 @@
 
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Payout Money')</h3>
+            <h3 class="mb-1">@lang('Sellout Gold')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Payout Money')</li>
+                    <li class="breadcrumb-item active">@lang('Sellout Gold')</li>
                 </ol>
             </nav>
         </div>
@@ -93,7 +93,7 @@
                                             name="wallet_type"
                                     >
                                         <option value="interest_balance"
-                                                class="bg-light text-dark">@lang('Profit Balance -'.currencyPosition(auth()->user()->interest_balance+0))</option>
+                                                class="bg-light text-dark">@lang('Gold value Balance -'.currencyPosition(auth()->user()->interest_balance+0))</option>
                                         <option value="profit_balance"
                                                 class="bg-light text-dark">@lang('Performance Balance -'.currencyPosition(auth()->user()->profit_balance+0))</option>
                                     </select>
@@ -173,7 +173,7 @@
                                             <label for="bank-wallet-type">@lang('Select Wallet')</label>
                                             <select class="form-control" name="wallet_type" id="bank-wallet-type">
                                                 <option value="interest_balance" class="bg-light text-dark">
-                                                    @lang('Profit Balance -'.currencyPosition(auth()->user()->interest_balance+0))
+                                                    @lang('Gold Value Balance -'.currencyPosition(auth()->user()->interest_balance+0))
                                                 </option>
                                                 <option value="profit_balance" class="bg-light text-dark">
                                                     @lang('Performance Balance -'.currencyPosition(auth()->user()->profit_balance+0))
@@ -193,7 +193,7 @@
                                     <div id="bank-withdrawal-summary" class="mb-3" style="display: none;">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="card-title">@lang('Withdrawal Summary')</h5>
+                                                <h5 class="card-title">@lang('Sellout Summary')</h5>
                                                 <div class="withdrawal-details mt-3">
                                                     <div class="row mb-2">
                                                         <div class="col-6">@lang('You will receive'):</div>

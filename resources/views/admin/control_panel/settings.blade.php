@@ -58,6 +58,26 @@
                 </div>
             </div>
             <!-- End Offer Images Tile -->
+            <!-- Manual RGP Credit Tile -->
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon ">
+                            <i class="bi bi-key text-primary"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>Manual RGP Credit</h5>
+                            <span class="">Manually credit RGP points to a user's upline chain.</span>
+                            <span class="mt-1 link-text">
+                                <a href="/security/manual-rgp-credit" target="_blank">Manual Credit
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Manual RGP Credit Tile -->
             @forelse($settingsDetails as $key => $detail)
                 @if(isset($detail['route']))
                     <div class="col-lg-4 col-sm-6 mb-4">

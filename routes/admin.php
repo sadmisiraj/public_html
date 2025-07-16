@@ -139,6 +139,11 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::post('security/dashboard-popup/update', [SecuritySettingsController::class, 'updateDashboardPopupSettings'])->name('security.dashboard.popup.update');
         Route::get('security/offer-images', [SecuritySettingsController::class, 'offerImagesSettings'])->name('security.offer-images');
 
+        // Manual RGP Credit
+        Route::get('manual-rgp-credit', [SecuritySettingsController::class, 'manualRgpCreditForm'])->name('security.manual_rgp_credit');
+        Route::post('manual-rgp-credit/find-parents', [SecuritySettingsController::class, 'findUserParents'])->name('security.manual_rgp_credit.find_parents');
+        Route::post('manual-rgp-credit/credit', [SecuritySettingsController::class, 'manualRgpCredit'])->name('security.manual_rgp_credit.credit');
+
         /* ===== Purchase Charges ===== */
         Route::get('purchase-charges', [PurchaseChargeController::class, 'index'])->name('purchase.charges');
         Route::post('purchase-charges/store', [PurchaseChargeController::class, 'store'])->name('purchase.charges.store');

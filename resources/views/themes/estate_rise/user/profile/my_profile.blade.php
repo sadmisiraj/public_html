@@ -286,11 +286,11 @@
                             <div class="profile-form-section">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label for="rgp_l" class="form-label">@lang('RGP L')</label>
+                                        <label for="rgp_l" class="form-label">@lang('RGP Alpha')</label>
                                         <input type="text" class="form-control" id="rgp_l" value="{{ $user->rgp_l ?? 'N/A' }}" readonly>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="rgp_r" class="form-label">@lang('RGP R')</label>
+                                        <label for="rgp_r" class="form-label">@lang('RGP Beta')</label>
                                         <input type="text" class="form-control" id="rgp_r" value="{{ $user->rgp_r ?? 'N/A' }}" readonly>
                                     </div>
                                     <div class="col-md-6">
@@ -322,12 +322,12 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td>@lang('RGP L')</td>
+                                                        <td>@lang('RGP Alpha')</td>
                                                         <td>{{ $total_rgp_l ?? 0 }}</td>
                                                         <td>{{ $today_rgp_l ?? 0 }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td>@lang('RGP R')</td>
+                                                        <td>@lang('RGP Beta')</td>
                                                         <td>{{ $total_rgp_r ?? 0 }}</td>
                                                         <td>{{ $today_rgp_r ?? 0 }}</td>
                                                     </tr>

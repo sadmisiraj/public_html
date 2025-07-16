@@ -21,6 +21,7 @@ class RecalculateRgpPoints extends Command
     protected $signature = 'rgp:recalculate 
                             {--debug : Show detailed debug information} 
                             {--check-only : Only check for existing transactions without recalculating}
+                            {--check-discrepancies : Check for discrepancies between current and expected RGP values}
                             {--preserve : Preserve existing transactions while recalculating}
                             {--reset-date= : Date from which to consider points were reset (format: Y-m-d)}';
 
@@ -56,6 +57,7 @@ class RecalculateRgpPoints extends Command
     {
         $debug = $this->option('debug');
         $checkOnly = $this->option('check-only');
+        $checkDiscrepancies = $this->option('check-discrepancies');
         $preserve = $this->option('preserve');
         $resetDate = $this->option('reset-date');
         
@@ -78,6 +80,10 @@ class RecalculateRgpPoints extends Command
 
         if ($checkOnly) {
             return $this->checkExistingTransactions();
+        }
+        
+        if ($checkDiscrepancies) {
+            return $this->checkDiscrepancies();
         }
         
         // Check if manage_plans table has the eligible_for_rgp column
@@ -145,13 +151,17 @@ class RecalculateRgpPoints extends Command
                 $userRgpBackup = collect();
             }
 
-            // Step 1: Reset all users' RGP points to zero
-            $this->info('Resetting all users\' RGP points to zero...');
-            User::query()->update([
-                'rgp_l' => 0.00,
-                'rgp_r' => 0.00,
-                'rgp_pair_matching' => 0.00
-            ]);
+            // Step 1: Only reset RGP points if not preserving existing transactions
+            if (!$preserve) {
+                $this->info('Resetting all users\' RGP points to zero...');
+                User::query()->update([
+                    'rgp_l' => 0.00,
+                    'rgp_r' => 0.00,
+                    'rgp_pair_matching' => 0.00
+                ]);
+            } else {
+                $this->info('Preserving existing RGP values as requested...');
+            }
 
             // Step 2: Delete all existing RGP transactions if not preserving
             if (!$preserve) {
@@ -185,7 +195,10 @@ class RecalculateRgpPoints extends Command
                     }
                     
                     // Step 5: Deduct RGP points from matched profits
-                    $transactionCount += $this->deductMatchedRgpPoints($user);
+                    // Only do this if we're doing a fresh recalculation (not preserving)
+                    if (!$preserve) {
+                        $transactionCount += $this->deductMatchedRgpPoints($user);
+                    }
                     
                     // Step 6: Create a "reset recovery" transaction if points were significantly different
                     // Only do this if the --preserve flag is set
@@ -220,6 +233,11 @@ class RecalculateRgpPoints extends Command
 
             $this->info("RGP points recalculation completed successfully!");
             $this->info("Created {$transactionCount} transactions for {$usersWithPlans} users with eligible plans.");
+            
+            if ($preserve) {
+                $this->info("Existing transactions were preserved. Use --preserve=false for a complete recalculation.");
+            }
+            
             return 0;
         } catch (\Exception $e) {
             $this->error('An error occurred: ' . $e->getMessage());
@@ -314,8 +332,8 @@ class RecalculateRgpPoints extends Command
             
             // Note: We don't need to reset points here as they're already reset in the handle method
             // We'll just start from the current values (which should be 0)
-            $currentRgpL = floatval($user->rgp_l ?? 0);
-            $currentRgpR = floatval($user->rgp_r ?? 0);
+            $currentRgpL = (int) ($user->rgp_l ?? 0);
+            $currentRgpR = (int) ($user->rgp_r ?? 0);
 
             foreach ($userPlans as $userPlan) {
                 $plan = $userPlan->plan;
@@ -326,8 +344,8 @@ class RecalculateRgpPoints extends Command
                 
                 // Calculate RGP points based on plan amount
                 // For all plans, use 1% of plan amount
-                $planAmount = floatval($plan->fixed_amount ?? 0);
-                $rgpPoints = $planAmount * 0.01; // 1% of plan amount
+                $planAmount = (int) ($plan->fixed_amount ?? 0);
+                $rgpPoints = (int) ($planAmount * 0.01); // 1% of plan amount
                 
                 if ($debug) {
                     $this->line("  Plan ID: {$plan->id}, Price: {$planAmount}, RGP Points: {$rgpPoints}, Eligible: Yes");
@@ -373,7 +391,7 @@ class RecalculateRgpPoints extends Command
             $this->line("  Propagating {$points} points up from user {$user->id}");
         }
         
-        // Start with the user's RGP parent
+        // Start with the user's RGP parent (skip the purchasing user)
         while ($currentUser->rgp_parent_id) {
             $parent = User::find($currentUser->rgp_parent_id);
             
@@ -388,13 +406,13 @@ class RecalculateRgpPoints extends Command
             $side = $currentUser->referral_node ?? 'left';
             
             // Use the points passed to the method
-            $pointsToAdd = $points;
+            $pointsToAdd = (int) $points;
             
             if ($debug) {
                 $this->line("  Adding {$pointsToAdd} points to parent {$parent->id} on {$side} side");
             }
             
-            // Create transaction for the parent
+            // Create transaction for the parent (service will update user values)
             $transaction = $this->rgpTransactionService->createTransaction(
                 $parent,
                 'credit',
@@ -413,22 +431,40 @@ class RecalculateRgpPoints extends Command
                 $transactionCount++;
             }
             
-            // Get current point values
-            $parentRgpL = floatval($parent->rgp_l ?? 0);
-            $parentRgpR = floatval($parent->rgp_r ?? 0);
-            
-            // Update parent's RGP points based on which side the user is on
-            if ($side === 'left') {
-                $parent->rgp_l = $parentRgpL + $pointsToAdd;
-            } else if ($side === 'right') {
-                $parent->rgp_r = $parentRgpR + $pointsToAdd;
-            }
-            
-            // Make sure to save the parent's updated RGP points
-            $parent->save();
-            
             // Move up to the next parent
             $currentUser = $parent;
+        }
+        
+        // After the loop, if we have a root user (no parent), credit them too
+        if ($currentUser && !$currentUser->rgp_parent_id) {
+            // Determine which side to add points to based on the referral_node
+            $side = $user->referral_node ?? 'left';
+            
+            // Use the points passed to the method
+            $pointsToAdd = (int) $points;
+            
+            if ($debug) {
+                $this->line("  Adding {$pointsToAdd} points to root user {$currentUser->id} on {$side} side");
+            }
+            
+            // Create transaction for the root user (service will update user values)
+            $transaction = $this->rgpTransactionService->createTransaction(
+                $currentUser,
+                'credit',
+                $side,
+                $pointsToAdd,
+                "RGP points of {$pointsToAdd} credited to {$side} side from downline {$user->username}",
+                'system',
+                $user->id,
+                $planId
+            );
+            
+            // Set the created_at date to the transaction date
+            if ($transaction) {
+                $transaction->created_at = $transactionDate;
+                $transaction->save();
+                $transactionCount++;
+            }
         }
         
         return $transactionCount;
@@ -463,14 +499,14 @@ class RecalculateRgpPoints extends Command
                 $amountInRs = floatval($profitTx->amount ?? 0);
                 $pointsToDeduct = $amountInRs / 10;
                 
-                // Ensure pointsToDeduct is a valid float
-                $pointsToDeduct = floatval($pointsToDeduct);
+                // Ensure pointsToDeduct is a valid integer
+                $pointsToDeduct = (int) $pointsToDeduct;
                 
                 if ($pointsToDeduct > 0) {
                     // Get the original transaction date
                     $txDate = $profitTx->created_at ? new \DateTime($profitTx->created_at) : now();
                     
-                    // Create a debit transaction
+                    // Create a match transaction (service will update user values)
                     $transaction = $this->rgpTransactionService->createTransaction(
                         $user,
                         'match',
@@ -488,15 +524,6 @@ class RecalculateRgpPoints extends Command
                         $transaction->save();
                         $transactionCount++;
                     }
-
-                    // Update user's RGP points
-                    $user->rgp_l = floatval($user->rgp_l) - $pointsToDeduct;
-                    $user->rgp_r = floatval($user->rgp_r) - $pointsToDeduct;
-                    
-                    // Ensure values don't go below zero
-                    $user->rgp_l = max(0, floatval($user->rgp_l));
-                    $user->rgp_r = max(0, floatval($user->rgp_r));
-                    $user->save();
                 }
             }
             
@@ -525,10 +552,10 @@ class RecalculateRgpPoints extends Command
         }
         
         $debug = $this->option('debug');
-        $currentRgpL = floatval($user->rgp_l);
-        $currentRgpR = floatval($user->rgp_r);
-        $backupRgpL = floatval($backupValues['rgp_l']);
-        $backupRgpR = floatval($backupValues['rgp_r']);
+        $currentRgpL = (int) $user->rgp_l;
+        $currentRgpR = (int) $user->rgp_r;
+        $backupRgpL = (int) $backupValues['rgp_l'];
+        $backupRgpR = (int) $backupValues['rgp_r'];
         $username = $backupValues['username'] ?? $user->username ?? 'Unknown';
         
         // Check if backup values were significantly higher (indicating a reset occurred)
@@ -549,7 +576,7 @@ class RecalculateRgpPoints extends Command
                 $this->line("Creating left recovery transaction for {$leftDiff} points");
             }
             
-            // Create transaction for left side recovery
+            // Create transaction for left side recovery (service will update user values)
             $transaction = $this->rgpTransactionService->createTransaction(
                 $user,
                 'credit',
@@ -566,10 +593,6 @@ class RecalculateRgpPoints extends Command
                 $transaction->save();
                 $transactionCount++;
             }
-            
-            // Update user's left RGP points
-            $user->rgp_l = $backupRgpL;
-            $user->save();
         }
         
         if ($rightDiff > 0) {
@@ -577,7 +600,7 @@ class RecalculateRgpPoints extends Command
                 $this->line("Creating right recovery transaction for {$rightDiff} points");
             }
             
-            // Create transaction for right side recovery
+            // Create transaction for right side recovery (service will update user values)
             $transaction = $this->rgpTransactionService->createTransaction(
                 $user,
                 'credit',
@@ -594,13 +617,129 @@ class RecalculateRgpPoints extends Command
                 $transaction->save();
                 $transactionCount++;
             }
-            
-            // Update user's right RGP points
-            $user->rgp_r = $backupRgpR;
-            $user->save();
         }
         
         return $transactionCount;
+    }
+
+    /**
+     * Check for discrepancies between current and expected RGP values
+     *
+     * @return int
+     */
+    protected function checkDiscrepancies()
+    {
+        $this->info('Checking for discrepancies between current and expected RGP values...');
+        
+        $users = User::all();
+        $discrepancies = [];
+        
+        foreach ($users as $user) {
+            if ($this->needsRecalculation($user)) {
+                // Calculate expected values
+                $totalLeftCredits = RgpTransaction::where('user_id', $user->id)
+                    ->where('transaction_type', 'credit')
+                    ->where('side', 'left')
+                    ->sum('amount');
+                    
+                $totalRightCredits = RgpTransaction::where('user_id', $user->id)
+                    ->where('transaction_type', 'credit')
+                    ->where('side', 'right')
+                    ->sum('amount');
+                    
+                $totalMatches = RgpTransaction::where('user_id', $user->id)
+                    ->where('transaction_type', 'match')
+                    ->sum('amount');
+                    
+                $expectedLeft = max(0, $totalLeftCredits - $totalMatches);
+                $expectedRight = max(0, $totalRightCredits - $totalMatches);
+                
+                $currentLeft = (int) $user->rgp_l;
+                $currentRight = (int) $user->rgp_r;
+                
+                $discrepancies[] = [
+                    'username' => $user->username,
+                    'current_l' => $currentLeft,
+                    'current_r' => $currentRight,
+                    'expected_l' => $expectedLeft,
+                    'expected_r' => $expectedRight,
+                    'left_diff' => $currentLeft - $expectedLeft,
+                    'right_diff' => $currentRight - $expectedRight,
+                    'total_credits' => $totalLeftCredits + $totalRightCredits,
+                    'total_matches' => $totalMatches
+                ];
+            }
+        }
+        
+        if (empty($discrepancies)) {
+            $this->info('No discrepancies found. All users have correct RGP values.');
+            return 0;
+        }
+        
+        $this->warn("Found " . count($discrepancies) . " users with discrepancies:");
+        
+        $headers = ['Username', 'Current L', 'Current R', 'Expected L', 'Expected R', 'L Diff', 'R Diff', 'Total Credits', 'Total Matches'];
+        $rows = [];
+        
+        foreach ($discrepancies as $discrepancy) {
+            $rows[] = [
+                $discrepancy['username'],
+                $discrepancy['current_l'],
+                $discrepancy['current_r'],
+                $discrepancy['expected_l'],
+                $discrepancy['expected_r'],
+                $discrepancy['left_diff'],
+                $discrepancy['right_diff'],
+                $discrepancy['total_credits'],
+                $discrepancy['total_matches']
+            ];
+        }
+        
+        $this->table($headers, $rows);
+        
+        $this->info('To fix discrepancies, run: php artisan rgp:recalculate --preserve');
+        
+        return 0;
+    }
+
+    /**
+     * Check if recalculation is needed for a user
+     *
+     * @param User $user
+     * @return bool
+     */
+    protected function needsRecalculation(User $user)
+    {
+        // Calculate what the user's RGP values should be based on transactions
+        $totalLeftCredits = RgpTransaction::where('user_id', $user->id)
+            ->where('transaction_type', 'credit')
+            ->where('side', 'left')
+            ->sum('amount');
+            
+        $totalRightCredits = RgpTransaction::where('user_id', $user->id)
+            ->where('transaction_type', 'credit')
+            ->where('side', 'right')
+            ->sum('amount');
+            
+        $totalMatches = RgpTransaction::where('user_id', $user->id)
+            ->where('transaction_type', 'match')
+            ->sum('amount');
+            
+        $expectedLeft = $totalLeftCredits - $totalMatches;
+        $expectedRight = $totalRightCredits - $totalMatches;
+        
+        // Ensure values don't go below 0
+        $expectedLeft = max(0, $expectedLeft);
+        $expectedRight = max(0, $expectedRight);
+        
+        $currentLeft = (int) $user->rgp_l;
+        $currentRight = (int) $user->rgp_r;
+        
+        // Check if there's a significant difference (more than 1 point)
+        $leftDiff = abs($currentLeft - $expectedLeft);
+        $rightDiff = abs($currentRight - $expectedRight);
+        
+        return $leftDiff > 1 || $rightDiff > 1;
     }
 
     /**

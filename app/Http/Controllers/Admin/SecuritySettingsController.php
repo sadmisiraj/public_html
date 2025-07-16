@@ -131,4 +131,126 @@ class SecuritySettingsController extends Controller
     {
         return redirect()->route('admin.offer-images.index');
     }
+
+    /**
+     * Show the Manual RGP Credit form
+     */
+    public function manualRgpCreditForm()
+    {
+        return view('admin.security.manual_rgp_credit');
+    }
+
+    /**
+     * AJAX: Find all parents up to the root for a given username
+     */
+    public function findUserParents(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string',
+        ]);
+        $user = \App\Models\User::whereRaw('LOWER(username) = ?', [strtolower($request->username)])->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+        $parents = [];
+        $creditedIds = [];
+        $current = $user;
+        while ($current && $current->rgp_parent_id) {
+            $parent = \App\Models\User::find($current->rgp_parent_id);
+            if (!$parent || in_array($parent->id, $creditedIds)) break;
+            $parents[] = [
+                'id' => $parent->id,
+                'username' => $parent->username,
+                'fullname' => trim($parent->firstname . ' ' . $parent->lastname),
+                'referral_node' => $current->referral_node,
+            ];
+            $creditedIds[] = $parent->id;
+            $current = $parent;
+        }
+        // Only add root if not already credited and not the original user
+        if ($current && !$current->rgp_parent_id && !in_array($current->id, $creditedIds) && $current->id != $user->id) {
+            $parents[] = [
+                'id' => $current->id,
+                'username' => $current->username,
+                'fullname' => trim($current->firstname . ' ' . $current->lastname),
+                'referral_node' => $user->referral_node, // for root, use the original user's node
+            ];
+        }
+        return response()->json(['parents' => $parents]);
+    }
+
+    /**
+     * AJAX: Credit RGP points to all parents in the chain (by username)
+     */
+    public function manualRgpCredit(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string',
+            'points' => 'required|numeric|min:0.01',
+        ]);
+        $user = \App\Models\User::whereRaw('LOWER(username) = ?', [strtolower($request->username)])->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+        $points = round($request->points, 2);
+        $credited = [];
+        $creditedIds = [];
+        $current = $user;
+        $rgpTransactionService = new \App\Services\RgpTransactionService();
+        while ($current && $current->rgp_parent_id) {
+            $parent = \App\Models\User::find($current->rgp_parent_id);
+            if (!$parent) break;
+            if (!in_array($parent->id, $creditedIds) && $parent->id != $user->id) {
+                $side = $current->referral_node ?? 'left';
+                
+                // Let the service handle the RGP value update
+                $rgpTransactionService->createTransaction(
+                    $parent,
+                    'credit',
+                    $side,
+                    $points,
+                    'Manual point added',
+                    'manual',
+                    $user->id,
+                    null
+                );
+                
+                $credited[] = [
+                    'id' => $parent->id,
+                    'username' => $parent->username,
+                    'fullname' => trim($parent->firstname . ' ' . $parent->lastname),
+                    'side' => $side,
+                    'points' => $points
+                ];
+                $creditedIds[] = $parent->id;
+            }
+            $current = $parent;
+        }
+        // After the loop, $current is the root (no parent)
+        if ($current && !$current->rgp_parent_id && !in_array($current->id, $creditedIds) && $current->id != $user->id) {
+            $side = $user->referral_node ?? 'left';
+            
+            // Let the service handle the RGP value update
+            $rgpTransactionService->createTransaction(
+                $current,
+                'credit',
+                $side,
+                $points,
+                'Manual point added',
+                'manual',
+                $user->id,
+                null
+            );
+            
+            $credited[] = [
+                'id' => $current->id,
+                'username' => $current->username,
+                'fullname' => trim($current->firstname . ' ' . $current->lastname),
+                'side' => $side,
+                'points' => $points
+            ];
+            $creditedIds[] = $current->id;
+        }
+        return response()->json(['credited' => $credited]);
+    }
 }

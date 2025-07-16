@@ -1,5 +1,5 @@
 @extends(template().'layouts.user')
-@section('title',trans('Team Members'))
+@section('title',trans('Reino Team Members'))
 
 @push('css-lib')
     <link rel="stylesheet" href="{{ asset(template(true).'css/bootstrap-datepicker.css') }}"/>
@@ -8,11 +8,11 @@
 @section('content')
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Team Members')</h3>
+            <h3 class="mb-1">@lang('Reino Team Members')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Team Members')</li>
+                    <li class="breadcrumb-item active">@lang('Reino Team Members')</li>
                 </ol>
             </nav>
         </div>

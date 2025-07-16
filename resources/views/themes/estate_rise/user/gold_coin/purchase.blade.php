@@ -99,14 +99,14 @@
                     <div class="form-group mb-3">
                         <label for="payment_source">@lang('Payment Source') <span class="text-danger">*</span></label>
                         <select name="payment_source" id="payment_source" class="form-control" required>
-                            <option value="deposit" {{ old('payment_source') == 'deposit' ? 'selected' : '' }}>@lang('Deposit Balance') - {{ currencyPosition($user->balance) }}</option>
-                            <option value="profit" {{ old('payment_source') == 'profit' ? 'selected' : '' }}>@lang('Profit Balance') - {{ currencyPosition($user->interest_balance) }}</option>
+                           
+                            <option value="profit" {{ old('payment_source') == 'profit' ? 'selected' : '' }}>@lang('Gold Value Balance') - {{ currencyPosition($user->interest_balance) }}</option>
                             <option value="performance" {{ old('payment_source') == 'performance' ? 'selected' : '' }}>@lang('Performance Balance') - {{ currencyPosition($user->profit_balance) }}</option>
                         </select>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="address">@lang('Address') <span class="text-danger">*</span></label>
+                        <label for="address">@lang('Delivery Address') <span class="text-danger">*</span></label>
                         <input type="text" name="address" id="address" class="form-control" value="{{ old('address') }}" required>
                     </div>
                     

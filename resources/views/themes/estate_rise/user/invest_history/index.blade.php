@@ -1,13 +1,13 @@
 @extends(template().'layouts.user')
-@section('title',trans('Purchase History'))
+@section('title',trans('Gold Purchase History'))
 @section('content')
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Purchase History')</h3>
+            <h3 class="mb-1">@lang('Gold Purchase History')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Purchase History')</li>
+                    <li class="breadcrumb-item active">@lang('Gold Purchase History')</li>
                 </ol>
             </nav>
         </div>
@@ -15,7 +15,7 @@
         <!-- Cmn table section start -->
         <div class="card">
             <div class="card-header d-flex justify-content-between pb-0 border-0">
-                <h4>@lang('Purchase History')</h4>
+                <h4>@lang('Gold Purchase History')</h4>
             </div>
             <div class="card-body">
                 <div class="cmn-table">
@@ -25,8 +25,8 @@
                             <tr>
                                 <th scope="col">@lang('SL')</th>
                                 <th scope="col">@lang('Purchase Plan')</th>
-                                <th scope="col">@lang('Return Profit')</th>
-                                <th scope="col">@lang('Received Amount')<i class="fa-sharp fa-thin fa-circle-info ms-1" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Total Return" data-bs-original-title="Per Return"></i></th>
+                                <th scope="col">@lang('Gold Value')</th>
+                                <th scope="col">@lang('Received Gold Value')<i class="fa-sharp fa-thin fa-circle-info ms-1" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Total Return" data-bs-original-title="Per Return"></i></th>
                                 <th scope="col">@lang('Upcoming Payment')</th>
                                 <th scope="col">@lang('Remarks')</th>
                                 <th scope="col">@lang('Invoice')</th>
@@ -140,7 +140,7 @@
                                                     }
                                                 @endphp
                                                 <div class="text-warning">
-                                                    <i class="fas fa-calendar-alt"></i> @lang('Payment delayed due to holiday:') {{ $holiday->name }}
+                                                    <i class="fas fa-calendar-alt"></i> @lang('Gold Value delayed due to holiday:') {{ $holiday->name }}
                                                 </div>
                                                 @if(count($upcomingHolidays) > 1)
                                                     <div class="mt-1">
@@ -152,17 +152,17 @@
                                                 @endif
                                             @elseif($isNextDayHoliday)
                                                 <div class="text-warning">
-                                                    <i class="fas fa-calendar-alt"></i> @lang('Next payment day is a holiday')
+                                                    <i class="fas fa-calendar-alt"></i> @lang('Next Gold Value day is a holiday')
                                                 </div>
                                                 <div class="mt-1">
-                                                    <i class="fas fa-info-circle"></i> @lang('Payment will be processed on next working day')
+                                                    <i class="fas fa-info-circle"></i> @lang('Gold Value will be processed on next working day')
                                                     <button type="button" class="btn btn-sm btn-info ms-2" data-bs-toggle="modal" data-bs-target="#holidayModal{{$invest->id}}">
                                                         @lang('See Details')
                                                     </button>
                                                 </div>
                                             @else
                                                 <div class="text-success">
-                                                    <i class="fas fa-check-circle"></i> @lang('Regular payment day - No holidays')
+                                                    <i class="fas fa-check-circle"></i> @lang('Regular Gold Value day - No holidays')
                                                 </div>
                                             @endif
                                         @else

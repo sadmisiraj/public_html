@@ -53,6 +53,18 @@
                 </ol>
             </nav>
         </div>
+        @if($announcements && count($announcements) > 0)
+            <div class="announcement-marquee mb-3">
+                <marquee behavior="scroll" direction="left" scrollamount="6" onmouseover="this.stop();" onmouseout="this.start();">
+                    @foreach($announcements as $announcement)
+                        <span class="announcement-item">{{ $announcement }}</span>
+                        @if(!$loop->last)
+                            <span class="mx-3">|</span>
+                        @endif
+                    @endforeach
+                </marquee>
+            </div>
+        @endif
      
         <!-- Page title end -->
         <div class="dashboard-top">
@@ -141,9 +153,9 @@
                     </div>
                     <div class="text-box">
                         <a href="{{route('user.plan')}}" class="cmn-btn"><i class="fa-regular fa-usd-circle"></i>
-                            @lang('Purchase')</a>
+                            @lang('Gold Purchase')</a>
                         <a href="{{route('user.addFund')}}" class="cmn-btn"><i class="fa-regular fa-wallet"></i>
-                            @lang('Deposit')</a>
+                            @lang('Gold Booking')</a>
                     </div>
                 </div>
             </div>
@@ -154,7 +166,7 @@
                     </div>
                     <div class="text-box">
                         <h4 class="title mb-0">{{currencyPosition(auth()->user()->balance+0)}}</h4>
-                        <p class="mb-0">@lang('Deposit Balance')</p>
+                        <p class="mb-0">@lang('Booking Balance')</p>
                     </div>
                 </div>
             </div>
@@ -176,7 +188,7 @@
                     </div>
                     <div class="text-box">
                         <h5 class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</h5>
-                        <p class="mtitle b-0">@lang('Profit Balance')</p>
+                        <p class="mtitle b-0">@lang('Gold value Balance')</p>
                     </div>
                 </div>
             </div>
@@ -187,7 +199,7 @@
                     </div>
                     <div class="text-box">
                         <h5 class="title mb-0">{{currencyPosition($totalDeposit+0)}} </h5>
-                        <p class="mb-0">@lang('Total Deposit')</p>
+                        <p class="mb-0">@lang('Total Gold Booking')</p>
                     </div>
                 </div>
             </div>
@@ -262,7 +274,7 @@
 
                                         <div class="text-box">
                                             <h5 class="title">{{currencyPosition($roi['totalInvestAmount']+0)}}</h5>
-                                            <h6>@lang('Total Purchase')</h6>
+                                            <h6>@lang('Total Gold Purchase')</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -274,7 +286,7 @@
 
                                         <div class="text-box">
                                             <h5 class="title">{{currencyPosition($totalPayout+0)}}</h5>
-                                            <h6>@lang('Total Payout')</h6>
+                                            <h6>@lang('Total Saled Gold')</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -379,7 +391,7 @@
 
                                         <div class="text-box">
                                             <h6>{{currencyPosition($lastPayout)}}</h6>
-                                            <h5 class="title">@lang('Last Payout')</h5>
+                                            <h5 class="title">@lang('Latest Gold sale ')</h5>
                                         </div>
                                     </div>
                                 </div>
@@ -651,6 +663,20 @@
             max-width: 100%;
             height: auto;
             display: block;
+        }
+        .announcement-marquee {
+            background: #fffbe6;
+            color: #ae8656;
+            border: 1px solid #ffe58f;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .announcement-item {
+            margin-right: 16px;
         }
     </style>
 @endpush

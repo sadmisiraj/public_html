@@ -57,6 +57,23 @@
                 </div>
             </div>
 
+            <div class="row mb-4">
+                <label class="col-sm-3 col-form-label form-label">@lang('Freeze Daily Credit Show')</label>
+                <div class="col-sm-9">
+                    <div class="form-check form-switch">
+                        <input type="hidden" name="freeze_daily_credit_show" value="0">
+                        <input type="checkbox" class="form-check-input" name="freeze_daily_credit_show"
+                               id="freezeDailyCreditSwitch" value="1" {{ $user->freeze_daily_credit_show == 1 ? 'checked' : '' }}>
+                        <label class="form-check-label" for="freezeDailyCreditSwitch">
+                            @lang('When enabled, shows 0 for today earned RGP values in user profile')
+                        </label>
+                    </div>
+                    @error('freeze_daily_credit_show')
+                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">@lang('Save Changes')</button>
             </div>

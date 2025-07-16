@@ -42,13 +42,21 @@ class DistributeProfit extends Command
         }
 
         DB::transaction(function () use ($basic, $now) {
+            // Use lockForUpdate to prevent race conditions
             Investment::with(['user:id,firstname,lastname,username,email,phone_code,phone,balance,interest_balance', 'plan'])
                 ->has('user')
                 ->whereHas('plan')
                 ->whereStatus(1)
                 ->where('afterward', '<=', $now)
+                ->lockForUpdate() // Add locking to prevent race conditions
                 ->chunk(100, function ($investments) use ($basic, $now) {
                     foreach ($investments as $data) {
+                        // Double-check that the investment is still eligible for profit distribution
+                        // This prevents processing investments that might have been updated by another process
+                        if ($data->afterward > $now || $data->status != 1) {
+                            continue;
+                        }
+
                         $pointTime = (float) $data->point_in_time;
 
                         $next_time = Carbon::parse($now)->addHours($pointTime);

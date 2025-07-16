@@ -44,10 +44,58 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'rgp_l' => 'decimal:2',
-        'rgp_r' => 'decimal:2',
-        'rgp_pair_matching' => 'decimal:2',
+        'rgp_l' => 'integer',
+        'rgp_r' => 'integer',
+        'rgp_pair_matching' => 'integer',
     ];
+
+    /**
+     * Get the RGP L value as an integer
+     */
+    public function getRgpLAttribute($value)
+    {
+        return $value ? (int) $value : 0;
+    }
+
+    /**
+     * Set the RGP L value
+     */
+    public function setRgpLAttribute($value)
+    {
+        $this->attributes['rgp_l'] = $value ? (int) $value : 0;
+    }
+
+    /**
+     * Get the RGP R value as an integer
+     */
+    public function getRgpRAttribute($value)
+    {
+        return $value ? (int) $value : 0;
+    }
+
+    /**
+     * Set the RGP R value
+     */
+    public function setRgpRAttribute($value)
+    {
+        $this->attributes['rgp_r'] = $value ? (int) $value : 0;
+    }
+
+    /**
+     * Get the RGP pair matching value as an integer
+     */
+    public function getRgpPairMatchingAttribute($value)
+    {
+        return $value ? (int) $value : 0;
+    }
+
+    /**
+     * Set the RGP pair matching value
+     */
+    public function setRgpPairMatchingAttribute($value)
+    {
+        $this->attributes['rgp_pair_matching'] = $value ? (int) $value : 0;
+    }
 
     protected $dates = ['deleted_at'];
 
@@ -102,6 +150,7 @@ class User extends Authenticatable
         'rgp_pair_matching',
         'dashboard_label',
         'dashboard_value',
+        'freeze_daily_credit_show',
     ];
 
     protected static function boot()

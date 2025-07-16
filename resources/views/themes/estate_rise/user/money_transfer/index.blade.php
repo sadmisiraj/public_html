@@ -4,11 +4,11 @@
 @section('content')
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Balance Transfer')</h3>
+            <h3 class="mb-1">@lang('Gold Value Transfer')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Balance Transfer')</li>
+                    <li class="breadcrumb-item active">@lang('Gold Value Transfer')</li>
                 </ol>
             </nav>
         </div>
@@ -37,7 +37,7 @@
 
                     <div class="card">
                         <div class="card-header">
-                            <h4>@lang('Balance Transfer')</h4>
+                            <h4>@lang('Gold value Transfer')</h4>
                         </div>
                         <div class="card-body">
                             <form action="{{route('user.money.transfer')}}" method="post" enctype="multipart/form-data">
@@ -68,8 +68,8 @@
                                             <label for="Amount" class="form-label">@lang('Select Wallet')</label>
                                             <select name="wallet_type" id="wallet_type" class="form-control" required>
                                                 <option value="" selected disabled>{{trans('Select Wallet')}}</option>
-                                                <option value="balance" >{{trans('Deposit Balance')}}</option>
-                                                <option value="interest_balance" >{{trans('Profit Balance')}}</option>
+                                                <option value="balance" >{{trans('Booking Balance')}}</option>
+                                                <option value="interest_balance" >{{trans('Gold Value Balance')}}</option>
                                                 <option value="profit_balance" >{{trans('Performance Balance')}}</option>
                                             </select>
                                         </div>
@@ -93,7 +93,7 @@
                                             @if($limitInfo['enabled'] && $limitInfo['remaining_transfers'] == 0)
                                                 @lang('Transfer Limit Reached')
                                             @else
-                                                @lang('send money')
+                                                @lang('send Gold Value ')
                                             @endif
                                         </button>
                                     </div>

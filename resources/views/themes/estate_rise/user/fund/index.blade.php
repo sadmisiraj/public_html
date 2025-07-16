@@ -1,5 +1,5 @@
 @extends(template().'layouts.user')
-@section('title',trans('Fund Deposit History'))
+@section('title',trans('Gold Booking History'))
 
 @push('css-lib')
     <link rel="stylesheet" href="{{ asset(template(true).'css/bootstrap-datepicker.css') }}"/>
@@ -8,11 +8,11 @@
 @section('content')
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Fund Deposit History')</h3>
+            <h3 class="mb-1">@lang('Gold Booking History')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Fund Deposit History')</li>
+                    <li class="breadcrumb-item active">@lang('Gold Booking History')</li>
                 </ol>
             </nav>
         </div>
@@ -20,7 +20,7 @@
         <!-- Cmn table section start -->
         <div class="card">
             <div class="card-header d-flex justify-content-between pb-0 border-0">
-                <h4>@lang('Fund History')</h4>
+                <h4>@lang('Gold Booking History')</h4>
                 <div class="btn-area gap-3 d-flex">
                     <button type="button" class="cmn-btn" data-bs-toggle="offcanvas"
                             data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">@lang('Filter')<i

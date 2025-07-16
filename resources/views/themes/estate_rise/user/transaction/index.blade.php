@@ -67,6 +67,24 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Mobile Transaction List -->
+                    <div class="transaction-mobile-list d-block d-md-none">
+                        @forelse($transactions as $transaction)
+                            <div class="transaction-mobile-card mb-2 p-2">
+                                <div class="d-flex justify-content-between align-items-center small">
+                                    <span class="text-truncate" style="max-width: 90px;">{{ $transaction->trx_id }}</span>
+                                    <span class="fontBold text-{{($transaction->trx_type == '+') ? 'success': 'danger'}}">
+                                        {{($transaction->trx_type == '+') ? '+' : '-'}}{{ currencyPosition($transaction->amount) }}
+                                    </span>
+                                    <span class="fontBold text-danger ms-2">{{ currencyPosition($transaction->charge) }}</span>
+                                </div>
+                                <div class="text-muted" style="font-size: 13px; line-height: 1.2;">{{ $transaction->remarks }}</div>
+                                <div class="text-muted" style="font-size: 12px;">{{ dateTime($transaction->created_at, 'd M Y h:i A') }}</div>
+                            </div>
+                        @empty
+                            <div class="text-center p-3">@lang('No transactions to show')</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,4 +130,29 @@
     </div>
     <!-- Offcanvas sidebar end -->
 @endsection
+
+@push('style')
+    <style>
+        @media (max-width: 767.98px) {
+            .table-responsive { display: none !important; }
+            .transaction-mobile-list { width: 100%; }
+            .transaction-mobile-card {
+                background: #fff;
+                border: 1px solid #eee;
+                border-radius: 6px;
+                margin-bottom: 8px;
+                padding: 8px 10px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            }
+            .transaction-mobile-card .d-flex > span {
+                font-size: 13px;
+                margin-right: 8px;
+            }
+            .transaction-mobile-card .text-muted {
+                margin-top: 2px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+@endpush
 

@@ -68,11 +68,11 @@
 @section('content')
 <div class="main-wrapper">
     <div class="pagetitle">
-        <h3 class="mb-1">@lang('Payout Security Verification')</h3>
+        <h3 class="mb-1">@lang('Gold Sellout Security Verification')</h3>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                <li class="breadcrumb-item active">@lang('Payout Security Verification')</li>
+                <li class="breadcrumb-item active">@lang('Gold Sellout Security Verification')</li>
             </ol>
         </nav>
     </div>

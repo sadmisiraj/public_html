@@ -308,7 +308,7 @@
                         </th>
                         <th>@lang('Trx Number')</th>
                         <th>@lang('User')</th>
-                        <th>@lang('Method')</th>
+                        <th>@lang('wallet')</th>
                         <th>@lang('Amount')</th>
                         <th>@lang('Charge')</th>
                         <th>@lang('Payout Amount')</th>
@@ -439,7 +439,7 @@
                     {data: 'no', name: 'no'},
                     {data: 'trx', name: 'trx'},
                     {data: 'name', name: 'name'},
-                    {data: 'method', name: 'method'},
+                    {data: 'wallet_type', name: 'wallet_type'},
                     {data: 'amount', name: 'amount'},
                     {data: 'charge', name: 'charge'},
                     {data: 'net amount', name: 'net amount'},

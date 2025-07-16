@@ -119,6 +119,7 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
 
             /* ====== Transaction Log =====*/
             Route::get('/transaction', [HomeController::class, 'transaction'])->name('transaction');
+            Route::get('/daily-profit-transaction', [HomeController::class, 'dailyProfitTransaction'])->name('daily-profit-transaction');
 
             // money-transfer
             Route::middleware(['money.transfer.otp.verification'])->group(function () {

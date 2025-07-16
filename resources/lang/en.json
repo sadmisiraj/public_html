@@ -7,6 +7,8 @@
     "Useful Links": "Useful Links",
     "Subscribe to Newsletter": "Subscribe to Newsletter",
     "Follow our social media": "Follow our social media",
+    "Freeze Daily Credit Show": "Freeze Daily Credit Show",
+    "When enabled, shows 0 for today earned RGP values in user profile": "When enabled, shows 0 for today earned RGP values in user profile",
     "Full name": "Full name",
     "Email address": "Email address",
     "Subject": "Subject",
@@ -356,5 +358,9 @@
     "Time has passed": "Time has passed",
     "Terminated": "Terminated",
     "Referral Users": "Referral Users",
-    "Select a Ticket to start messaging": "Select a Ticket to start messaging"
+    "Select a Ticket to start messaging": "Select a Ticket to start messaging",
+    "Daily Profit Transaction": "Daily Profit Transaction",
+    "Daily Profit Transaction History": "Daily Profit Transaction History",
+    "Daily Profit Transaction Filter": "Daily Profit Transaction Filter",
+    "No daily profit transactions to show": "No daily profit transactions to show"
 }

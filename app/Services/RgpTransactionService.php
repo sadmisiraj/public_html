@@ -34,9 +34,9 @@ class RgpTransactionService
         // Generate a unique transaction ID
         $transactionId = 'RGP-' . strtoupper(Str::random(8));
         
-        // Get previous values
-        $previousRgpL = floatval($user->rgp_l ?? 0);
-        $previousRgpR = floatval($user->rgp_r ?? 0);
+        // Get previous values using accessors
+        $previousRgpL = (int) $user->rgp_l;
+        $previousRgpR = (int) $user->rgp_r;
         
         // Calculate new values based on transaction type and side
         $newRgpL = $previousRgpL;
@@ -44,26 +44,26 @@ class RgpTransactionService
         
         if ($transactionType === 'credit') {
             if ($side === 'left' || $side === 'both') {
-                $newRgpL = $previousRgpL + $amount;
+                $newRgpL = $previousRgpL + (int) $amount;
             }
             if ($side === 'right' || $side === 'both') {
-                $newRgpR = $previousRgpR + $amount;
+                $newRgpR = $previousRgpR + (int) $amount;
             }
         } elseif ($transactionType === 'debit') {
             if ($side === 'left' || $side === 'both') {
-                $newRgpL = $previousRgpL - $amount;
+                $newRgpL = max(0, $previousRgpL - (int) $amount);
             }
             if ($side === 'right' || $side === 'both') {
-                $newRgpR = $previousRgpR - $amount;
+                $newRgpR = max(0, $previousRgpR - (int) $amount);
             }
         } elseif ($transactionType === 'match') {
             // For matching, amount is subtracted from both sides
-            $newRgpL = $previousRgpL - $amount;
-            $newRgpR = $previousRgpR - $amount;
+            $newRgpL = max(0, $previousRgpL - (int) $amount);
+            $newRgpR = max(0, $previousRgpR - (int) $amount);
         }
         
         // Create the transaction record
-        return RgpTransaction::create([
+        $transaction = RgpTransaction::create([
             'user_id' => $user->id,
             'transaction_type' => $transactionType,
             'side' => $side,
@@ -78,5 +78,12 @@ class RgpTransactionService
             'related_user_id' => $relatedUserId,
             'plan_id' => $planId,
         ]);
+        
+        // Update the user's RGP values in the database
+        $user->rgp_l = $newRgpL;
+        $user->rgp_r = $newRgpR;
+        $user->save();
+        
+        return $transaction;
     }
 } 

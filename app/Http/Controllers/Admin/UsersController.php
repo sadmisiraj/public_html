@@ -266,6 +266,7 @@ class UsersController extends Controller
             'referral_node' => 'nullable|string|in:left,right,',
             'dashboard_label' => 'nullable|string|max:255',
             'dashboard_value' => 'nullable|string|max:255',
+            'freeze_daily_credit_show' => 'nullable|integer|in:0,1',
         ]);
 
 
@@ -302,6 +303,7 @@ class UsersController extends Controller
                 'referral_node' => $request->referral_node,
                 'dashboard_label' => $request->dashboard_label,
                 'dashboard_value' => $request->dashboard_value,
+                'freeze_daily_credit_show' => $request->freeze_daily_credit_show,
             ]);
 
             return back()->with('success', 'Basic Information Updated Successfully.');
@@ -1258,6 +1260,7 @@ class UsersController extends Controller
             'rgp_l' => 'required|string|max:50',
             'rgp_r' => 'required|string|max:50',
             'rgp_pair_matching' => 'required|string|max:50',
+            'freeze_daily_credit_show' => 'nullable|integer|in:0,1',
         ]);
 
         try {
@@ -1276,12 +1279,6 @@ class UsersController extends Controller
             // Calculate the pair matching value automatically
             $pairMatching = min($newRgpL, $newRgpR);
 
-            $user->update([
-                'rgp_l' => $request->rgp_l,
-                'rgp_r' => $request->rgp_r,
-                'rgp_pair_matching' => $pairMatching,
-            ]);
-            
             // Log the RGP transactions if values changed
             $rgpTransactionService = new RgpTransactionService();
             
@@ -1319,6 +1316,11 @@ class UsersController extends Controller
                 );
             }
 
+            // Update pair matching value and freeze_daily_credit_show
+            $user->rgp_pair_matching = $pairMatching;
+            $user->freeze_daily_credit_show = $request->freeze_daily_credit_show;
+            $user->save();
+
             return back()->with('success', 'RGP values updated successfully. Current pair matching value is ' . $pairMatching);
 
         } catch (\Exception $exp) {
@@ -1341,23 +1343,34 @@ class UsersController extends Controller
             });
             
             // Calculate the matching value (minimum of left and right)
-            $rgpL = floatval($user->rgp_l ?? 0);
-            $rgpR = floatval($user->rgp_r ?? 0);
-            $matchingPoints = (min($rgpL, $rgpR));
-            $matchingValue = (min($rgpL, $rgpR))*10;
+            $rgpL = (int) $user->rgp_l;
+            $rgpR = (int) $user->rgp_r;
+            $matchingPoints = min($rgpL, $rgpR);
+            $matchingValue = $matchingPoints * 10; // Convert RGP points to balance (10x multiplier)
             
             // Only process if there's a value to match
-            if ($matchingValue <= 0) {
+            if ($matchingPoints <= 0) {
                 return back()->with('error', 'There are no RGP values to match for this user.');
             }
             
-            // Update the user's RGP values
-            $user->rgp_l = number_format($rgpL - $matchingPoints, 2);
-            $user->rgp_r = number_format($rgpR - $matchingPoints, 2);
+            // Log the RGP transaction - the service will update user's RGP values
+            $rgpTransactionService = new RgpTransactionService();
+            $rgpTransactionService->createTransaction(
+                $user,
+                'match',
+                'both',
+                $matchingPoints,
+                'RGP matched profit by admin',
+                'admin',
+                null,
+                null
+            );
+            
+            // Only update the pair matching and balance, NOT rgp_l/rgp_r (service already handled this)
             $user->rgp_pair_matching = 0; // Reset pair matching since we've matched it
             
             // Add the matching value to the user's balance
-            $user->profit_balance += $matchingValue;
+            $user->profit_balance = floatval($user->profit_balance) + $matchingValue;
             $user->save();
             
             // Generate a unique transaction ID for RGP matching
@@ -1375,19 +1388,6 @@ class UsersController extends Controller
             $transaction->transactional_type = 'RGP';
             $transaction->balance_type = 'profit_balance';
             $transaction->save();
-            
-            // Log the RGP transaction
-            $rgpTransactionService = new RgpTransactionService();
-            $rgpTransactionService->createTransaction(
-                $user,
-                'match',
-                'both',
-                $matchingPoints,
-                'RGP matched profit by admin',
-                'admin',
-                null,
-                null
-            );
             
             // Send notifications
             $msg = [

@@ -23,10 +23,10 @@
         <div class="wallet-box">
             <div class="cmn-list">
                 <div class="item">
-                    <h6>@lang('Account Balance')</h6> <span class="tag">{{basicControl()->base_currency}}</span>
+                    <h6>@lang('Account Wallet')</h6> <span class="tag">{{basicControl()->base_currency}}</span>
                 </div>
                 <div class="item">
-                    <p class="mb-0"> @lang('Deposit Balance') </p>
+                    <p class="mb-0"> @lang('Booking Balance') </p>
                     <p class="mb-0">{{currencyPosition(auth()->user()->balance+0)}}</p>
                 </div>
                 <div class="item">
@@ -34,7 +34,7 @@
                     <p class="mb-0">{{currencyPosition(auth()->user()->profit_balance+0)}}</p>
                 </div>
                 <div class="item">
-                    <p class="mb-0"> @lang('Profit Balance') </p>
+                    <p class="mb-0"> @lang('Gold Value') </p>
                     <p class="mb-0">{{currencyPosition(auth()->user()->interest_balance+0)}}</p>
                 </div>
             </div>
@@ -55,25 +55,25 @@
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.invest-history'])}}" href="{{route('user.invest-history')}}">
                 <i class="fal fa-file-medical-alt"></i>
-                <span>@lang('Purchase history')</span>
+                <span>@lang('Purchase Plan history')</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.addFund', 'user.addFund.confirm'])}}" href="{{route('user.addFund')}}">
                 <i class="far fa-funnel-dollar"></i>
-                <span>@lang('Deposit Wallet')</span>
+                <span>@lang('Gold Booking Wallet')</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.fund.index'])}}" href="{{route('user.fund.index')}}">
                 <i class="far fa-search-dollar"></i>
-                <span>@lang('Deposit History')</span>
+                <span>@lang('Gold Booking History')</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.money-transfer'])}}" href="{{route('user.money-transfer')}}">
                 <i class="far fa-money-check-alt"></i>
-                <span>@lang('Balance Transfer')</span>
+                <span>@lang('Gold Value Transfer')</span>
             </a>
         </li>
         <li class="nav-item">
@@ -89,27 +89,33 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link collapsed {{menuActive(['user.daily-profit-transaction'])}}" href="{{route('user.daily-profit-transaction')}}">
+                <i class="fa-regular fa-chart-line"></i>
+                <span>@lang('Daily Profit Transaction')</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.payout'])}}" href="{{route('user.payout')}}">
                 <i class="fal fa-hand-holding-usd"></i>
-                <span>@lang('payout Request')</span>
+                <span>@lang('Gold Sell')</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.payout.index'])}}" href="{{route('user.payout.index')}}">
                 <i class="far fa-badge-dollar"></i>
-                <span>@lang('payout history')</span>
+                <span>@lang('Gold Selling history')</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.referral'])}}" href="{{route('user.referral')}}">
                 <i class="fal fa-retweet-alt"></i>
-                <span>@lang('my Team')</span>
+                <span>@lang('my Reino Team')</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.referral.bonus', 'user.referral.bonus.search'])}}" href="{{route('user.referral.bonus')}}">
                 <i class="fal fa-box-usd"></i>
-                <span> @lang('Team bonus') </span>
+                <span> @lang('Reino Team bonus') </span>
             </a>
         </li>
         <li class="nav-item">
@@ -130,12 +136,12 @@
                 <span>@lang('support ticket')</span>
             </a>
         </li>
-        <!-- <li class="nav-item">
+        <li class="nav-item">
             <a class="nav-link collapsed {{menuActive(['user.rgp.transactions'])}}" href="{{route('user.rgp.transactions')}}">
                 <i class="fal fa-network-wired"></i>
                 <span>@lang('RGP Transactions')</span>
             </a>
-        </li> -->
+        </li>
         <br>
         <br>
     </ul>

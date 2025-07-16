@@ -1,5 +1,5 @@
 @extends(template().'layouts.user')
-@section('title',trans('Purchase Plan'))
+@section('title',trans('Gold Purchase Plan'))
 @push('style')
     <style>
         .disabled-plan {
@@ -33,11 +33,11 @@
 @section('content')
     <div class="main-wrapper">
         <div class="pagetitle">
-            <h3 class="mb-1">@lang('Purchase Plan')</h3>
+            <h3 class="mb-1">@lang('Gold Purchase Plan')</h3>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{route('page')}}">@lang('Home')</a></li>
-                    <li class="breadcrumb-item active">@lang('Purchase Plan')</li>
+                    <li class="breadcrumb-item active">@lang('Gold Purchase Plan')</li>
                 </ol>
             </nav>
         </div>
@@ -184,7 +184,7 @@
                                 <select class="form-select" aria-label="Default select example" name="balance_type">
                                     @auth
                                         <option
-                                            value="balance">@lang('Deposit Balance')
+                                            value="balance">@lang('Booking Balance')
                                             - {{currencyPosition(auth()->user()->balance)}}</option>
                                         <option
                                             value="profit_balance">@lang('Performance Balance')
