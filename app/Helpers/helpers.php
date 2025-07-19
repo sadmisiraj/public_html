@@ -1461,7 +1461,7 @@ if (!function_exists('getPaginate')) {
 if (!function_exists('paginateLinks')) {
     function paginateLinks($data)
     {
-        return $data->appends(request()->all())->links();
+        return $data->appends(request()->all())->links(template().'partials.pagination');
     }
 }
 

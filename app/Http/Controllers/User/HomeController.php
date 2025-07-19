@@ -180,6 +180,24 @@ class HomeController extends Controller
             });
         $monthly['referralFundBonus'] = $monthlyReferralFundBonus;
         $latestRegisteredUser = User::where('referral_id', $this->user->id)->latest()->first();
+        
+        // Add RGP data for dashboard
+        $data['total_rgp_l'] = $user->rgpTransactions()->where('side', 'left')->where('transaction_type', 'credit')->sum('amount');
+        $data['total_rgp_r'] = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->sum('amount');
+        // Today's RGP L and RGP R (sum only 'credit' transactions)
+        $today = date('Y-m-d');
+        $today_rgp_l = $user->rgpTransactions()->where('side', 'left')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
+        $today_rgp_r = $user->rgpTransactions()->where('side', 'right')->where('transaction_type', 'credit')->whereDate('created_at', $today)->sum('amount');
+        
+        // If freeze_daily_credit_show is enabled, show 0 for today's values
+        if ($user->freeze_daily_credit_show) {
+            $data['today_rgp_l'] = 0;
+            $data['today_rgp_r'] = 0;
+        } else {
+            $data['today_rgp_l'] = $today_rgp_l;
+            $data['today_rgp_r'] = $today_rgp_r;
+        }
+        
         return view(template() . 'user.dashboard', $data, compact('monthly', 'latestRegisteredUser', 'showDashboardPopup'));
     }
 

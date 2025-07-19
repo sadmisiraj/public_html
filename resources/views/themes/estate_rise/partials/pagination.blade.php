@@ -3,15 +3,15 @@
         <ul class="pagination">
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
-                <li class="page-item">
-                    <a href="javascript:void(0)" class="page-link">
-                        <i class="fal fa-long-arrow-left"></i>
-                    </a>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
                 </li>
             @else
                 <li class="page-item">
-                    <a href="{{ $paginator->previousPageUrl() }}" class="page-link">
-                        <i class="fal fa-long-arrow-left"></i>
+                    <a href="{{ $paginator->previousPageUrl() }}" class="page-link" rel="prev">
+                        <i class="fas fa-chevron-left"></i>
                     </a>
                 </li>
             @endif
@@ -20,8 +20,8 @@
             @foreach ($elements as $element)
                 {{-- "Three Dots" Separator --}}
                 @if (is_string($element))
-                    <li class=" page-item">
-                        <a href="javascript:void(0)" class="page-link">{{ $element }}</a>
+                    <li class="page-item disabled">
+                        <span class="page-link">{{ $element }}</span>
                     </li>
                 @endif
 
@@ -30,11 +30,11 @@
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
                             <li class="page-item active">
-                                <a href="javascript:void(0)" class="page-link">{{ $page }}<span class="sr-only">(current)</span></a>
+                                <span class="page-link">{{ $page }}</span>
                             </li>
                         @else
                             <li class="page-item">
-                                <a href="{{ $url}}" class="page-link">{{ $page }}</a>
+                                <a href="{{ $url }}" class="page-link">{{ $page }}</a>
                             </li>
                         @endif
                     @endforeach
@@ -45,14 +45,14 @@
             @if ($paginator->hasMorePages())
                 <li class="page-item">
                     <a href="{{ $paginator->nextPageUrl() }}" class="page-link" rel="next">
-                        <i class="fal fa-long-arrow-right"></i>
+                        <i class="fas fa-chevron-right"></i>
                     </a>
                 </li>
             @else
-                <li class="disabled page-item">
-                    <a href="javascript:void(0)" class="disabled page-link">
-                        <i class="fal fa-long-arrow-right"></i>
-                    </a>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
                 </li>
             @endif
         </ul>

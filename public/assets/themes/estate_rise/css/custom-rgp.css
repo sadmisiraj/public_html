@@ -22,4 +22,254 @@
     #sidebar {
         overflow-y: scroll;
     }
+}
+
+/* Mobile-specific RGP improvements - Compact version */
+@media (max-width: 767px) {
+    /* Reduce overall spacing */
+    .dashboard-inner {
+        margin-top: 5px;
+    }
+    
+    /* Compact card styling */
+    .card {
+        margin-bottom: 10px;
+    }
+    
+    .card-header {
+        padding: 10px 15px;
+    }
+    
+    .card-title {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+    
+    /* Improve touch targets but keep compact */
+    .form-control, .form-select {
+        min-height: 36px;
+        padding: 6px 10px;
+    }
+    
+    /* Better spacing for mobile */
+    .card-body {
+        padding: 0;
+    }
+    
+    /* Improve button touch targets */
+    .btn {
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+    }
+    
+    /* Better table readability on mobile */
+    .table-responsive--md {
+        margin: 0 10px;
+    }
+    
+    /* Improve badge visibility */
+    .badge {
+        min-width: 50px;
+        text-align: center;
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+    
+    /* Better form spacing */
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    /* Improve filter button */
+    .filter-btn {
+        background: linear-gradient(135deg, rgb(var(--primary-color)), rgb(var(--primary-color), 0.8));
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(var(--primary-color), 0.3);
+    }
+    
+    /* Better balance display */
+    .balance-item {
+        transition: all 0.3s ease;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .balance-item:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow2);
+    }
+    
+    /* Improve empty state */
+    .empty-state {
+        background: var(--bg-color2);
+        border-radius: 8px;
+        margin: 15px 0;
+        padding: 20px 15px;
+    }
+    
+    .empty-state i {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+    
+    .empty-state h6 {
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+    
+    .empty-state p {
+        font-size: 12px;
+        margin: 0;
+    }
+    
+    /* Better pagination on mobile */
+    .pagination .page-link {
+        min-width: 32px;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    /* Compact transaction cards */
+    .custom--table tbody tr {
+        margin-bottom: 6px;
+        padding: 8px;
+        border-radius: 4px;
+    }
+    
+    .custom--table tbody td {
+        padding: 3px 0;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+    
+    .custom--table tbody td::before {
+        font-size: 11px;
+        min-width: 80px;
+    }
+    
+    /* Compact transaction ID */
+    .transaction-id {
+        font-size: 11px;
+    }
+    
+    /* Compact amount */
+    .amount-value {
+        font-size: 12px;
+    }
+    
+    /* Compact date */
+    .date-value {
+        font-size: 10px;
+    }
+    
+    /* Reduce filter form padding */
+    .filter-form {
+        padding: 0 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* Compact balance items */
+    .balance-info {
+        gap: 8px;
+    }
+    
+    .balance-item span {
+        font-size: 12px;
+    }
+    
+    .balance-item .fw-bold {
+        font-size: 13px;
+    }
+    
+    /* Reduce card footer padding */
+    .card-footer {
+        padding: 8px 15px;
+    }
+}
+
+/* Tablet improvements */
+@media (min-width: 768px) and (max-width: 991px) {
+    .balance-info {
+        flex-wrap: wrap;
+    }
+    
+    .filter-form .row {
+        margin-bottom: 20px;
+    }
+}
+
+/* Desktop enhancements */
+@media (min-width: 992px) {
+    .custom--table tbody tr:hover {
+        background-color: var(--bg-color2);
+        transition: background-color 0.3s ease;
+    }
+    
+    .transaction-id {
+        transition: color 0.3s ease;
+    }
+    
+    .transaction-id:hover {
+        color: rgb(var(--primary-color));
+    }
+}
+
+/* Dark theme improvements */
+.dark-theme .balance-item {
+    background: var(--bg-color3);
+    border-color: var(--border-color2);
+}
+
+.dark-theme .filter-btn {
+    background: linear-gradient(135deg, rgb(var(--primary-color)), rgb(var(--primary-color), 0.8));
+}
+
+.dark-theme .empty-state {
+    background: var(--bg-color3);
+}
+
+/* Animation for loading states */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom--table tbody tr {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Improve accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .custom--table tbody tr {
+        animation: none;
+    }
+    
+    .filter-btn:hover {
+        transform: none;
+    }
+    
+    .balance-item:hover {
+        transform: none;
+    }
 } 

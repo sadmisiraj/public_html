@@ -2912,7 +2912,7 @@ Desktop view card section start
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 2fr);
   gap: 15px;
   height: 100%;
 }
@@ -4294,4 +4294,211 @@ Map section end
     display: inline-block;
     font-size: 14px;
     color: var(--primary);
+}
+
+/* Mobile Dashboard Tile Styles */
+@media (max-width: 767px) {
+    /* Grid container mobile optimization */
+    .grid-container {
+        gap: 8px;
+        margin: 15px 0;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-container .item {
+        margin-bottom: 8px;
+    }
+    
+    /* Deposit invest box - main action tile */
+    .deposit-invest-box {
+        padding: 12px;
+        min-height: 70px;
+        border-radius: 12px;
+    }
+    
+    .deposit-invest-box .img-box {
+        width: 50px;
+        height: 50px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .deposit-invest-box .img-box img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .deposit-invest-box .text-box {
+        gap: 6px;
+    }
+    
+    .deposit-invest-box .cmn-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+    
+    /* Balance tiles */
+    .box-card2 {
+        padding: 12px;
+        min-height: 70px;
+        border-radius: 12px;
+    }
+    
+    .box-card2 .img-box {
+        width: 50px;
+        height: 50px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .box-card2 .img-box img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .box-card2 .title {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+    
+    .box-card2 p {
+        font-size: 12px;
+        margin: 0;
+    }
+    
+    /* Todo list tiles */
+    .box-card3 {
+        padding: 12px;
+        min-height: 70px;
+        border-radius: 12px;
+    }
+    
+    .box-card3 .icon-box {
+        width: 50px;
+        height: 50px;
+        margin-right: 12px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .box-card3 .icon-box i {
+        font-size: 25px;
+    }
+    
+    .box-card3 .title {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+    
+    .box-card3 h6 {
+        font-size: 12px;
+        margin: 0;
+        color: var(--grayish-blue);
+    }
+    
+    /* Make text more readable */
+    .box-card2 .title,
+    .box-card3 .title {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        line-height: 1.2;
+    }
+    
+    .box-card2 p,
+    .box-card3 h6 {
+        font-size: 12px !important;
+        line-height: 1.3;
+    }
+    
+    /* Compact layout for todo list */
+    .card .card-body .row {
+        gap: 8px;
+    }
+    
+    .card .card-body .col-md-6 {
+        margin-bottom: 8px;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 575px) {
+    .grid-container {
+        gap: 6px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .deposit-invest-box,
+    .box-card2,
+    .box-card3 {
+        padding: 10px;
+        min-height: 60px;
+    }
+    
+    .deposit-invest-box .img-box,
+    .box-card2 .img-box,
+    .box-card3 .icon-box {
+        width: 45px;
+        height: 45px;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .deposit-invest-box .img-box img,
+    .box-card2 .img-box img {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .box-card3 .icon-box i {
+        font-size: 22px;
+    }
+    
+    .box-card2 .title,
+    .box-card3 .title {
+        font-size: 14px !important;
+    }
+    
+    .box-card2 p,
+    .box-card3 h6 {
+        font-size: 11px !important;
+    }
+    
+    .deposit-invest-box .cmn-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+}
+
+/* Force 2-column grid and unify tile text for dashboard tiles on mobile */
+@media (max-width: 767px) {
+  .grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .box-card2 .text-box h4,
+  .box-card2 .text-box h5,
+  .box-card2 .text-box .title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    line-height: 1.2 !important;
+  }
+  .box-card2 .text-box p,
+  .box-card2 .text-box .mtitle {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0 !important;
+  }
 }

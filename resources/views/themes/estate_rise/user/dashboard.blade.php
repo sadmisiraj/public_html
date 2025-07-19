@@ -205,8 +205,234 @@
             </div>
         </div>
 
+        <!-- Mobile-only Action Tiles -->
+        <div class="mobile-action-tiles d-md-none">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="mobile-action-card">
+                        <div class="action-icon">
+                            <i class="fa-regular fa-usd-circle"></i>
+                        </div>
+                        <div class="action-content">
+                            <h6 class="action-title">@lang('Gold Purchase')</h6>
+                            <p class="action-desc">@lang('Buy gold packages')</p>
+                        </div>
+                        <a href="{{route('user.plan')}}" class="action-link"></a>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="mobile-action-card">
+                        <div class="action-icon">
+                            <i class="fa-regular fa-wallet"></i>
+                        </div>
+                        <div class="action-content">
+                            <h6 class="action-title">@lang('Gold Booking')</h6>
+                            <p class="action-desc">@lang('Add funds to wallet')</p>
+                        </div>
+                        <a href="{{route('user.addFund')}}" class="action-link"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- RGP Earnings Section -->
+        <div class="rgp-earnings-section mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">@lang('RGP Earnings')</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Desktop Table (hidden on mobile) -->
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>@lang('Total Earned')</th>
+                                    <th>@lang('Earned Today')</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@lang('RGP Alpha')</td>
+                                    <td>{{ $total_rgp_l ?? 0 }}</td>
+                                    <td>{{ $today_rgp_l ?? 0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>@lang('RGP Beta')</td>
+                                    <td>{{ $total_rgp_r ?? 0 }}</td>
+                                    <td>{{ $today_rgp_r ?? 0 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Mobile Cards (visible on mobile only) -->
+                    <div class="rgp-mobile-cards d-block d-md-none">
+                        <div class="rgp-card">
+                            <div class="rgp-label">@lang('RGP Alpha')</div>
+                            <div class="rgp-row"><span>@lang('Total Earned'):</span> <span>{{ $total_rgp_l ?? 0 }}</span></div>
+                            <div class="rgp-row"><span>@lang('Earned Today'):</span> <span>{{ $today_rgp_l ?? 0 }}</span></div>
+                        </div>
+                        <div class="rgp-card">
+                            <div class="rgp-label">@lang('RGP Beta')</div>
+                            <div class="rgp-row"><span>@lang('Total Earned'):</span> <span>{{ $total_rgp_r ?? 0 }}</span></div>
+                            <div class="rgp-row"><span>@lang('Earned Today'):</span> <span>{{ $today_rgp_r ?? 0 }}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <style>
+        /* Mobile Action Tiles Styles */
+        .mobile-action-tiles {
+            margin: 20px 0;
+            padding: 0 15px;
+        }
+        
+        .mobile-action-card {
+            position: relative;
+            background: linear-gradient(135deg, rgb(var(--primary-color)) 0%, rgb(var(--primary-color), 0.8) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(var(--primary-color), 0.3);
+            transition: all 0.3s ease;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mobile-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(var(--primary-color), 0.4);
+        }
+        
+        .mobile-action-card .action-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
+        .mobile-action-card .action-icon i {
+            font-size: 24px;
+            color: rgb(var(--white));
+        }
+        
+        .mobile-action-card .action-content {
+            color: rgb(var(--white));
+        }
+        
+        .mobile-action-card .action-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: rgb(var(--white));
+        }
+        
+        .mobile-action-card .action-desc {
+            font-size: 12px;
+            margin: 0;
+            opacity: 0.9;
+            color: rgb(var(--white));
+        }
+        
+        .mobile-action-card .action-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+        
+        /* Hide on desktop */
+        @media (min-width: 768px) {
+            .mobile-action-tiles {
+                display: none !important;
+            }
+        }
+        
+        /* Dark theme support */
+        .dark-theme .mobile-action-card {
+            background: linear-gradient(135deg, rgb(var(--primary-color)) 0%, rgb(var(--primary-color), 0.9) 100%);
+        }
+        </style>
+
+        <style>
+        /* RGP Earnings Styles */
+        .rgp-earnings-section {
+            margin: 20px 0;
+        }
+        
+        .rgp-mobile-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .rgp-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .rgp-card .rgp-label {
+            font-weight: 700;
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .rgp-card .rgp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .rgp-card .rgp-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .rgp-card .rgp-row span:first-child {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .rgp-card .rgp-row span:last-child {
+            color: #495057;
+            font-weight: 700;
+        }
+        
+        /* Dark theme support */
+        .dark-theme .rgp-card {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            border-color: #6c757d;
+        }
+        
+        .dark-theme .rgp-card .rgp-label {
+            color: #f8f9fa;
+        }
+        
+        .dark-theme .rgp-card .rgp-row span:first-child {
+            color: #adb5bd;
+        }
+        
+        .dark-theme .rgp-card .rgp-row span:last-child {
+            color: #f8f9fa;
+        }
+        </style>
 
         <div class="mt-30">
             <div class="row g-4">
@@ -657,6 +883,10 @@
             }
             .grid-container .item {
                 margin-bottom: 16px;
+            }
+            /* Hide the first deposit-invest-box tile on mobile */
+            .grid-container .item:first-child {
+                display: none !important;
             }
         }
         .img-box img {
