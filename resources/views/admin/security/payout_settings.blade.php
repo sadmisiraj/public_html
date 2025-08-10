@@ -70,6 +70,20 @@
                                                 <label class="form-check-label" for="moneyTransferLimitEnabled"></label>
                                             </div>
                                         </div>
+
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="flex-grow-1">
+                                                <h5 class="mb-0">@lang('Enable Withdrawal Limits')</h5>
+                                                <span class="d-block small text-muted">
+                                                    @lang('When enabled, users will have limits on how frequently they can make withdrawals.')
+                                                </span>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" name="withdrawal_limit_enabled" id="withdrawalLimitEnabled" 
+                                                    {{ $basicControl->withdrawal_limit_enabled ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="withdrawalLimitEnabled"></label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -121,6 +135,53 @@
                                 </div>
                             </div>
 
+                            <!-- Withdrawal Limit Settings -->
+                            <div id="withdrawalLimitSettings" class="row mb-4" style="display: {{ $basicControl->withdrawal_limit_enabled ? 'block' : 'none' }};">
+                                <div class="col-md-12">
+                                    <div class="card border-light">
+                                        <div class="card-header bg-light">
+                                            <h6 class="card-title mb-0">@lang('Withdrawal Limit Configuration')</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="withdrawalLimitType" class="form-label">@lang('Limit Type')</label>
+                                                    <select name="withdrawal_limit_type" id="withdrawalLimitType" class="form-select">
+                                                        <option value="daily" {{ $basicControl->withdrawal_limit_type === 'daily' ? 'selected' : '' }}>@lang('Daily')</option>
+                                                        <option value="weekly" {{ $basicControl->withdrawal_limit_type === 'weekly' ? 'selected' : '' }}>@lang('Weekly')</option>
+                                                        <option value="custom_days" {{ $basicControl->withdrawal_limit_type === 'custom_days' ? 'selected' : '' }}>@lang('Custom Days')</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label for="withdrawalLimitCount" class="form-label">@lang('Number of Withdrawals Allowed')</label>
+                                                    <input type="number" class="form-control" name="withdrawal_limit_count" id="withdrawalLimitCount" 
+                                                        value="{{ $basicControl->withdrawal_limit_count ?? 1 }}" min="1" max="100">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-3" id="withdrawalCustomDaysRow" style="display: {{ $basicControl->withdrawal_limit_type === 'custom_days' ? 'block' : 'none' }};">
+                                                <div class="col-md-6">
+                                                    <label for="withdrawalLimitDays" class="form-label">@lang('Number of Days')</label>
+                                                    <input type="number" class="form-control" name="withdrawal_limit_days" id="withdrawalLimitDays" 
+                                                        value="{{ $basicControl->withdrawal_limit_days ?? 1 }}" min="1" max="365">
+                                                    <small class="text-muted">@lang('For custom days limit type only')</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="alert alert-info">
+                                                <strong>@lang('Examples:')</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    <li><strong>@lang('Daily'):</strong> @lang('Users can withdraw X times per day')</li>
+                                                    <li><strong>@lang('Weekly'):</strong> @lang('Users can withdraw X times per week')</li>
+                                                    <li><strong>@lang('Custom Days'):</strong> @lang('Users can withdraw X times every Y days')</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-primary">@lang('Save Changes')</button>
                         </form>
                     </div>
@@ -164,6 +225,7 @@
     @push('script')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Money Transfer Limit Settings
             const limitEnabledCheckbox = document.getElementById('moneyTransferLimitEnabled');
             const limitSettings = document.getElementById('moneyTransferLimitSettings');
             const limitTypeSelect = document.getElementById('limitType');
@@ -177,6 +239,22 @@
             // Toggle custom days row visibility
             limitTypeSelect.addEventListener('change', function() {
                 customDaysRow.style.display = this.value === 'custom_days' ? 'block' : 'none';
+            });
+
+            // Withdrawal Limit Settings
+            const withdrawalLimitEnabledCheckbox = document.getElementById('withdrawalLimitEnabled');
+            const withdrawalLimitSettings = document.getElementById('withdrawalLimitSettings');
+            const withdrawalLimitTypeSelect = document.getElementById('withdrawalLimitType');
+            const withdrawalCustomDaysRow = document.getElementById('withdrawalCustomDaysRow');
+
+            // Toggle withdrawal limit settings visibility
+            withdrawalLimitEnabledCheckbox.addEventListener('change', function() {
+                withdrawalLimitSettings.style.display = this.checked ? 'block' : 'none';
+            });
+
+            // Toggle withdrawal custom days row visibility
+            withdrawalLimitTypeSelect.addEventListener('change', function() {
+                withdrawalCustomDaysRow.style.display = this.value === 'custom_days' ? 'block' : 'none';
             });
         });
     </script>

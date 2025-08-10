@@ -33,6 +33,26 @@
             </div>
         @endif
         
+        @if($withdrawalLimitInfo['enabled'])
+            <div class="col-12 withdrawal-limit-alert">
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <div class="icon-area">
+                        <i class="fa-light fa-info-circle"></i>
+                    </div>
+                    <div class="text-area">
+                        <div class="description">
+                            <h5 class="mb-1">@lang('Withdrawal Limits')</h5>
+                            <p class="mb-0">{{ $withdrawalLimitInfo['message'] }}</p>
+                            @if($withdrawalLimitInfo['reset_date'])
+                                <small class="text-muted">@lang('Next reset'): {{ $withdrawalLimitInfo['reset_date']->format('M d, Y h:i A') }}</small>
+                            @endif
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="fa-regular fa-xmark"></i></button>
+                </div>
+            </div>
+        @endif
+        
         @if(session('error'))
             <div class="col-12 global-error-alert">
                 <div class="alert alert-danger alert-dismissible" role="alert">

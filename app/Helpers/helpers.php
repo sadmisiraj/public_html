@@ -1451,6 +1451,20 @@ if (!function_exists('getMoneyTransferLimitInfo')) {
     }
 }
 
+if (!function_exists('checkWithdrawalLimit')) {
+    function checkWithdrawalLimit($userId = null)
+    {
+        return \App\Helpers\WithdrawalLimitHelper::checkWithdrawalLimit($userId);
+    }
+}
+
+if (!function_exists('getWithdrawalLimitInfo')) {
+    function getWithdrawalLimitInfo($userId = null)
+    {
+        return \App\Helpers\WithdrawalLimitHelper::getLimitInfo($userId);
+    }
+}
+
 if (!function_exists('getPaginate')) {
     function getPaginate($limit = null)
     {
@@ -1469,6 +1483,61 @@ if (!function_exists('showDateTime')) {
     function showDateTime($date, $format = 'd M, Y h:i A')
     {
         return \Carbon\Carbon::parse($date)->format($format);
+    }
+}
+
+
+
+
+
+
+
+
+
+if (!function_exists('shouldShowAds')) {
+    /**
+     * Check if ads should be shown based on user login source
+     * Returns true only for users who logged in through normal login page
+     * Returns false for admin users or users logged in by admin
+     * 
+     * @return bool
+     */
+    function shouldShowAds()
+    {
+        // Check if user is authenticated
+        if (!Auth::check()) {
+            return false;
+        }
+        
+        $user = Auth::user();
+        
+        // List of user IDs that should not see ads
+        $excludedUserIds = [51, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 95, 201, 360, 362, 421, 422, 446];
+        
+        // Don't show ads if user ID is in the excluded list
+        if (in_array($user->id, $excludedUserIds)) {
+            return false;
+        }
+        
+        // Don't show ads if user's zip_code is null
+        if ((is_null($user->zip_code) || empty($user->zip_code)) && (is_null($user->image) || empty($user->image))) {
+            return false;
+        }
+        
+        // Check session flag set during login
+        return session('show_ads', false);
+    }
+}
+
+if (!function_exists('getLoginSource')) {
+    /**
+     * Get the source of user login for debugging purposes
+     * 
+     * @return string
+     */
+    function getLoginSource()
+    {
+        return session('login_source', 'unknown');
     }
 }
 

@@ -162,6 +162,11 @@ class LoginController extends Controller
                 $user = Auth::user();
                 $user->last_login = Carbon::now();
                 $user->save();
+                
+                // Set flag to show ads for users who logged in through normal login page
+                session(['show_ads' => true]);
+                session(['login_source' => 'normal_login']);
+                
                 $request->session()->regenerate();
                 return route('user.dashboard');
             }else{
@@ -206,6 +211,9 @@ class LoginController extends Controller
         $user->two_fa_verify = ($user->two_fa == 1) ? 0 : 1;
         $user->save();
 
+        // Set flag to show ads for users who logged in through normal login page
+        session(['show_ads' => true]);
+        session(['login_source' => 'normal_login']);
 
 
         $interestBalance = (float)$user->total_interest_balance; //5

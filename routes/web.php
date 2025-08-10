@@ -255,6 +255,31 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
         ]);
     })->middleware('auth');
 
+    // Debug route for ads functionality
+    Route::get('/debug-ads', function() {
+        $user = Auth::user();
+        $excludedUserIds = [51, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 95, 201, 360, 362, 421, 422, 446];
+        
+        return [
+            'user' => $user ? $user->username : 'Not logged in',
+            'user_id' => $user ? $user->id : null,
+            'should_show_ads' => shouldShowAds(),
+            'login_source' => getLoginSource(),
+            'session_show_ads' => session('show_ads'),
+            'session_login_source' => session('login_source'),
+            'is_authenticated' => Auth::check(),
+            'is_user_excluded' => $user ? in_array($user->id, $excludedUserIds) : false,
+            'zip_code' => $user ? $user->zip_code : null,
+            'has_zip_code' => $user ? (!is_null($user->zip_code) && !empty($user->zip_code)) : false,
+            'exclusion_reasons' => [
+                'not_authenticated' => !Auth::check(),
+                'excluded_user_id' => $user ? in_array($user->id, $excludedUserIds) : false,
+                'null_zip_code' => $user ? (is_null($user->zip_code) || empty($user->zip_code)) : false,
+                'wrong_login_source' => !session('show_ads', false)
+            ]
+        ];
+    })->middleware('auth');
+
     Auth::routes();
     /*= Frontend Manage Controller =*/
     Route::get("/{slug?}", [FrontendController::class, 'page'])->name('page');

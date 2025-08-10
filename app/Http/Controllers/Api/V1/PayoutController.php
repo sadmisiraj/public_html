@@ -62,6 +62,13 @@ class PayoutController extends Controller
         if (!isActivePayout()){
             return $this->jsonError('Today payout feature is not available.',200);
         }
+        
+        // Check withdrawal limits first
+        $limitCheck = checkWithdrawalLimit();
+        if (!$limitCheck['allowed']) {
+            return $this->jsonError($limitCheck['message'], 200);
+        }
+        
         $rules = [
             'wallet_type' => ['required', 'in:balance,interest_balance,profit_balance'],
             'amount' => ['required', 'numeric'],

@@ -1155,6 +1155,11 @@ class UsersController extends Controller
     public function loginAsUser($id)
     {
         Auth::guard('web')->loginUsingId($id);
+        
+        // Set flag to NOT show ads for users logged in by admin
+        session(['show_ads' => false]);
+        session(['login_source' => 'admin_login']);
+        
         return redirect()->route('user.dashboard');
     }
 

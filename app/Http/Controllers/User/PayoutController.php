@@ -64,6 +64,7 @@ class PayoutController extends Controller
         $data['basic'] = basicControl();
         $data['payoutMethod'] = PayoutMethod::where('is_active', 1)->get();
         $data['bankDetails'] = Auth::user()->bankDetails;
+        $data['withdrawalLimitInfo'] = getWithdrawalLimitInfo();
         
         // Check if the bank details are verified
         if ($data['bankDetails'] && !$data['bankDetails']->is_verified) {
@@ -226,6 +227,12 @@ class PayoutController extends Controller
     {
         if (!isActivePayout()){
             return back()->with('error', 'Today payout feature is not available.');
+        }
+        
+        // Check withdrawal limits first
+        $limitCheck = checkWithdrawalLimit();
+        if (!$limitCheck['allowed']) {
+            return back()->withInput()->with('error', $limitCheck['message']);
         }
         
         \Log::info('Payout request received', $request->all());

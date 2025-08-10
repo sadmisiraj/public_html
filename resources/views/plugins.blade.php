@@ -16,6 +16,13 @@
 @endif
 <!--End of Google analytic Script-->
 
+<!--Start of Google AdSense Script-->
+@if(basicControl()->analytic_status && shouldShowAds())
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8596056517622475"
+    crossorigin="anonymous"></script>
+@endif
+<!--End of Google AdSense Script-->
+
 
 <!--Start of Tawk.to Script-->
 @if(basicControl()->tawk_status)

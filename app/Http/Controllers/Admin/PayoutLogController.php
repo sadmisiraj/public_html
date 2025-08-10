@@ -358,8 +358,10 @@ class PayoutLogController extends Controller
             return back()->with('error', 'Action not possible');
         }
 
-        /* Add money from Sender Wallet */
-        updateBalance($payout->user_id, $payout->net_amount_in_base_currency+0, 1,$payout->wallet_type);
+        /* Add money back to user's wallet - credit the full original amount */
+        // Use amount field since amount_in_base_currency might be 0 due to conversion issues
+        $amountToCredit = $payout->amount_in_base_currency > 0 ? $payout->amount_in_base_currency : $payout->amount;
+        updateBalance($payout->user_id, $amountToCredit+0, 1, $payout->wallet_type);
 
         $payout->feedback = $feedback;
         $payout->status = 3;
