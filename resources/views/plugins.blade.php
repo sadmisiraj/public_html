@@ -17,7 +17,7 @@
 <!--End of Google analytic Script-->
 
 <!--Start of Google AdSense Script-->
-@if(basicControl()->analytic_status && shouldShowAds())
+@if(basicControl()->analytic_status && shouldShowAds() && 1==0)
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8596056517622475"
     crossorigin="anonymous"></script>
 @endif

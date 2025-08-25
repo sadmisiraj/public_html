@@ -1,6 +1,6 @@
 {{-- Example of how to conditionally show ads in any Blade template --}}
 
-@if(shouldShowAds())
+@if(shouldShowAds() && 1==0)
     {{-- Display ads only for users who logged in through normal login page --}}
     <div class="advertisement-section">
         <h4>Advertisement</h4>
