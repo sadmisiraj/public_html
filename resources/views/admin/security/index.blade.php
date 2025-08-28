@@ -113,6 +113,25 @@
                 </div>
             </div>
 
+            <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <div class="d-flex flex-row p-4 gap-4 justify-items-center">
+                        <span class="card-icon">
+                            <i class="text-primary bi bi-shield-check"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <h5>@lang('Laravel Nova Subscription')</h5>
+                            <span>@lang('Manage your Laravel Nova Pro subscription and renewal')</span>
+                            <span class="mt-1 link-text">
+                                <a href="{{ route('admin.security.laravel-nova') }}">@lang('Manage Subscription')
+                                    <i class="fa-sharp fa-light fa-chevron-right"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- This can be expanded later with more security settings -->
         </div>
     </div>

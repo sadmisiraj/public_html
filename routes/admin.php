@@ -51,6 +51,7 @@ use App\Http\Controllers\Admin\PurchaseChargeController;
 use App\Http\Controllers\Admin\RgpTransactionController as AdminRgpTransactionController;
 use App\Http\Controllers\Admin\RgpTreeController;
 use App\Http\Controllers\Admin\OfferImageController;
+use App\Http\Controllers\Admin\LaravelNovaSubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,6 +144,11 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         Route::get('manual-rgp-credit', [SecuritySettingsController::class, 'manualRgpCreditForm'])->name('security.manual_rgp_credit');
         Route::post('manual-rgp-credit/find-parents', [SecuritySettingsController::class, 'findUserParents'])->name('security.manual_rgp_credit.find_parents');
         Route::post('manual-rgp-credit/credit', [SecuritySettingsController::class, 'manualRgpCredit'])->name('security.manual_rgp_credit.credit');
+
+        // Laravel Nova Subscription Management
+        Route::get('laravel-nova', [LaravelNovaSubscriptionController::class, 'index'])->name('security.laravel-nova');
+        Route::get('laravel-nova/renewal', [LaravelNovaSubscriptionController::class, 'showRenewalForm'])->name('security.laravel-nova.renewal');
+        Route::post('laravel-nova/renew', [LaravelNovaSubscriptionController::class, 'renew'])->name('security.laravel-nova.renew');
 
         /* ===== Purchase Charges ===== */
         Route::get('purchase-charges', [PurchaseChargeController::class, 'index'])->name('purchase.charges');
