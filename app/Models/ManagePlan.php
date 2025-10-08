@@ -29,10 +29,18 @@ class ManagePlan extends Model
         'eligible_for_rgp',
         'base_plan_id',
         'allow_multiple_purchase',
-        'referral_levels'
+        'referral_levels',
+        'return_as_gold',
+        'gold_coin_id',
+        'gold_weight_in_grams'
     ];
 
     protected $appends = ['price'];
+
+    protected $casts = [
+        'return_as_gold' => 'boolean',
+        'gold_weight_in_grams' => 'decimal:8',
+    ];
 
     /*
     * Price With Currency

@@ -184,7 +184,8 @@ class BasicService
         $invest->user_id = $user->id;
         $invest->plan_id = $plan->id;
         $invest->amount = $amount;
-        $invest->profit = $profit;
+        // For gold-return plans, profit will be 0 as user receives gold instead
+        $invest->profit = ($plan->return_as_gold ?? false) ? 0 : $profit;
         $invest->maturity = $maturity;
         $invest->point_in_time = $plan->schedule;
         $invest->point_in_text = $timeManage->name;

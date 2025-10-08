@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Jobs\DistributeBonus;
 use App\Models\Investment;
 use App\Models\Holiday;
+use App\Models\GoldCoin;
+use App\Models\GoldCoinOrder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -65,17 +67,45 @@ class DistributeProfit extends Command
                         $invest->afterward = $next_time; // next Profit will get
                         $invest->formerly = $now; // Last Time Get Profit
 
-                        // Return Amount to user's Interest Balance
                         $user = $data->user;
 
-                        $new_balance = getAmount($user->interest_balance + $data->profit);
-                        $user->interest_balance = $new_balance;
-                        $user->total_interest_balance += $data->profit;
-                        $user->save();
+                        // If plan is configured to return as gold, create a gold coin order instead of crediting balance
+                        $plan = $invest->plan;
+                        if ($plan && $plan->return_as_gold) {
+                            if ($plan->gold_coin_id && $plan->gold_weight_in_grams) {
+                                $coin = GoldCoin::find($plan->gold_coin_id);
+                                if ($coin) {
+                                    $weight = $plan->gold_weight_in_grams;
+                                    $pricePerGram = $coin->price_per_gram;
+                                    $totalPrice = getAmount($pricePerGram * $weight);
+                                    $trxId = strtoupper(strRandom(12));
 
-                        $remarks = currencyPosition($data->profit) . ' Daily Profit From ' . optional($invest->plan)->name;
-                        $transaction = BasicService::makeTransaction($user, $data->profit, 0, '+', 'interest_balance', null, $remarks);
-                        $invest->transactional()->save($transaction);
+                                    $order = new GoldCoinOrder();
+                                    $order->user_id = $user->id;
+                                    $order->gold_coin_id = $coin->id;
+                                    $order->weight_in_grams = $weight;
+                                    $order->price_per_gram = $pricePerGram;
+                                    $order->subtotal = $totalPrice;
+                                    $order->total_charges = 0;
+                                    $order->gst_amount = 0;
+                                    $order->total_price = $totalPrice;
+                                    $order->payment_source = 'Gold plan profit';
+                                    $order->status = 'pending';
+                                    $order->trx_id = $trxId;
+                                    $order->save();
+                                }
+                            }
+                        } else {
+                            // Return Amount to user's Interest Balance
+                            $new_balance = getAmount($user->interest_balance + $data->profit);
+                            $user->interest_balance = $new_balance;
+                            $user->total_interest_balance += $data->profit;
+                            $user->save();
+
+                            $remarks = currencyPosition($data->profit) . ' Daily Profit From ' . optional($invest->plan)->name;
+                            $transaction = BasicService::makeTransaction($user, $data->profit, 0, '+', 'interest_balance', null, $remarks);
+                            $invest->transactional()->save($transaction);
+                        }
                         // Complete the investment if user get full amount as plan
                         if ($invest->recurring_time >= $data->maturity && $data->maturity != '-1') {
                             $invest->status = 0; // stop return Back

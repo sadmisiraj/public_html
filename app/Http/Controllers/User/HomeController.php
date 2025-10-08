@@ -787,7 +787,9 @@ class HomeController extends Controller
             $user->save();
 
 
-            $profit = ($plan->profit_type == 1) ? ($amount * $plan->profit) / 100 : $plan->profit;
+            $profit = ($plan->return_as_gold ?? false)
+                ? 0
+                : (($plan->profit_type == 1) ? ($amount * $plan->profit) / 100 : $plan->profit);
             $maturity = ($plan->is_lifetime == 1) ? '-1' : $plan->repeatable;
 
             //// For Fixed Plan

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Investment;
 use App\Models\ManagePlan;
+use App\Models\GoldCoin;
 use App\Models\ManageTime;
 use App\Traits\Notify;
 use Illuminate\Http\Request;
@@ -75,7 +76,8 @@ class ManagePlanController extends Controller
     {
         $times = ManageTime::latest()->get();
         $plans = ManagePlan::where('status', 1)->get();
-        return view('admin.plan.create', compact('times', 'plans'));
+        $goldCoins = GoldCoin::active()->get();
+        return view('admin.plan.create', compact('times', 'plans', 'goldCoins'));
     }
 
 
@@ -88,8 +90,10 @@ class ManagePlanController extends Controller
         $request->validate([
             'name' => 'required',
             'schedule' => 'required',
-            'profit' => 'numeric|min:0',
+            'profit' => 'nullable|numeric|min:0',
             'referral_levels' => 'required|integer|min:1|max:10',
+            'gold_coin_id' => 'nullable|exists:gold_coins,id',
+            'gold_weight_in_grams' => 'nullable|numeric|min:0.00000001',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                 if ($value==1 && $request->is_capital_back==1) {
                     $fail('When capital back is on then you can not on lifetime feature');
@@ -112,6 +116,15 @@ class ManagePlanController extends Controller
         $eligible_for_rgp = $reqData['eligible_for_rgp'] ?? 0;
         $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
         $referral_levels = $reqData['referral_levels'] ?? 1;
+        $return_as_gold = $reqData['return_as_gold'] ?? 0;
+        $gold_coin_id = $reqData['gold_coin_id'] ?? null;
+        $gold_weight_in_grams = $reqData['gold_weight_in_grams'] ?? null;
+
+        if ($return_as_gold) {
+            if (!$gold_coin_id || !$gold_weight_in_grams) {
+                return back()->with('error', 'Gold coin and weight are required when Return as Gold is enabled.')->withInput();
+            }
+        }
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -142,6 +155,9 @@ class ManagePlanController extends Controller
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->allow_multiple_purchase = $allow_multiple_purchase;
         $data->referral_levels = $referral_levels;
+        $data->return_as_gold = $return_as_gold;
+        $data->gold_coin_id = $gold_coin_id;
+        $data->gold_weight_in_grams = $gold_weight_in_grams;
         $data->save();
 
         return back()->with('success', 'Plan has been Added');
@@ -156,7 +172,8 @@ class ManagePlanController extends Controller
         $data = ManagePlan::findOrFail($id);
         $times = ManageTime::latest()->get();
         $plans = ManagePlan::where('status', 1)->where('id', '!=', $id)->get();
-        return view('admin.plan.edit', compact('data', 'times', 'plans'));
+        $goldCoins = GoldCoin::active()->get();
+        return view('admin.plan.edit', compact('data', 'times', 'plans', 'goldCoins'));
     }
 
     /**
@@ -169,9 +186,11 @@ class ManagePlanController extends Controller
         $request->validate([
             'name' => 'required',
             'schedule' => 'numeric|min:0',
-            'profit' => 'numeric|min:0',
+            'profit' => 'nullable|numeric|min:0',
             'referral_levels' => 'required|integer|min:1|max:10',
             'repeatable' => 'sometimes|required',
+            'gold_coin_id' => 'nullable|exists:gold_coins,id',
+            'gold_weight_in_grams' => 'nullable|numeric|min:0.00000001',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                     if ($value==1 && $request->is_capital_back==1) {
                         $fail('When capital back is on then you can not on lifetime feature');
@@ -193,6 +212,18 @@ class ManagePlanController extends Controller
         $eligible_for_rgp = $reqData['eligible_for_rgp'] ?? 0;
         $allow_multiple_purchase = $reqData['allow_multiple_purchase'] ?? 0;
         $referral_levels = $reqData['referral_levels'] ?? 1;
+        $return_as_gold = $reqData['return_as_gold'] ?? 0;
+        $gold_coin_id = $reqData['gold_coin_id'] ?? null;
+        $gold_weight_in_grams = $reqData['gold_weight_in_grams'] ?? null;
+
+        if ($return_as_gold) {
+            if (!$gold_coin_id || !$gold_weight_in_grams) {
+                return back()->with('error', 'Gold coin and weight are required when Return as Gold is enabled.')->withInput();
+            }
+        } else {
+            $gold_coin_id = null;
+            $gold_weight_in_grams = null;
+        }
 
         if (($minimum_amount < 0 || $maximum_amount < 0) && $fixed_amount < 0) {
             return back()->with('error', 'Invest Amount cannot lower than 0')->withInput();
@@ -227,6 +258,9 @@ class ManagePlanController extends Controller
         $data->base_plan_id = $reqData['base_plan_id'] ?? null;
         $data->allow_multiple_purchase = $allow_multiple_purchase;
         $data->referral_levels = $referral_levels;
+        $data->return_as_gold = $return_as_gold;
+        $data->gold_coin_id = $gold_coin_id;
+        $data->gold_weight_in_grams = $gold_weight_in_grams;
         $data->save();
 
         return back()->with('success', 'Plan has been Updated');

@@ -121,7 +121,7 @@
                                        aria-label="The Yield represents the percentage return on investment over the specified period."
                                        data-bs-original-title="The Yield represents the percentage return on investment over the specified period."
                                     ></i>
-                                    <div class="input-group mb-4">
+                                    <div class="input-group mb-4" id="yield_group">
                                         <input type="number" class="form-control @error('profit') is-invalid @enderror" id="return_period" value="{{old('profit',$data->profit)}}" name="profit" placeholder="e.g : 5.00" step="0.001">
 
                                         <!-- Select -->
@@ -162,6 +162,34 @@
                                     @error("schedule")
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
                                     @enderror
+                                </div>
+
+                                <div class="col-md-6" id="gold_fields" style="display:none;">
+                                    <label class="form-label">@lang('Gold Reward')</label>
+                                    <div class="mb-3">
+                                        <label for="gold_coin_id" class="form-label">@lang('Gold Coin')</label>
+                                        <div class="tom-select-custom">
+                                            <select class="js-select form-select" name="gold_coin_id" id="gold_coin_id" autocomplete="off"
+                                                    data-hs-tom-select-options='{
+                                                  "placeholder": "Select a gold coin"
+                                             }'>
+                                                <option value="">@lang('Select')</option>
+                                                @foreach($goldCoins as $coin)
+                                                    <option value="{{$coin->id}}" @selected(old('gold_coin_id', $data->gold_coin_id) == $coin->id)>{{$coin->name}} ({{$coin->karat}}k)</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @error("gold_coin_id")
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="gold_weight_in_grams" class="form-label">@lang('Gold Weight (g) per accrual')</label>
+                                        <input type="number" class="form-control @error('gold_weight_in_grams') is-invalid @enderror" value="{{old('gold_weight_in_grams', $data->gold_weight_in_grams)}}" id="gold_weight_in_grams" name="gold_weight_in_grams" placeholder="e.g : 0.50" step="0.00000001">
+                                        @error("gold_weight_in_grams")
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6" id="Maturity">
@@ -317,6 +345,28 @@
                                             <div class="flex-grow-1 ms-3">
                                                 <div class="row align-items-center">
                                                     <div class="col-sm mb-2 mb-sm-0">
+                                                        <h5 class="mb-0">@lang('Return as Gold')</h5>
+                                                        <p class="fs-5 text-body mb-0">@lang('If enabled, user receives gold coin per accrual instead of profit credit.')</p>
+                                                    </div>
+                                                    <div class="col-sm-auto d-flex align-items-center">
+                                                        <div class="form-check form-switch form-switch-google">
+                                                            <input type="hidden" name="return_as_gold" value="0">
+                                                            <input class="form-check-input" name="return_as_gold"
+                                                                   type="checkbox" id="return_as_gold" value="1" @checked(old('return_as_gold', $data->return_as_gold) == 1)>
+                                                            <label class="form-check-label"
+                                                                   for="return_as_gold"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="list-group-item mb-4">
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-sm mb-2 mb-sm-0">
                                                         <h5 class="mb-0">@lang('Allow Multiple Purchase')</h5>
                                                         <p class="fs-5 text-body mb-0">@lang('If enabled, users can purchase this plan multiple times')</p>
                                                     </div>
@@ -462,6 +512,22 @@
             } else {
                 $('#Maturity').show()
             }
+        })
+
+        function toggleGoldFields() {
+            if ($('#return_as_gold').is(':checked')) {
+                $('#gold_fields').show();
+                $('#yield_group').closest('.col-md-6').hide();
+            } else {
+                $('#gold_fields').hide();
+                $('#yield_group').closest('.col-md-6').show();
+            }
+        }
+
+        toggleGoldFields();
+
+        $(document).on('change','#return_as_gold',function (){
+            toggleGoldFields();
         })
 
         $(document).on('change','#plan_price_type',function (){
