@@ -52,12 +52,12 @@
                                                 $coinsPerPeriod = $isPerLakhMode
                                                     ? (int) round((($invest->amount ?? 0) / $lakh) * (($plan->gold_coins_per_lakh ?? 0)))
                                                     : 1;
-                                                // For coins-per-lakh mode, each coin is 1 g (as per requirement)
-                                                $weightLabel = $isPerLakhMode
-                                                    ? '1 g'
-                                                    : (!is_null($plan->gold_weight_in_grams) ? number_format($plan->gold_weight_in_grams+0, 2) . ' g' : '');
+                                                $coinWeightG = $isPerLakhMode
+                                                    ? 1
+                                                    : (float) ($plan->gold_weight_in_grams ?? 0);
+                                                $coinWeightLabel = number_format($coinWeightG, 0) . ' ' . trans('gram');
                                             @endphp
-                                            {{ $coinsPerPeriod }} {{ Str::plural('coin', $coinsPerPeriod) }} @if($weightLabel) ({{ $weightLabel }}) @endif {{ 'per ' . trans($invest->point_in_text) }}
+                                            {{ $coinWeightLabel }} {{ trans('Gold Coin') }} @if($coinsPerPeriod > 1) x {{ $coinsPerPeriod }} @endif {{ 'per ' . trans($invest->point_in_text) }}
                                         @else
                                             {{currencyPosition($invest->profit)}}
                                             {{($invest->period == '-1') ? trans('For Lifetime') : 'per '. trans($invest->point_in_text)}}
@@ -75,11 +75,15 @@
                                                     ? (int) round((($invest->amount ?? 0) / $lakh) * (($plan->gold_coins_per_lakh ?? 0)))
                                                     : 1;
                                                 $tenure = ($invest->maturity == '-1') ? null : (int)$invest->maturity;
+                                                $totalCoins = $tenure ? ($coinsPerPeriod * $tenure) : null;
+                                                $receivedCoins = (int) ($invest->recurring_time ?? 0) * $coinsPerPeriod;
+                                                if ($totalCoins !== null && $receivedCoins > $totalCoins) { $receivedCoins = $totalCoins; }
+                                                $remainingCoins = $totalCoins !== null ? max($totalCoins - $receivedCoins, 0) : null;
                                             @endphp
-                                            @if($tenure)
-                                                {{ $coinsPerPeriod }} x {{ $tenure }} = {{ $coinsPerPeriod * $tenure }} {{ trans('coins') }} @if($isPerLakhMode) (1 g each) @endif
+                                            @if($totalCoins !== null)
+                                                {{ trans('Received') }}: {{ $receivedCoins }} {{ trans('coins') }} | {{ trans('Remaining') }}: {{ $remainingCoins }} {{ trans('coins') }}
                                             @else
-                                                {{ $coinsPerPeriod }} x {{ trans('Lifetime') }} = ∞ {{ trans('coins') }} @if($isPerLakhMode) (1 g each) @endif
+                                                {{ trans('Received') }}: {{ $receivedCoins }} {{ trans('coins') }} | {{ trans('Remaining') }}: {{ trans('Lifetime') }}
                                             @endif
                                         @else
                                             {{$invest->recurring_time}} x {{ $invest->profit }} =  {{currencyPosition($invest->recurring_time*$invest->profit)}}
