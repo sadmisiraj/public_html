@@ -55,7 +55,20 @@ class DistributeBonus implements ShouldQueue
             if (!$refer) {
                 break;
             }
-            $commission = \App\Models\Referral::where('commission_type', $commissionType)->where('level', $i)->first();
+            // Prefer plan-specific commission levels when planId is provided, fallback to global
+            $commission = null;
+            if (!empty($planId)) {
+                $commission = \App\Models\Referral::where('commission_type', $commissionType)
+                    ->where('level', $i)
+                    ->where('plan_id', $planId)
+                    ->first();
+            }
+            if (!$commission) {
+                $commission = \App\Models\Referral::where('commission_type', $commissionType)
+                    ->where('level', $i)
+                    ->whereNull('plan_id')
+                    ->first();
+            }
             if (!$commission) {
                 break;
             }

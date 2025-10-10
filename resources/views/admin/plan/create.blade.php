@@ -231,6 +231,21 @@
                                     </div>
                                 </div>
 
+                                @php $refLevels = old('referral_levels', 1); @endphp
+                                <div class="col-md-12" id="referralPercentsWrapper" style="display: {{ ($refLevels > 0) ? 'block' : 'none' }};">
+                                    <div class="row">
+                                        <div class="col-12 mb-2">
+                                            <strong>@lang('Referral Percentages per Level (optional, overrides global)')</strong>
+                                        </div>
+                                        @for($lvl=1; $lvl<=10; $lvl++)
+                                            <div class="col-md-3 mb-3 referral-percent-input" data-level="{{$lvl}}" style="display: {{ ($lvl <= $refLevels) ? 'block' : 'none' }};">
+                                                <label class="form-label">@lang('Level') {{$lvl}} (%)</label>
+                                                <input type="number" step="0.01" min="0" class="form-control" name="referral_percent[{{$lvl}}]" value="{{ old('referral_percent.'.$lvl) }}" placeholder="e.g. 2.5">
+                                            </div>
+                                        @endfor
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <!-- Body -->
@@ -527,6 +542,27 @@
         $(document).on('change','#return_as_gold',function (){
             toggleGoldFields();
         })
+
+        function syncReferralPercentInputs() {
+            const levels = parseInt($('#referral_levels').val() || '0', 10);
+            if (isNaN(levels)) return;
+            $('.referral-percent-input').each(function(){
+                const lvl = parseInt($(this).data('level'), 10);
+                if (lvl <= levels) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            if (levels > 0) {
+                $('#referralPercentsWrapper').show();
+            } else {
+                $('#referralPercentsWrapper').hide();
+            }
+        }
+
+        syncReferralPercentInputs();
+        $(document).on('input change', '#referral_levels', syncReferralPercentInputs);
 
         $(document).on('change','#plan_price_type',function (){
             if ($(this).is(':checked')) {

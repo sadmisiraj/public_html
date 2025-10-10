@@ -94,6 +94,7 @@ class ManagePlanController extends Controller
             'referral_levels' => 'required|integer|min:1|max:10',
             'gold_coin_id' => 'nullable|exists:gold_coins,id',
             'gold_weight_in_grams' => 'nullable|numeric|min:0.00000001',
+            'referral_percent.*' => 'nullable|numeric|min:0',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                 if ($value==1 && $request->is_capital_back==1) {
                     $fail('When capital back is on then you can not on lifetime feature');
@@ -160,6 +161,23 @@ class ManagePlanController extends Controller
         $data->gold_weight_in_grams = $gold_weight_in_grams;
         $data->save();
 
+        // Save per-plan referral percents if provided
+        if (!empty($reqData['referral_percent']) && is_array($reqData['referral_percent'])) {
+            \App\Models\Referral::where('commission_type', 'invest')->where('plan_id', $data->id)->delete();
+            $levelCount = (int) $referral_levels;
+            for ($k = 1; $k <= $levelCount; $k++) {
+                if (!isset($reqData['referral_percent'][$k])) continue;
+                $percent = $reqData['referral_percent'][$k];
+                if ($percent === null || $percent === '') continue;
+                $ref = new \App\Models\Referral();
+                $ref->commission_type = 'invest';
+                $ref->plan_id = $data->id;
+                $ref->level = $k;
+                $ref->percent = $percent;
+                $ref->save();
+            }
+        }
+
         return back()->with('success', 'Plan has been Added');
     }
 
@@ -191,6 +209,7 @@ class ManagePlanController extends Controller
             'repeatable' => 'sometimes|required',
             'gold_coin_id' => 'nullable|exists:gold_coins,id',
             'gold_weight_in_grams' => 'nullable|numeric|min:0.00000001',
+            'referral_percent.*' => 'nullable|numeric|min:0',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                     if ($value==1 && $request->is_capital_back==1) {
                         $fail('When capital back is on then you can not on lifetime feature');
@@ -262,6 +281,23 @@ class ManagePlanController extends Controller
         $data->gold_coin_id = $gold_coin_id;
         $data->gold_weight_in_grams = $gold_weight_in_grams;
         $data->save();
+
+        // Save per-plan referral percents if provided
+        if (!empty($reqData['referral_percent']) && is_array($reqData['referral_percent'])) {
+            \App\Models\Referral::where('commission_type', 'invest')->where('plan_id', $data->id)->delete();
+            $levelCount = (int) $referral_levels;
+            for ($k = 1; $k <= $levelCount; $k++) {
+                if (!isset($reqData['referral_percent'][$k])) continue;
+                $percent = $reqData['referral_percent'][$k];
+                if ($percent === null || $percent === '') continue;
+                $ref = new \App\Models\Referral();
+                $ref->commission_type = 'invest';
+                $ref->plan_id = $data->id;
+                $ref->level = $k;
+                $ref->percent = $percent;
+                $ref->save();
+            }
+        }
 
         return back()->with('success', 'Plan has been Updated');
     }
