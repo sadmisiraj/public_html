@@ -44,13 +44,46 @@
                                         <br> {{currencyPosition($invest->amount)}}
                                     </td>
                                     <td>
-                                        {{currencyPosition($invest->profit)}}
-                                        {{($invest->period == '-1') ? trans('For Lifetime') : 'per '. trans($invest->point_in_text)}}
-                                        <br>
-                                        {{($invest->capital_status == '1') ? '+ '.trans('Capital') :''}}
+                                        @if(optional($invest->plan)->return_as_gold)
+                                            @php
+                                                $plan = optional($invest->plan);
+                                                $lakh = 100000;
+                                                $isPerLakhMode = ($plan->gold_reward_type == 1);
+                                                $coinsPerPeriod = $isPerLakhMode
+                                                    ? (int) round((($invest->amount ?? 0) / $lakh) * (($plan->gold_coins_per_lakh ?? 0)))
+                                                    : 1;
+                                                // For coins-per-lakh mode, each coin is 1 g (as per requirement)
+                                                $weightLabel = $isPerLakhMode
+                                                    ? '1 g'
+                                                    : (!is_null($plan->gold_weight_in_grams) ? number_format($plan->gold_weight_in_grams+0, 2) . ' g' : '');
+                                            @endphp
+                                            {{ $coinsPerPeriod }} {{ Str::plural('coin', $coinsPerPeriod) }} @if($weightLabel) ({{ $weightLabel }}) @endif {{ 'per ' . trans($invest->point_in_text) }}
+                                        @else
+                                            {{currencyPosition($invest->profit)}}
+                                            {{($invest->period == '-1') ? trans('For Lifetime') : 'per '. trans($invest->point_in_text)}}
+                                            <br>
+                                            {{($invest->capital_status == '1') ? '+ '.trans('Capital') :''}}
+                                        @endif
                                     </td>
                                     <td>
-                                        {{$invest->recurring_time}} x {{ $invest->profit }} =  {{currencyPosition($invest->recurring_time*$invest->profit)}}
+                                        @if(optional($invest->plan)->return_as_gold)
+                                            @php
+                                                $plan = optional($invest->plan);
+                                                $lakh = 100000;
+                                                $isPerLakhMode = ($plan->gold_reward_type == 1);
+                                                $coinsPerPeriod = $isPerLakhMode
+                                                    ? (int) round((($invest->amount ?? 0) / $lakh) * (($plan->gold_coins_per_lakh ?? 0)))
+                                                    : 1;
+                                                $tenure = ($invest->maturity == '-1') ? null : (int)$invest->maturity;
+                                            @endphp
+                                            @if($tenure)
+                                                {{ $coinsPerPeriod }} x {{ $tenure }} = {{ $coinsPerPeriod * $tenure }} {{ trans('coins') }} @if($isPerLakhMode) (1 g each) @endif
+                                            @else
+                                                {{ $coinsPerPeriod }} x {{ trans('Lifetime') }} = ∞ {{ trans('coins') }} @if($isPerLakhMode) (1 g each) @endif
+                                            @endif
+                                        @else
+                                            {{$invest->recurring_time}} x {{ $invest->profit }} =  {{currencyPosition($invest->recurring_time*$invest->profit)}}
+                                        @endif
                                     </td>
                                     <td>
                                         @if($invest->status == 1)

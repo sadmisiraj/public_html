@@ -184,11 +184,25 @@
                                         @enderror
                                     </div>
                                     <div class="mb-4">
-                                        <label for="gold_weight_in_grams" class="form-label">@lang('Gold Weight (g) per accrual')</label>
-                                        <input type="number" class="form-control @error('gold_weight_in_grams') is-invalid @enderror" value="{{old('gold_weight_in_grams')}}" id="gold_weight_in_grams" name="gold_weight_in_grams" placeholder="e.g : 0.50" step="0.00000001">
-                                        @error("gold_weight_in_grams")
-                                        <span class="invalid-feedback d-block">{{ $message }}</span>
-                                        @enderror
+                                        <label class="form-label">@lang('Reward Configuration')</label>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="gold_reward_type" id="gold_reward_fixed" value="0" {{ old('gold_reward_type', 0) == 0 ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gold_reward_fixed">@lang('Fixed weight per accrual')</label>
+                                                </div>
+                                                <input type="number" class="form-control mt-2 @error('gold_weight_in_grams') is-invalid @enderror" value="{{old('gold_weight_in_grams')}}" id="gold_weight_in_grams" name="gold_weight_in_grams" placeholder="e.g : 0.50" step="0.00000001">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="gold_reward_type" id="gold_reward_per_lakh" value="1" {{ old('gold_reward_type') == 1 ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gold_reward_per_lakh">@lang('Coins per 1 lakh')</label>
+                                                </div>
+                                                <input type="number" class="form-control mt-2 @error('gold_coins_per_lakh') is-invalid @enderror" value="{{old('gold_coins_per_lakh')}}" id="gold_coins_per_lakh" name="gold_coins_per_lakh" placeholder="e.g : 1" step="0.00000001">
+                                            </div>
+                                        </div>
+                                        @error("gold_weight_in_grams")<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
+                                        @error("gold_coins_per_lakh")<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                                     </div>
                                 </div>
 

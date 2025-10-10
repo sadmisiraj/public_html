@@ -94,6 +94,8 @@ class ManagePlanController extends Controller
             'referral_levels' => 'required|integer|min:1|max:10',
             'gold_coin_id' => 'nullable|exists:gold_coins,id',
             'gold_weight_in_grams' => 'nullable|numeric|min:0.00000001',
+            'gold_reward_type' => 'nullable|in:0,1',
+            'gold_coins_per_lakh' => 'nullable|numeric|min:0.00000001',
             'referral_percent.*' => 'nullable|numeric|min:0',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                 if ($value==1 && $request->is_capital_back==1) {
@@ -107,7 +109,7 @@ class ManagePlanController extends Controller
         }
         $minimum_amount = $reqData['minimum_amount'];
         $maximum_amount = $reqData['maximum_amount'];
-        $fixed_amount = $reqData['plan_price_type'] == 1 ? $reqData['fixed_amount'] : 0;
+        $fixed_amount = ($reqData['plan_price_type'] ?? 0) == 1 ? $reqData['fixed_amount'] : 0;
         $profit_type = (int)$reqData['profit_type'];
 
         $repeatable = $reqData['is_lifetime'] == 1 ? 0 : $reqData['repeatable'];
@@ -122,8 +124,19 @@ class ManagePlanController extends Controller
         $gold_weight_in_grams = $reqData['gold_weight_in_grams'] ?? null;
 
         if ($return_as_gold) {
-            if (!$gold_coin_id || !$gold_weight_in_grams) {
-                return back()->with('error', 'Gold coin and weight are required when Return as Gold is enabled.')->withInput();
+            if (!$gold_coin_id) {
+                return back()->with('error', 'Gold coin is required when Return as Gold is enabled.')->withInput();
+            }
+            $rewardType = (int)($reqData['gold_reward_type'] ?? 0);
+            if ($rewardType === 1) {
+                if (empty($reqData['gold_coins_per_lakh'])) {
+                    return back()->with('error', 'Please provide coins per 1 lakh for gold reward.')->withInput();
+                }
+                // weight not required in this mode
+            } else {
+                if (empty($gold_weight_in_grams)) {
+                    return back()->with('error', 'Please provide gold weight per accrual.')->withInput();
+                }
             }
         }
 
@@ -159,6 +172,8 @@ class ManagePlanController extends Controller
         $data->return_as_gold = $return_as_gold;
         $data->gold_coin_id = $gold_coin_id;
         $data->gold_weight_in_grams = $gold_weight_in_grams;
+        $data->gold_reward_type = $reqData['gold_reward_type'] ?? 0;
+        $data->gold_coins_per_lakh = $reqData['gold_coins_per_lakh'] ?? null;
         $data->save();
 
         // Save per-plan referral percents if provided
@@ -209,6 +224,8 @@ class ManagePlanController extends Controller
             'repeatable' => 'sometimes|required',
             'gold_coin_id' => 'nullable|exists:gold_coins,id',
             'gold_weight_in_grams' => 'nullable|numeric|min:0.00000001',
+            'gold_reward_type' => 'nullable|in:0,1',
+            'gold_coins_per_lakh' => 'nullable|numeric|min:0.00000001',
             'referral_percent.*' => 'nullable|numeric|min:0',
             'is_lifetime' => [function ($attribute, $value, $fail)use($request) {
                     if ($value==1 && $request->is_capital_back==1) {
@@ -223,7 +240,7 @@ class ManagePlanController extends Controller
 
         $minimum_amount = $reqData['minimum_amount'];
         $maximum_amount = $reqData['maximum_amount'];
-        $fixed_amount = isset($reqData['plan_price_type']) ? $reqData['fixed_amount'] : 0;
+        $fixed_amount = ($reqData['plan_price_type'] ?? 0) == 1 ? $reqData['fixed_amount'] : 0;
         $profit_type = (int)$reqData['profit_type'];
         $repeatable = $reqData['is_lifetime'] ? 0  : $reqData['repeatable'];
         $featured = $reqData['featured'];
@@ -236,8 +253,19 @@ class ManagePlanController extends Controller
         $gold_weight_in_grams = $reqData['gold_weight_in_grams'] ?? null;
 
         if ($return_as_gold) {
-            if (!$gold_coin_id || !$gold_weight_in_grams) {
-                return back()->with('error', 'Gold coin and weight are required when Return as Gold is enabled.')->withInput();
+            if (!$gold_coin_id) {
+                return back()->with('error', 'Gold coin is required when Return as Gold is enabled.')->withInput();
+            }
+            $rewardType = (int)($reqData['gold_reward_type'] ?? 0);
+            if ($rewardType === 1) {
+                if (empty($reqData['gold_coins_per_lakh'])) {
+                    return back()->with('error', 'Please provide coins per 1 lakh for gold reward.')->withInput();
+                }
+                // weight not required in this mode
+            } else {
+                if (empty($gold_weight_in_grams)) {
+                    return back()->with('error', 'Please provide gold weight per accrual.')->withInput();
+                }
             }
         } else {
             $gold_coin_id = null;
@@ -280,6 +308,8 @@ class ManagePlanController extends Controller
         $data->return_as_gold = $return_as_gold;
         $data->gold_coin_id = $gold_coin_id;
         $data->gold_weight_in_grams = $gold_weight_in_grams;
+        $data->gold_reward_type = $reqData['gold_reward_type'] ?? 0;
+        $data->gold_coins_per_lakh = $reqData['gold_coins_per_lakh'] ?? null;
         $data->save();
 
         // Save per-plan referral percents if provided

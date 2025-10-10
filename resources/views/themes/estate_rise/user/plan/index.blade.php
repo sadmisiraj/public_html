@@ -264,12 +264,37 @@
             let currency = "{{basicControl()->base_currency}}";
             $('.price-range').text(`@lang('Purchase Range'): ${price}`);
 
-            if (data.fixed_amount == '0') {
-                $('.invest-amount').val('');
-                $('#amount').attr('readonly', false);
+            // For gold plans: present dropdown of multiples of 1 lakh between min and max; else keep input
+            let isGoldPlan = !!data.return_as_gold;
+            const inputGroup = $('#amount').closest('.input-group');
+            inputGroup.find('#amountDropdown').remove();
+            if (isGoldPlan) {
+                // Build dropdown
+                const minAmt = parseFloat(data.minimum_amount || 0);
+                const maxAmt = parseFloat(data.maximum_amount || 0);
+                const lakh = 100000;
+                const start = Math.max(1, Math.ceil(minAmt / lakh));
+                const end = Math.max(start, Math.floor(maxAmt / lakh));
+                let select = $('<select/>', {class: 'form-select', id: 'amountDropdown'});
+                for (let i = start; i <= end; i++) {
+                    const val = i * lakh;
+                    const label = i + ' Lakh';
+                    select.append($('<option/>', {value: val, text: label}));
+                }
+                // Replace text input behavior
+                $('#amount').val(start * lakh).attr('readonly', true);
+                inputGroup.append(select);
+                select.on('change', function(){
+                    $('#amount').val($(this).val());
+                });
             } else {
-                $('.invest-amount').val(data.fixed_amount);
-                $('#amount').attr('readonly', true);
+                if (data.fixed_amount == '0') {
+                    $('.invest-amount').val('');
+                    $('#amount').attr('readonly', false);
+                } else {
+                    $('.invest-amount').val(data.fixed_amount);
+                    $('#amount').attr('readonly', true);
+                }
             }
 
             $('.profit-details').html(`@lang('Profit'): ${(data.profit_type == '1') ? `${data.profit} %` : `${data.profit} ${currency}`}`);

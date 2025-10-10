@@ -32,7 +32,9 @@ class ManagePlan extends Model
         'referral_levels',
         'return_as_gold',
         'gold_coin_id',
-        'gold_weight_in_grams'
+        'gold_weight_in_grams',
+        'gold_reward_type',
+        'gold_coins_per_lakh'
     ];
 
     protected $appends = ['price'];
@@ -40,6 +42,8 @@ class ManagePlan extends Model
     protected $casts = [
         'return_as_gold' => 'boolean',
         'gold_weight_in_grams' => 'decimal:8',
+        'gold_reward_type' => 'integer',
+        'gold_coins_per_lakh' => 'decimal:8',
     ];
 
     /*

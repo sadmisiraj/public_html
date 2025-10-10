@@ -9,6 +9,8 @@ use App\Models\Investment;
 use App\Models\ManagePlan;
 use App\Models\ManageTime;
 use App\Models\Transaction;
+use App\Models\GoldCoin;
+use App\Models\GoldCoinOrder;
 use App\Traits\Notify;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -193,6 +195,44 @@ class BasicService
         $invest->status = 1;
         $invest->capital_back = $plan->is_capital_back;
         $invest->save();
+
+        // Immediately deliver first gold order if plan returns as gold
+        if (($plan->return_as_gold ?? false) && $plan->gold_coin_id && $plan->gold_weight_in_grams) {
+            $coin = GoldCoin::find($plan->gold_coin_id);
+            if ($coin) {
+                $weight = $plan->gold_weight_in_grams;
+                $pricePerGram = $coin->price_per_gram;
+                $totalPrice = getAmount($pricePerGram * $weight);
+                $trxId = strtoupper(strRandom(12));
+
+                $order = new GoldCoinOrder();
+                $order->user_id = $user->id;
+                $order->gold_coin_id = $coin->id;
+                $order->weight_in_grams = $weight;
+                $order->price_per_gram = $pricePerGram;
+                $order->subtotal = $totalPrice;
+                $order->purchase_charges = null;
+                $order->total_charges = 0;
+                $order->gst_amount = 0;
+                $order->total_price = $totalPrice;
+                $order->payment_source = 'Gold plan profit';
+                $order->status = 'pending';
+                $order->trx_id = $trxId;
+                $order->save();
+
+                // Count this as the first accrual
+                $invest->recurring_time = ($invest->recurring_time ?? 0) + 1;
+                $now = Carbon::now();
+                $invest->formerly = $now;
+                $invest->afterward = Carbon::parse($now)->addHours($plan->schedule);
+
+                // If plan reaches maturity immediately, mark as completed
+                if ($invest->maturity != '-1' && $invest->recurring_time >= $invest->maturity) {
+                    $invest->status = 0;
+                }
+                $invest->save();
+            }
+        }
         return $invest;
     }
 
