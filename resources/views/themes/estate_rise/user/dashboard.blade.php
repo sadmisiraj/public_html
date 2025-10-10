@@ -235,6 +235,19 @@
             </div>
         </div>
 
+        <!-- Gold Plans Banner -->
+        <div class="mt-4">
+            <a href="{{ route('user.plan') }}" class="w-100 text-decoration-none">
+                <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert" style="border-radius: 12px;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bullhorn me-2"></i>
+                        <strong>@lang('New gold plans launched. Explore.')</strong>
+                    </div>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
         <!-- RGP Earnings Section -->
         <div class="rgp-earnings-section mt-4">
             <div class="card">
