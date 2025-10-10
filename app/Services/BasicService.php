@@ -197,11 +197,21 @@ class BasicService
         $invest->save();
 
         // Immediately deliver first gold order if plan returns as gold
-        if (($plan->return_as_gold ?? false) && $plan->gold_coin_id && $plan->gold_weight_in_grams) {
+        if (($plan->return_as_gold ?? false) && $plan->gold_coin_id) {
             $coin = GoldCoin::find($plan->gold_coin_id);
             if ($coin) {
-                $weight = $plan->gold_weight_in_grams;
                 $pricePerGram = $coin->price_per_gram;
+                $lakh = 100000;
+                $isPerLakhMode = (int)($plan->gold_reward_type ?? 0) === 1;
+                // Determine coins per accrual
+                $coinsPerAccrual = $isPerLakhMode
+                    ? (int) round(($amount / $lakh) * ((float)($plan->gold_coins_per_lakh ?? 1)))
+                    : 1;
+                if ($coinsPerAccrual < 1) { $coinsPerAccrual = 1; }
+
+                // Determine total weight for this accrual
+                $weightPerCoinG = $isPerLakhMode ? 1.0 : (float) ($plan->gold_weight_in_grams ?? 0);
+                $weight = $coinsPerAccrual * $weightPerCoinG; // grams
                 $totalPrice = getAmount($pricePerGram * $weight);
                 $trxId = strtoupper(strRandom(12));
 

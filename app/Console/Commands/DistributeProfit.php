@@ -72,11 +72,19 @@ class DistributeProfit extends Command
                         // If plan is configured to return as gold, create a gold coin order instead of crediting balance
                         $plan = $invest->plan;
                         if ($plan && $plan->return_as_gold) {
-                            if ($plan->gold_coin_id && $plan->gold_weight_in_grams) {
+                            if ($plan->gold_coin_id) {
                                 $coin = GoldCoin::find($plan->gold_coin_id);
                                 if ($coin) {
-                                    $weight = $plan->gold_weight_in_grams;
                                     $pricePerGram = $coin->price_per_gram;
+                                    $lakh = 100000;
+                                    $isPerLakhMode = (int)($plan->gold_reward_type ?? 0) === 1;
+                                    $coinsPerAccrual = $isPerLakhMode
+                                        ? (int) round(((float)$data->amount / $lakh) * ((float)($plan->gold_coins_per_lakh ?? 1)))
+                                        : 1;
+                                    if ($coinsPerAccrual < 1) { $coinsPerAccrual = 1; }
+
+                                    $weightPerCoinG = $isPerLakhMode ? 1.0 : (float) ($plan->gold_weight_in_grams ?? 0);
+                                    $weight = $coinsPerAccrual * $weightPerCoinG;
                                     $totalPrice = getAmount($pricePerGram * $weight);
                                     $trxId = strtoupper(strRandom(12));
 
