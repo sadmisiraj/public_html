@@ -48,6 +48,19 @@
                 <h5 class="mb-0">@lang('Purchase Details')</h5>
             </div>
             <div class="card-body">
+                @if(isset($goldPurchaseLimitInfo) && $goldPurchaseLimitInfo['enabled'])
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-info-circle me-2"></i>
+                            <span>{{ $goldPurchaseLimitInfo['message'] }}</span>
+                        </div>
+                        @if($goldPurchaseLimitInfo['reset_date'])
+                            <div class="small text-muted mt-1">
+                                @lang('Resets on:') {{ showDateTime($goldPurchaseLimitInfo['reset_date']) }}
+                            </div>
+                        @endif
+                    </div>
+                @endif
                 <form action="{{ route('user.goldcoin.purchase') }}" method="POST">
                     @csrf
                     <input type="hidden" name="coin_id" value="{{ $coin->id }}">

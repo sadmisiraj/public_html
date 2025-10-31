@@ -23,6 +23,19 @@
         <div class="col-12 mt-3">
             <div class="card">
                 <div class="card-body">
+                        @if(isset($goldPurchaseLimitInfo) && $goldPurchaseLimitInfo['enabled'])
+                            <div class="alert alert-info">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    <span>{{ $goldPurchaseLimitInfo['message'] }}</span>
+                                </div>
+                                @if($goldPurchaseLimitInfo['reset_date'])
+                                    <div class="small text-muted mt-1">
+                                        @lang('Resets on:') {{ showDateTime($goldPurchaseLimitInfo['reset_date']) }}
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     <div class="row g-4">
                         @forelse($coins as $coin)
                             <div class="col-lg-4 col-md-6">

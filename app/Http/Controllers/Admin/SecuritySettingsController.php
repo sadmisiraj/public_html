@@ -44,12 +44,16 @@ class SecuritySettingsController extends Controller
             'withdrawal_limit_type' => 'required_if:withdrawal_limit_enabled,1|in:daily,weekly,custom_days',
             'withdrawal_limit_count' => 'required_if:withdrawal_limit_enabled,1|integer|min:1|max:100',
             'withdrawal_limit_days' => 'required_if:withdrawal_limit_type,custom_days|integer|min:1|max:365',
+            'gold_purchase_limit_type' => 'required_if:gold_purchase_limit_enabled,1|in:daily,weekly,custom_days',
+            'gold_purchase_limit_count' => 'required_if:gold_purchase_limit_enabled,1|integer|min:1|max:100',
+            'gold_purchase_limit_days' => 'required_if:gold_purchase_limit_type,custom_days|integer|min:1|max:365',
         ]);
 
         $requirePayoutOtp = $request->has('require_payout_otp') ? 1 : 0;
         $requireMoneyTransferOtp = $request->has('require_money_transfer_otp') ? 1 : 0;
         $moneyTransferLimitEnabled = $request->has('money_transfer_limit_enabled') ? 1 : 0;
         $withdrawalLimitEnabled = $request->has('withdrawal_limit_enabled') ? 1 : 0;
+        $goldPurchaseLimitEnabled = $request->has('gold_purchase_limit_enabled') ? 1 : 0;
 
         try {
             $basic = basicControl();
@@ -66,6 +70,10 @@ class SecuritySettingsController extends Controller
                 'withdrawal_limit_type' => $request->withdrawal_limit_type ?? 'daily',
                 'withdrawal_limit_count' => $request->withdrawal_limit_count ?? 1,
                 'withdrawal_limit_days' => $request->withdrawal_limit_days ?? 1,
+                'gold_purchase_limit_enabled' => $goldPurchaseLimitEnabled,
+                'gold_purchase_limit_type' => $request->gold_purchase_limit_type ?? 'daily',
+                'gold_purchase_limit_count' => $request->gold_purchase_limit_count ?? 1,
+                'gold_purchase_limit_days' => $request->gold_purchase_limit_days ?? 1,
             ]);
 
             if (!$response) {

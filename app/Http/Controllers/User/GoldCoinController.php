@@ -22,8 +22,9 @@ class GoldCoinController extends Controller
         $pageTitle = 'Purchase Gold';
         $coins = GoldCoin::where('status', 1)->latest()->get();
         $basic = basicControl();
+        $goldPurchaseLimitInfo = getGoldPurchaseLimitInfo();
         
-        return view(template() . 'user.gold_coin.index', compact('pageTitle', 'coins', 'basic'));
+        return view(template() . 'user.gold_coin.index', compact('pageTitle', 'coins', 'basic', 'goldPurchaseLimitInfo'));
     }
     
     public function coinDetails($id)
@@ -33,12 +34,19 @@ class GoldCoinController extends Controller
         $user = Auth::user();
         $basic = basicControl();
         $purchaseCharges = PurchaseCharge::getActiveCharges();
+        $goldPurchaseLimitInfo = getGoldPurchaseLimitInfo();
         
-        return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic', 'purchaseCharges'));
+        return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic', 'purchaseCharges', 'goldPurchaseLimitInfo'));
     }
     
     public function purchaseGold(Request $request)
     {
+        // Check gold purchase limit prior to validation
+        $limitCheck = checkGoldPurchaseLimit();
+        if (!$limitCheck['allowed']) {
+            return back()->withInput()->with('error', $limitCheck['message']);
+        }
+
         $validator = Validator::make($request->all(), [
             'coin_id' => 'required|exists:gold_coins,id',
             'weight' => 'required|numeric|min:0.01',

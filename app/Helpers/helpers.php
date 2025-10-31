@@ -1465,6 +1465,20 @@ if (!function_exists('getWithdrawalLimitInfo')) {
     }
 }
 
+if (!function_exists('checkGoldPurchaseLimit')) {
+    function checkGoldPurchaseLimit($userId = null)
+    {
+        return \App\Helpers\GoldPurchaseLimitHelper::checkGoldPurchaseLimit($userId);
+    }
+}
+
+if (!function_exists('getGoldPurchaseLimitInfo')) {
+    function getGoldPurchaseLimitInfo($userId = null)
+    {
+        return \App\Helpers\GoldPurchaseLimitHelper::getLimitInfo($userId);
+    }
+}
+
 if (!function_exists('getPaginate')) {
     function getPaginate($limit = null)
     {
