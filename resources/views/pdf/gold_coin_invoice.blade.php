@@ -49,6 +49,21 @@
     </table>
     <table>
         <tr>
+            <th>Expected Delivery</th>
+            <td>
+                @php
+                    $days = $order->goldCoin->delivery_days ?? null;
+                @endphp
+                @if(!is_null($days) && (int)$days > 0)
+                    {{ $order->created_at->copy()->addDays((int)$days)->format('d-M-Y') }}
+                @else
+                    N/A
+                @endif
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
             <th>Sl No</th>
             <th>Description of Goods</th>
             <th>Quantity</th>

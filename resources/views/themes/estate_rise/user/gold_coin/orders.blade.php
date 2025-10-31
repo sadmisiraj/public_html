@@ -44,6 +44,7 @@
                                 <th>@lang('Total Price')</th>
                                 <th>@lang('Payment Source')</th>
                                 <th>@lang('Status')</th>
+                                <th>@lang('Expected Delivery')</th>
                                 <th>@lang('Date')</th>
                                 <th>@lang('Action')</th>
                             </tr>
@@ -69,6 +70,16 @@
                                             <span class="badge bg-danger">@lang('Cancelled')</span>
                                         @elseif($order->status == 'refunded')
                                             <span class="badge bg-secondary">@lang('Refunded')</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @php
+                                            $days = $order->goldCoin->delivery_days ?? null;
+                                        @endphp
+                                        @if(!is_null($days) && (int)$days > 0)
+                                            {{ showDateTime($order->created_at->copy()->addDays((int)$days), 'd M, Y') }}
+                                        @else
+                                            @lang('N/A')
                                         @endif
                                     </td>
                                     <td>{{ $order->created_at->format('d M, Y') }}</td>

@@ -14,6 +14,7 @@ class GoldCoin extends Model
         'karat',
         'price_per_gram',
         'description',
+        'delivery_days',
         'image',
         'image_driver',
         'status'
@@ -22,6 +23,7 @@ class GoldCoin extends Model
     protected $casts = [
         'price_per_gram' => 'decimal:8',
         'status' => 'boolean',
+        'delivery_days' => 'integer',
     ];
 
     public function orders()

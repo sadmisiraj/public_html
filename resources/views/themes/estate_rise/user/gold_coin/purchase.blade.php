@@ -31,6 +31,12 @@
                     <span>@lang('Price Per Gram'):</span>
                     <span class="fw-bold">{{ currencyPosition($coin->price_per_gram) }}</span>
                 </div>
+                @if(!is_null($coin->delivery_days) && (int)$coin->delivery_days > 0)
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>@lang('Expected Delivery'):</span>
+                        <span class="fw-bold">{{ showDateTime(\Carbon\Carbon::now()->addDays((int)$coin->delivery_days), 'd M, Y') }}</span>
+                    </div>
+                @endif
                 
                 @if($coin->description)
                     <div class="mb-3">

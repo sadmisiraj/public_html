@@ -67,6 +67,19 @@
                                         <td>@lang('Address'):</td>
                                         <td>{{ $order->address ?? '-' }}</td>
                                     </tr>
+                                    <tr>
+                                        <td>@lang('Expected Delivery'):</td>
+                                        <td>
+                                            @php
+                                                $days = $order->goldCoin->delivery_days ?? null;
+                                            @endphp
+                                            @if(!is_null($days) && (int)$days > 0)
+                                                {{ showDateTime($order->created_at->copy()->addDays((int)$days), 'd M, Y') }}
+                                            @else
+                                                @lang('N/A')
+                                            @endif
+                                        </td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>

@@ -37,6 +37,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
+                                        <label for="delivery_days">@lang('Estimated Delivery Time (days)')</label>
+                                        <input type="number" name="delivery_days" id="delivery_days" class="form-control" value="{{ old('delivery_days', $coin->delivery_days) }}" min="0" max="365" placeholder="e.g., 7">
+                                        <small class="text-muted">@lang('How many days it typically takes to deliver this coin')</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="status">@lang('Status') <span class="text-danger">*</span></label>
                                         <select name="status" id="status" class="form-control" required>
                                             <option value="1" {{ old('status', $coin->status) == 1 ? 'selected' : '' }}>@lang('Active')</option>

@@ -38,6 +38,7 @@ class GoldCoinController extends Controller
             'karat' => 'required|string|max:50',
             'price_per_gram' => 'required|numeric|min:0',
             'description' => 'nullable|string',
+            'delivery_days' => 'nullable|integer|min:0|max:365',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|boolean',
         ]);
@@ -51,6 +52,7 @@ class GoldCoinController extends Controller
         $coin->karat = $request->karat;
         $coin->price_per_gram = $request->price_per_gram;
         $coin->description = $request->description;
+        $coin->delivery_days = $request->delivery_days;
         $coin->status = $request->status;
 
         if ($request->hasFile('image')) {
@@ -83,6 +85,7 @@ class GoldCoinController extends Controller
             'karat' => 'required|string|max:50',
             'price_per_gram' => 'required|numeric|min:0',
             'description' => 'nullable|string',
+            'delivery_days' => 'nullable|integer|min:0|max:365',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|boolean',
         ]);
@@ -96,6 +99,7 @@ class GoldCoinController extends Controller
         $coin->karat = $request->karat;
         $coin->price_per_gram = $request->price_per_gram;
         $coin->description = $request->description;
+        $coin->delivery_days = $request->delivery_days;
         $coin->status = $request->status;
 
         if ($request->hasFile('image')) {
