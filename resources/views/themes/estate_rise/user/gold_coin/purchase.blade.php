@@ -131,6 +131,7 @@
                             @foreach(($agents ?? []) as $agent)
                                 <option value="{{ $agent->id }}" {{ old('agent_user_id') == $agent->id ? 'selected' : '' }}>
                                     {{ trim(($agent->firstname ?? '') . ' ' . ($agent->lastname ?? '')) }} ({{ $agent->username }})
+                                    @if(!empty($agent->city)) - {{ $agent->city }} @endif
                                 </option>
                             @endforeach
                         </select>

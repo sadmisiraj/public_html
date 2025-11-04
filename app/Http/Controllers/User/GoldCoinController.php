@@ -35,16 +35,12 @@ class GoldCoinController extends Controller
         $user = Auth::user();
         $basic = basicControl();
         $purchaseCharges = PurchaseCharge::getActiveCharges();
-        // Agents with stock for this coin
+        // Show all agents regardless of current stock; they can arrange within delivery time
         $agents = \App\Models\User::where('is_gold_agent', true)
-            ->whereIn('id', function ($q) use ($coin) {
-                $q->select('user_id')
-                  ->from((new GoldAgentInventory())->getTable())
-                  ->where('gold_coin_id', $coin->id)
-                  ->where('stock', '>', 0);
-            })
+            ->orderBy('firstname')
+            ->orderBy('lastname')
             ->orderBy('username')
-            ->get();
+            ->get(['id','firstname','lastname','username','city']);
         $goldPurchaseLimitInfo = getGoldPurchaseLimitInfo();
         
         return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic', 'purchaseCharges', 'goldPurchaseLimitInfo', 'agents'));
