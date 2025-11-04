@@ -20,6 +20,8 @@ class GoldCoinOrder extends Model
         'gst_amount',
         'total_price',
         'payment_source',
+        'agent_user_id',
+        'agent_delivered_at',
         'status',
         'admin_feedback',
         'trx_id',
@@ -34,6 +36,7 @@ class GoldCoinOrder extends Model
         'total_charges' => 'decimal:8',
         'gst_amount' => 'decimal:8',
         'total_price' => 'decimal:8',
+        'agent_delivered_at' => 'datetime',
     ];
 
     public function user()
@@ -44,6 +47,11 @@ class GoldCoinOrder extends Model
     public function goldCoin()
     {
         return $this->belongsTo(GoldCoin::class);
+    }
+
+    public function agentUser()
+    {
+        return $this->belongsTo(User::class, 'agent_user_id');
     }
 
     public function scopePending($query)

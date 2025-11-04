@@ -46,6 +46,7 @@ use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\SecuritySettingsController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Admin\GoldCoinController;
+use App\Http\Controllers\Admin\GoldAgentController;
 use App\Http\Controllers\Admin\UserBankDetailController;
 use App\Http\Controllers\Admin\PurchaseChargeController;
 use App\Http\Controllers\Admin\RgpTransactionController as AdminRgpTransactionController;
@@ -553,6 +554,16 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
             Route::get('/order/history', [GoldCoinController::class, 'orderHistory'])->name('order.history');
             Route::get('/order/history/export/csv', [GoldCoinController::class, 'exportOrderHistoryCSV'])->name('order.history.export.csv');
             Route::get('/order/history/export/pdf', [GoldCoinController::class, 'exportOrderHistoryPDF'])->name('order.history.export.pdf');
+        });
+
+        // Gold Pickup Agents
+        Route::prefix('gold-agents')->name('gold.agents.')->group(function () {
+            Route::get('/', [GoldAgentController::class, 'index'])->name('index');
+            Route::post('/toggle', [GoldAgentController::class, 'toggle'])->name('toggle');
+            Route::get('/{userId}/inventory', [GoldAgentController::class, 'inventory'])->name('inventory');
+            Route::post('/{userId}/inventory', [GoldAgentController::class, 'inventoryUpdate'])->name('inventory.update');
+            Route::get('/deliveries', [GoldAgentController::class, 'deliveries'])->name('deliveries');
+            Route::get('/{userId}/transactions', [GoldAgentController::class, 'transactions'])->name('transactions');
         });
 
     });

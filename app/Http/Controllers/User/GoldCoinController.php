@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\GoldCoin;
 use App\Models\GoldCoinOrder;
+use App\Models\GoldAgentInventory;
 use App\Models\PurchaseCharge;
 use App\Models\Transaction;
 use App\Models\InAppNotification;
@@ -34,9 +35,19 @@ class GoldCoinController extends Controller
         $user = Auth::user();
         $basic = basicControl();
         $purchaseCharges = PurchaseCharge::getActiveCharges();
+        // Agents with stock for this coin
+        $agents = \App\Models\User::where('is_gold_agent', true)
+            ->whereIn('id', function ($q) use ($coin) {
+                $q->select('user_id')
+                  ->from((new GoldAgentInventory())->getTable())
+                  ->where('gold_coin_id', $coin->id)
+                  ->where('stock', '>', 0);
+            })
+            ->orderBy('username')
+            ->get();
         $goldPurchaseLimitInfo = getGoldPurchaseLimitInfo();
         
-        return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic', 'purchaseCharges', 'goldPurchaseLimitInfo'));
+        return view(template() . 'user.gold_coin.purchase', compact('pageTitle', 'coin', 'user', 'basic', 'purchaseCharges', 'goldPurchaseLimitInfo', 'agents'));
     }
     
     public function purchaseGold(Request $request)
@@ -52,6 +63,7 @@ class GoldCoinController extends Controller
             'weight' => 'required|numeric|min:0.01',
             'payment_source' => 'required|in:deposit,profit,performance',
             'address' => 'required|string|max:255',
+            'agent_user_id' => 'required|exists:users,id',
         ]);
 
         if ($validator->fails()) {
@@ -60,6 +72,11 @@ class GoldCoinController extends Controller
 
         $user = Auth::user();
         $coin = GoldCoin::where('status', 1)->findOrFail($request->coin_id);
+        // Validate agent is eligible
+        $agent = \App\Models\User::where('id', $request->agent_user_id)->where('is_gold_agent', 1)->first();
+        if (!$agent) {
+            return back()->with('error', 'Invalid agent selected.')->withInput();
+        }
         
         $weight = $request->weight;
         $subtotal = $weight * $coin->price_per_gram;
@@ -124,6 +141,7 @@ class GoldCoinController extends Controller
         $order->gst_amount = $gstAmount; // Keep for backward compatibility
         $order->total_price = $totalPrice;
         $order->payment_source = $request->payment_source;
+        $order->agent_user_id = $agent->id;
         $order->status = 'pending';
         $order->trx_id = $trxId;
         $order->address = $request->address;

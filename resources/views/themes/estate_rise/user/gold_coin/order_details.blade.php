@@ -68,6 +68,27 @@
                                         <td>{{ $order->address ?? '-' }}</td>
                                     </tr>
                                     <tr>
+                                        <td>@lang('Gold Pickup Agent'):</td>
+                                        <td>
+                                            @if($order->agentUser)
+                                                {{ trim(($order->agentUser->firstname ?? '') . ' ' . ($order->agentUser->lastname ?? '')) }} ({{ $order->agentUser->username }})
+                                            @else
+                                                @lang('N/A')
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>@lang('Delivered By'):</td>
+                                        <td>
+                                            @if($order->agent_delivered_at && $order->agentUser)
+                                                {{ trim(($order->agentUser->firstname ?? '') . ' ' . ($order->agentUser->lastname ?? '')) }} ({{ $order->agentUser->username }})
+                                                <span class="text-muted">— {{ showDateTime($order->agent_delivered_at, 'd M, Y H:i') }}</span>
+                                            @else
+                                                @lang('Not delivered yet')
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>@lang('Expected Delivery'):</td>
                                         <td>
                                             @php

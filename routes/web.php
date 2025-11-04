@@ -142,6 +142,10 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::get('/goldcoin/orders/export/csv/{status?}', [GoldCoinController::class, 'exportOrdersCSV'])->name('goldcoin.orders.export.csv');
             Route::get('/goldcoin/orders/export/pdf/{status?}', [GoldCoinController::class, 'exportOrdersPDF'])->name('goldcoin.orders.export.pdf');
             
+            // Agent routes
+            Route::get('/agent', [\App\Http\Controllers\User\GoldAgentController::class, 'index'])->name('agent.index');
+            Route::post('/agent/order/{trx_id}/deliver', [\App\Http\Controllers\User\GoldAgentController::class, 'markDelivered'])->name('agent.order.deliver');
+            
             // referral bonus
             Route::get('/referral-bonus', [HomeController::class, 'referralBonus'])->name('referral.bonus');
             

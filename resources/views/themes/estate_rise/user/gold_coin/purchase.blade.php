@@ -123,6 +123,19 @@
                             <option value="performance" {{ old('payment_source') == 'performance' ? 'selected' : '' }}>@lang('Performance Balance') - {{ currencyPosition($user->profit_balance) }}</option>
                         </select>
                     </div>
+
+                    <div class="form-group mb-3">
+                        <label for="agent_user_id">@lang('Gold Pickup Agent') <span class="text-danger">*</span></label>
+                        <select name="agent_user_id" id="agent_user_id" class="form-control" required>
+                            <option value="">@lang('Select an agent')</option>
+                            @foreach(($agents ?? []) as $agent)
+                                <option value="{{ $agent->id }}" {{ old('agent_user_id') == $agent->id ? 'selected' : '' }}>
+                                    {{ trim(($agent->firstname ?? '') . ' ' . ($agent->lastname ?? '')) }} ({{ $agent->username }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">@lang('Select a nearby agent to pick up your coin faster.')</small>
+                    </div>
                     
                     <div class="form-group mb-3">
                         <label for="address">@lang('Delivery Address') <span class="text-danger">*</span></label>

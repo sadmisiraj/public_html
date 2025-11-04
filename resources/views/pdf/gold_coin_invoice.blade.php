@@ -60,6 +60,15 @@
                     N/A
                 @endif
             </td>
+            <th>Delivered By</th>
+            <td>
+                @if($order->agent_delivered_at && $order->agentUser)
+                    {{ trim(($order->agentUser->firstname ?? '') . ' ' . ($order->agentUser->lastname ?? '')) }} ({{ $order->agentUser->username }})
+                    on {{ $order->agent_delivered_at->format('d-M-Y H:i') }}
+                @else
+                    Not delivered yet
+                @endif
+            </td>
         </tr>
     </table>
     <table>

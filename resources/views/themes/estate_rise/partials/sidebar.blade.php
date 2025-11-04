@@ -142,6 +142,14 @@
                 <span>@lang('RGP Transactions')</span>
             </a>
         </li>
+        @if($user && $user->is_gold_agent)
+            <li class="nav-item">
+                <a class="nav-link collapsed {{menuActive(['user.agent.index'])}}" href="{{route('user.agent.index')}}">
+                    <i class="fa-regular fa-user-shield"></i>
+                    <span>@lang('Agent Dashboard')</span>
+                </a>
+            </li>
+        @endif
         <br>
         <br>
     </ul>

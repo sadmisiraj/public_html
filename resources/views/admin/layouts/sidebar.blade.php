@@ -106,6 +106,27 @@
                                        href="{{ route('admin.goldcoin.order.history') }}">@lang('Order History')</a>
                                 </div>
                             </div>
+
+                            <div class="nav-item">
+                                <a class="nav-link dropdown-toggle {{ menuActive(['admin.gold.agents.*'], 3) }}"
+                                   href="#navbarVerticalGoldAgentsMenu"
+                                   role="button"
+                                   data-bs-toggle="collapse"
+                                   data-bs-target="#navbarVerticalGoldAgentsMenu"
+                                   aria-expanded="false"
+                                   aria-controls="navbarVerticalGoldAgentsMenu">
+                                    <i class="fa-solid fa-user-shield nav-icon"></i>
+                                    <span class="nav-link-title">@lang('Gold Pickup Agents')</span>
+                                </a>
+                                <div id="navbarVerticalGoldAgentsMenu"
+                                     class="nav-collapse collapse {{ menuActive(['admin.gold.agents.*'], 2) }}"
+                                     data-bs-parent="#navbarVerticalGoldAgentsMenu">
+                                    <a class="nav-link {{ menuActive(['admin.gold.agents.index']) }}"
+                                       href="{{ route('admin.gold.agents.index') }}">@lang('Manage Agents')</a>
+                                    <a class="nav-link {{ menuActive(['admin.gold.agents.deliveries']) }}"
+                                       href="{{ route('admin.gold.agents.deliveries') }}">@lang('Delivered Orders')</a>
+                                </div>
+                            </div>
                         @endif
 
                         @if(adminAccessRoute(config('role.referral.access.view')))
