@@ -13,6 +13,7 @@ class GoldCoinOrder extends Model
         'user_id',
         'gold_coin_id',
         'weight_in_grams',
+        'coins_count',
         'price_per_gram',
         'subtotal',
         'purchase_charges',
@@ -30,6 +31,7 @@ class GoldCoinOrder extends Model
 
     protected $casts = [
         'weight_in_grams' => 'decimal:8',
+        'coins_count' => 'integer',
         'price_per_gram' => 'decimal:8',
         'subtotal' => 'decimal:8',
         'purchase_charges' => 'array',

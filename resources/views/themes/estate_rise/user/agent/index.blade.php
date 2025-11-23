@@ -60,6 +60,7 @@
                                 <th>@lang('Total')</th>
                                 <th>@lang('Buyer')</th>
                                 <th>@lang('Status')</th>
+                                <th>@lang('Expected Delivery')</th>
                                 <th>@lang('Order Date')</th>
                                 <th>@lang('Actions')</th>
                             </tr>
@@ -73,6 +74,14 @@
                                 <td>{{ currencyPosition($order->total_price) }}</td>
                                 <td>{{ trim(($order->user->firstname ?? '') . ' ' . ($order->user->lastname ?? '')) }} ({{ $order->user->username }})</td>
                                 <td>{{ ucfirst($order->status) }}</td>
+                                <td>
+                                    @php $dd = $order->goldCoin->delivery_days ?? null; @endphp
+                                    @if(!is_null($dd) && (int)$dd > 0)
+                                        {{ $order->created_at->copy()->addDays((int)$dd)->format('d M, Y') }}
+                                    @else
+                                        @lang('N/A')
+                                    @endif
+                                </td>
                                 <td>{{ $order->created_at->format('d M, Y') }}</td>
                                 <td>
                                     @if($order->status !== 'completed')

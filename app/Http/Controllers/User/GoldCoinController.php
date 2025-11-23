@@ -75,6 +75,7 @@ class GoldCoinController extends Controller
         }
         
         $weight = $request->weight;
+        $coinsCount = (int) ceil(max(0.01, (float)$weight));
         $subtotal = $weight * $coin->price_per_gram;
         
         // Calculate purchase charges using configurable charges
@@ -130,6 +131,7 @@ class GoldCoinController extends Controller
         $order->user_id = $user->id;
         $order->gold_coin_id = $coin->id;
         $order->weight_in_grams = $weight;
+        $order->coins_count = $coinsCount;
         $order->price_per_gram = $coin->price_per_gram;
         $order->subtotal = $subtotal;
         $order->purchase_charges = $chargesBreakdown;

@@ -98,6 +98,18 @@ class GoldAgentController extends Controller
         return view('admin.gold_agents.deliveries', compact('pageTitle', 'orders'));
     }
 
+    public function pending()
+    {
+        $pageTitle = 'Pending Gold Orders by Agents';
+        $orders = GoldCoinOrder::with(['user', 'goldCoin', 'agentUser'])
+            ->whereNull('agent_delivered_at')
+            ->whereNotNull('agent_user_id')
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.gold_agents.pending', compact('pageTitle', 'orders'));
+    }
+
     public function transactions(Request $request, $userId)
     {
         $pageTitle = 'Agent Coin Transactions';

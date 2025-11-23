@@ -562,6 +562,7 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
             Route::post('/toggle', [GoldAgentController::class, 'toggle'])->name('toggle');
             Route::get('/{userId}/inventory', [GoldAgentController::class, 'inventory'])->name('inventory');
             Route::post('/{userId}/inventory', [GoldAgentController::class, 'inventoryUpdate'])->name('inventory.update');
+            Route::get('/pending', [GoldAgentController::class, 'pending'])->name('pending');
             Route::get('/deliveries', [GoldAgentController::class, 'deliveries'])->name('deliveries');
             Route::get('/{userId}/transactions', [GoldAgentController::class, 'transactions'])->name('transactions');
         });

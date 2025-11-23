@@ -43,7 +43,7 @@ class GoldAgentController extends Controller
             ->where('agent_user_id', $user->id)
             ->firstOrFail();
 
-        // Mark delivered and decrement inventory by 1 (per order)
+        // Mark delivered and decrement inventory by coins_count (per order)
         $order->agent_delivered_at = now();
         $order->status = 'completed';
         $order->save();
@@ -51,8 +51,9 @@ class GoldAgentController extends Controller
         $inv = GoldAgentInventory::where('user_id', $user->id)
             ->where('gold_coin_id', $order->gold_coin_id)
             ->first();
+        $decrement = max(1, (int)($order->coins_count ?? 1));
         if ($inv && $inv->stock > 0) {
-            $inv->stock = max(0, $inv->stock - 1);
+            $inv->stock = max(0, $inv->stock - $decrement);
             $inv->save();
         }
 
@@ -60,7 +61,7 @@ class GoldAgentController extends Controller
             'user_id' => $user->id,
             'gold_coin_id' => $order->gold_coin_id,
             'change_type' => 'agent_deliver',
-            'quantity_change' => -1,
+            'quantity_change' => -$decrement,
             'reference' => $order->trx_id,
             'meta' => [
                 'order_id' => $order->id,
