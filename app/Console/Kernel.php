@@ -18,7 +18,8 @@ class Kernel extends ConsoleKernel
         PayoutCryptoCurrencyUpdateCron::class,
         DistributeProfit::class,
         RecalculateRgpPoints::class,
-        Commands\UpdateKycStatus::class
+        Commands\UpdateKycStatus::class,
+        Commands\CheckSubscriptionExpiration::class
     ];
 
     /**
@@ -36,6 +37,8 @@ class Kernel extends ConsoleKernel
             $schedule->command('payout-crypto-currency-update-cron')->{basicControl()->coin_market_cap_auto_update_at}();
         }
         $schedule->command('model:prune')->days(1);
+        // Check subscription expiration daily
+        $schedule->command('subscription:check-expiration')->daily();
     }
 
     /**

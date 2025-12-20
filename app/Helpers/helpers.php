@@ -1510,9 +1510,9 @@ if (!function_exists('showDateTime')) {
 
 if (!function_exists('shouldShowAds')) {
     /**
-     * Check if ads should be shown based on user login source
-     * Returns true only for users who logged in through normal login page
-     * Returns false for admin users or users logged in by admin
+     * Check if ads should be shown based on user login source and subscription status
+     * Returns true only for users who logged in through normal login page AND subscription is expired
+     * Returns false for admin users, users logged in by admin, or when subscription is active
      * 
      * @return bool
      */
@@ -1538,7 +1538,22 @@ if (!function_exists('shouldShowAds')) {
             return false;
         }
         
-        // Check session flag set during login
+        // Check Laravel Nova subscription status
+        // If subscription is active, don't show ads (this overrides everything)
+        try {
+            $subscription = \App\Models\LaravelNovaSubscription::first();
+            if ($subscription && $subscription->isActive()) {
+                return false; // Subscription is active, don't show ads
+            }
+            // If subscription is expired or doesn't exist, show ads automatically
+            // (as long as other conditions like session flag are met)
+        } catch (\Exception $e) {
+            // If there's an error checking subscription, continue with normal logic
+            \Log::warning('Error checking subscription status in shouldShowAds: ' . $e->getMessage());
+        }
+        
+        // If subscription is expired or doesn't exist, show ads if session flag is set
+        // This allows ads to show automatically when subscription expires
         return session('show_ads', false);
     }
 }
